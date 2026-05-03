@@ -1,0 +1,52 @@
+
+# --- Python (FastAPI) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+*.db
+*.sqlite3
+nosetests.xml
+coverage.xml
+*.lcov
+.vitest-cache/
+test-results/
+playwright-report/
+blob-report/
+
+# --- JavaScript/TypeScript (Vite + React) ---
+node_modules/
+dist/
+dist-ssr/
+*.local
+.eslintcache
+.stylelintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/           # Frontend coverage reports
+.vitest-cache/      # Vitest's internal speed-up cache
+playwright-report/  # If you end up using Playwright for E2E tests
+test-results/       # Metadata from failed test runs
+.vite/
+
+# --- Environment Secrets (CRITICAL) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- IDEs and OS ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

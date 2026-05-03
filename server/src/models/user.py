@@ -1,0 +1,70 @@
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import relationship
+from datetime import datetime
+ 
+from src.database import Base
+import enum
+ 
+ 
+# Role Enum
+class UserRole(str, enum.Enum):
+    SUPER_ADMIN = "super_admin"
+    ADMIN = "admin"
+    ALUMNI = "alumni"
+    STUDENT = "student"
+ 
+ 
+class User(Base):
+    __tablename__ = "users"
+ 
+    # Primary Key
+    id = Column(Integer, primary_key=True, index=True)
+ 
+    # Basic Info
+    username = Column(String, nullable=False, index=True)
+    email = Column(String, nullable=False, index=True)
+ 
+    # Auth
+    password_hash = Column(String, nullable=False)
+    activation_token_hash = Column(String, nullable=True, unique=True, index=True)
+    activation_token_expires_at = Column(DateTime, nullable=True)
+ 
+    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=False)
+ 
+    # Role
+    role = Column(Enum(UserRole), default=UserRole.STUDENT)
+ 
+    # Status
+    is_active = Column(Boolean, default=True)
+ 
+    # Timestamp
+    created_at = Column(DateTime, default=datetime.utcnow)
+ 
+    # Relationships
+    college = relationship("College", back_populates="users")
+    profile = relationship("Profile", back_populates="user", uselist=False)
+    posts = relationship("Post", back_populates="user", cascade="all, delete")
+    
+    messages = relationship(
+        "Message",
+        foreign_keys="Message.sender_id",
+        back_populates="sender",
+    )
+    sent_connections = relationship(
+        "Connection",
+        foreign_keys="Connection.sender_id",
+        back_populates="sender",
+        cascade="all, delete",
+    )
+    received_connections = relationship(
+        "Connection",
+        foreign_keys="Connection.receiver_id",
+        back_populates="receiver",
+        cascade="all, delete",
+    )
+ 
+
+    __table_args__ = (
+        UniqueConstraint('email', 'college_id', name='unique_email_college'),
+        UniqueConstraint('username', 'college_id', name='unique_username_college'),
+    )
