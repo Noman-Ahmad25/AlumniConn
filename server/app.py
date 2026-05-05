@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-
+import os
 
 from src.database.base import Base
 from src.database.session import engine, SessionLocal
@@ -63,7 +63,6 @@ app.add_middleware(
 )
 
 
-Base.metadata.create_all(bind=engine)
 app.include_router(college_router, prefix="/colleges", tags=["Colleges"])
 app.include_router(college_request_router, prefix="/college-requests", tags=["College Requests"])
 app.include_router(alumni_request_router, prefix="/alumni-requests", tags=["Alumni Requests"])

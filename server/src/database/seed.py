@@ -8,9 +8,12 @@ import os
 
 def seed_super_admin(db: Session):
     # Retrieve data from environment variables
-    email = os.getenv("SUPER_ADMIN_EMAIL", "noman@gmail.com")
-    username = os.getenv("SUPER_ADMIN_USERNAME", "noman")
-    password = os.getenv("SUPER_ADMIN_PASSWORD", "noman123")
+    email = os.getenv("SUPER_ADMIN_EMAIL")
+    username = os.getenv("SUPER_ADMIN_USERNAME")
+    password = os.getenv("SUPER_ADMIN_PASSWORD")
+
+    if not password:
+        raise ValueError("SUPER_ADMIN_PASSWORD environment variable is required!")
 
     # Check if exists to prevent duplicates
     try:

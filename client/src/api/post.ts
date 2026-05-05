@@ -11,13 +11,30 @@ export const getUserPosts = async (userId: number): Promise<Post[]> => {
     return response.data;
 }
 
-export const createPost = async ( data: {
-    content?: string
-    image_url?: string
-    is_opportunity: boolean
+// UPDATED: Now accepts a File object and uses FormData
+export const createPost = async (data: {
+    content?: string;
+    is_opportunity: boolean;
+    image_file?: File | null; // Added file support
 }): Promise<Post> => {
-    const response = await API.post("/posts/", data)
-    return response.data
+    const formData = new FormData();
+
+    if (data.content) {
+        formData.append("content", data.content);
+    }
+    
+    formData.append("is_opportunity", String(data.is_opportunity));
+
+    if (data.image_file) {
+        formData.append("file", data.image_file); // Must match the backend key 'file'
+    }
+
+    const response = await API.post("/posts/", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return response.data;
 }
 
 export const toggleLike = async (postId: number) => {
