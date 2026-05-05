@@ -61,3 +61,10 @@ migrations/
 # Alembic configuration and versions
 alembic.ini
 alembic/versions/
+
+
+# Ignore all files in the static folder and its subfolders
+server/static/**/*
+
+# Except for .gitkeep files so the folders stay in Git
+!server/static/**/.gitkeep
