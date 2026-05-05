@@ -50,3 +50,14 @@ test-results/       # Metadata from failed test runs
 *.swo
 .DS_Store
 Thumbs.db
+
+# Ignore all Markdown files
+*.md
+
+# Ignore anything in a 'docs' or 'migrations' folder
+docs
+migrations/
+
+# Alembic configuration and versions
+alembic.ini
+alembic/versions/

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { loginUser } from "../api/auth"
 import { getColleges, type College } from "../api/college"
 import { getApiErrorMessage } from "../utils/error"
-import { getCurrentUserRoleFromToken, getRoleHomePath, notifyAuthChanged } from "../utils/auth"
+import { getCurrentUserRoleFromToken, getRoleHomePath, setAuthToken } from "../utils/auth"
 
 interface LoginForm {
   email: string
@@ -54,11 +54,16 @@ export default function Login() {
               ...form,
               college_id: Number(form.college_id),
             });
-            localStorage.setItem("access_token", response.access_token);
-            notifyAuthChanged();
+            setAuthToken(response.access_token);
             navigate(getRoleHomePath(getCurrentUserRoleFromToken()));
         } catch (error: unknown) {
-            setError(getApiErrorMessage(error, "Invalid email or password"));
+            const message = getApiErrorMessage(error, "Invalid email or password");
+            // Handle specific college approval error
+            if (message === "College not approved") {
+                setError("Your college is pending approval. Please try again later.");
+            } else {
+                setError(message);
+            }
         } finally {
             setLoading(false);
         }

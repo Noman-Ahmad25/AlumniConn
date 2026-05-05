@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 import os
-import secrets
 import re
 
 from sqlalchemy.orm import Session
@@ -10,7 +9,6 @@ from src.models.college import College
 from src.models.user import User, UserRole
 from src.models.profile import Profile
 from src.schemas.request import CollegeRequestCreate
-from src.services.email_service import send_admin_credentials_email, send_college_rejection_email
 from src.utils.security import hash_password
 
 
@@ -21,9 +19,12 @@ def create_college_request(
     """
     Create a new college request.
     
+    Creates a User record (is_active=False) immediately with the provided password.
+    Links the CollegeRequest to this user via requested_by.
+    
     Args:
         db: Database session
-        college_data: Public college and admin details
+        college_data: Public college and admin details (including admin_password)
     
     Returns:
         CollegeRequest object
@@ -54,6 +55,26 @@ def create_college_request(
     if existing_request:
         raise ValueError("This college or admin already has a pending request.")
     
+    # Create the admin user with is_active=False
+    admin_user = User(
+        username=_username_from_admin_name(college_data.admin_name),
+        email=admin_email,
+        password_hash=hash_password(college_data.admin_password),
+        role=UserRole.ADMIN,
+        is_active=False  # Not active until college is approved
+    )
+    db.add(admin_user)
+    db.flush()  # Get the user ID
+    
+    # Create profile for the user
+    profile = Profile(
+        user_id=admin_user.id,
+        full_name=college_data.admin_name,
+    )
+    db.add(profile)
+    db.flush()
+    
+    # Create the college request linked to this user
     db_request = CollegeRequest(
         name=college_data.name,
         domain=domain,
@@ -62,6 +83,7 @@ def create_college_request(
         description=college_data.description,
         admin_name=college_data.admin_name,
         admin_email=admin_email,
+        requested_by=admin_user.id,  # Link to the created user
         status=CollegeRequestStatus.PENDING
     )
     db.add(db_request)
@@ -109,14 +131,15 @@ def approve_college_request(
     reviewer_id: int
 ) -> CollegeRequest:
     """
-    Approve a college request and create the college + assign admin.
+    Approve a college request and create the college.
     
-    Creates an ACTIVE admin account that can login immediately.
+    Activates the existing admin user and links them to the new college.
+    College is marked as APPROVED and admin can login immediately.
     
     SECURITY:
     - Only SUPER_ADMIN can call this
-    - User cannot approve their own request
     - Request must be PENDING
+    - User must exist (created during request)
     
     Args:
         db: Database session
@@ -137,44 +160,40 @@ def approve_college_request(
     if college_req.status != CollegeRequestStatus.PENDING:
         raise ValueError(f"Cannot approve request with status '{college_req.status}'.")
     
+    # Get the admin user who requested this college
+    if not college_req.requested_by:
+        raise ValueError("Request does not have an associated user.")
+    
+    admin_user = db.query(User).filter(User.id == college_req.requested_by).first()
+    if not admin_user:
+        raise ValueError("Requested admin user not found.")
+    
     existing_college = db.query(College).filter(
         func.lower(College.domain) == college_req.domain.lower()
     ).first()
     if existing_college:
         raise ValueError("Domain already in use by an existing college.")
 
-    # Generate temporary password for admin
-    temporary_password = secrets.token_urlsafe(16)
-
-    # Create the college
+    # Create the college with is_approved=True
     new_college = College(
         name=college_req.name,
         domain=college_req.domain,
         location=college_req.location,
         established_year=college_req.established_year,
-        description=college_req.description
+        description=college_req.description,
+        is_approved=True  # College is approved and can accept users
     )
     db.add(new_college)
     db.flush()  # Flush to get the college ID
-
-    # Create admin account as ACTIVE (no activation token needed)
-    admin_user = User(
-        username=_username_from_admin_name(college_req.admin_name),
-        email=college_req.admin_email,
-        password_hash=hash_password(temporary_password),
-        college_id=new_college.id,
-        role=UserRole.ADMIN,
-        is_active=True,  # Created as ACTIVE immediately
-        activation_token_hash=None,
-        activation_token_expires_at=None,
-    )
-    db.add(admin_user)
-    db.flush()
-    db.add(Profile(
-        user_id=admin_user.id,
-        college_id=new_college.id,
-        full_name=college_req.admin_name,
-    ))
+    
+    # Activate the existing admin user and link to college
+    admin_user.is_active = True
+    admin_user.college_id = new_college.id
+    
+    # Update the user's profile with college_id
+    profile = db.query(Profile).filter(Profile.user_id == admin_user.id).first()
+    if profile:
+        profile.college_id = new_college.id
     
     # Update request
     college_req.status = CollegeRequestStatus.APPROVED
@@ -185,16 +204,8 @@ def approve_college_request(
     db.commit()
     db.refresh(college_req)
 
-    # Send email with credentials
-    try:
-        send_admin_credentials_email(
-            admin_user.email, 
-            new_college.name, 
-            admin_user.email,
-            temporary_password
-        )
-    except Exception as exc:
-        print(f"Failed to send admin credentials email for user {admin_user.id}: {exc}")
+    # Log approval
+    print(f"[COLLEGE_APPROVED] College: {new_college.name}, Admin Email: {admin_user.email}")
 
     return college_req
 
@@ -210,7 +221,6 @@ def reject_college_request(
     
     SECURITY:
     - Only SUPER_ADMIN can call this
-    - User cannot reject their own request
     - Request must be PENDING
     
     Args:
@@ -241,10 +251,8 @@ def reject_college_request(
     db.commit()
     db.refresh(college_req)
     
-    try:
-        send_college_rejection_email(college_req.admin_email, college_req.name, rejection_reason)
-    except Exception as exc:
-        print(f"Failed to send college rejection email to {college_req.admin_email}: {exc}")
+    # Log rejection (no email sending)
+    print(f"[COLLEGE_REJECTED] College request ID: {request_id}, Reason: {rejection_reason}")
     
     return college_req
 

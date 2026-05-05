@@ -7,7 +7,12 @@ export function getAuthToken() {
 }
 
 export function hasAuthToken() {
-  return Boolean(getAuthToken())
+  return getTokenPayload() !== null
+}
+
+export function setAuthToken(token: string) {
+  localStorage.setItem("access_token", token)
+  notifyAuthChanged()
 }
 
 export function notifyAuthChanged() {
@@ -24,14 +29,17 @@ export function getTokenPayload(): AuthTokenPayload | null {
   if (
     decoded &&
     typeof decoded.user_id === "number" &&
-    typeof decoded.college_id === "number" &&
+    (typeof decoded.college_id === "number" || decoded.college_id === null) &&
     isUserRole(decoded.role)
   ) {
+    const exp = typeof decoded.exp === "number" ? decoded.exp : undefined
+    if (exp && exp <= Math.floor(Date.now() / 1000)) return null
+
     return {
       user_id: decoded.user_id,
       college_id: decoded.college_id,
       role: decoded.role,
-      exp: typeof decoded.exp === "number" ? decoded.exp : undefined,
+      exp,
     }
   }
 
@@ -44,8 +52,7 @@ export function getCurrentUserIdFromToken() {
 }
 
 export function getCurrentUserRoleFromToken() {
-  const decoded = decodeTokenPayload()
-  return isUserRole(decoded?.role) ? decoded.role : null
+  return getTokenPayload()?.role ?? null
 }
 
 export function hasRole(roles: UserRole[]) {

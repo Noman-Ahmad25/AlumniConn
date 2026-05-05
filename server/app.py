@@ -1,11 +1,14 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 from src.database.base import Base
-from src.database.session import engine
-
+from src.database.session import engine, SessionLocal
+from src.database.seed import seed_super_admin 
 from src.models.user import User
+
 from src.models.profile import Profile
 from src.models.connection import Connection
 from src.models.message import Message
@@ -29,7 +32,20 @@ from src.routes.comment import router as comment_router
 from src.routes.user import router as user_router
 
 
-app = FastAPI(title="AlumniConn API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # This block runs on startup
+    db = SessionLocal()
+    try:
+        seed_super_admin(db)
+    finally:
+        db.close()
+    yield
+    # Any cleanup code (shutdown) goes here
+
+# 3. Update the FastAPI initialization
+app = FastAPI(title="AlumniConn API", lifespan=lifespan)
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,7 +56,7 @@ app.add_middleware(
     allow_credentials=True,
 )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 Base.metadata.create_all(bind=engine)
 app.include_router(college_router, prefix="/colleges", tags=["Colleges"])

@@ -3,15 +3,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from src.services.auth_service import (
-    activate_user,
     login_super_admin,
     login_user,
     register_user,
-    verify_activation_token,
 )
 from src.schemas.user import (
-    ActivationRequest,
-    ActivationVerifyResponse,
     SuperAdminLogin,
     TokenResponse,
     UserCreate,
@@ -41,6 +37,8 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
     """Main login endpoint — accepts JSON with email, password, college_id."""
     token = login_user(db, user_credentials)
+    if token == "college_not_approved":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="College not approved")
     if token == "inactive":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is inactive")
     if token == "super_admin_login_required":
@@ -60,26 +58,6 @@ def super_admin_login(user_credentials: SuperAdminLogin, db: Session = Depends(g
     return {"access_token": token, "token_type": "bearer"}
 
 
-@router.get("/activate/verify", response_model=ActivationVerifyResponse)
-def verify_activation(token: str, db: Session = Depends(get_db)):
-    result = verify_activation_token(db, token)
-    if result == "expired":
-        return {"valid": False, "detail": "Activation link has expired"}
-    if result != "valid":
-        return {"valid": False, "detail": "Activation link is invalid"}
-    return {"valid": True, "detail": "Activation link is valid"}
-
-
-@router.post("/activate", response_model=UserResponse)
-def activate_account(payload: ActivationRequest, db: Session = Depends(get_db)):
-    result = activate_user(db, payload)
-    if result == "expired":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Activation link has expired")
-    if result == "invalid":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Activation link is invalid")
-    return result
-
-
 @router.post("/token", response_model=TokenResponse, include_in_schema=False)
 def token_for_swagger(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """
@@ -96,6 +74,8 @@ def token_for_swagger(user: OAuth2PasswordRequestForm = Depends(), db: Session =
 
     user_credentials = UserLogin(email=user.username, password=user.password, college_id=college_id)
     token = login_user(db, user_credentials)
+    if token == "college_not_approved":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="College not approved")
     if token == "inactive":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is inactive")
     if token == "super_admin_login_required":

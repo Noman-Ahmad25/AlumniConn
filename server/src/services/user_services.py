@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError  # FIX: was used but never imported
 from ..models.user import User, UserRole
 from ..schemas.user import UserCreate
-from ..core.security import create_access_token, hash_password, verify_password
+from ..utils.security import create_access_token, hash_password, verify_password
 
 
 def register_user(db: Session, user_data: UserCreate):

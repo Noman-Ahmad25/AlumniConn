@@ -2,7 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { loginSuperAdmin } from "../api/auth"
 import { getApiErrorMessage } from "../utils/error"
-import { notifyAuthChanged } from "../utils/auth"
+import { setAuthToken } from "../utils/auth"
 
 interface SuperAdminLoginForm {
   email: string
@@ -32,8 +32,7 @@ export default function SuperAdminLogin() {
 
     try {
       const response = await loginSuperAdmin(form)
-      localStorage.setItem("access_token", response.access_token)
-      notifyAuthChanged()
+      setAuthToken(response.access_token)
       navigate("/super-admin/college-requests")
     } catch (err: unknown) {
       setError(getApiErrorMessage(err, "Invalid super admin credentials"))

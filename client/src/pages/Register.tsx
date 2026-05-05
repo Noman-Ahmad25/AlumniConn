@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { loginUser, registerUser } from '../api/auth'
 import { getColleges, type College } from '../api/college'
 import { getApiErrorMessage } from '../utils/error'
-import { notifyAuthChanged } from '../utils/auth'
+import { setAuthToken } from '../utils/auth'
 
 interface RegisterForm {
     username: string
@@ -53,7 +53,8 @@ export default function Register(){
         try {
             const payload = {
                 ...form,
-                college_id: Number(form.college_id)
+                college_id: Number(form.college_id),
+                role: "student" as const
             }
 
             await registerUser(payload)
@@ -63,8 +64,7 @@ export default function Register(){
                 college_id: Number(form.college_id)
             })
 
-            localStorage.setItem('access_token', response.access_token)
-            notifyAuthChanged()
+            setAuthToken(response.access_token)
             navigate('/create-profile')
         }
         catch (error: unknown) {

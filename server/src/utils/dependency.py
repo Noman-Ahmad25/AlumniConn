@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 
 from src.database.session import get_db
 from src.utils.security import decode_access_token
-from src.models.user import User
+from src.models.user import User, UserRole
 from src.models.post import Post
 from src.models.profile import Profile
 from src.models.like import Like
@@ -15,21 +15,39 @@ from src.models.connection import Connection, ConnectionStatus
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
+
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     payload = decode_access_token(token)
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid token")
+
     user_id = payload.get("user_id")
     college_id = payload.get("college_id")
-    if not user_id or not college_id:
+    role_claim = payload.get("role")
+
+    if user_id is None or role_claim is None:
         raise HTTPException(status_code=401, detail="Invalid token")
-    user = db.query(User).options(joinedload(User.profile)).filter(
-        User.id == user_id,
-        User.college_id == college_id,
-    ).first()
+
+    try:
+        token_role = UserRole(role_claim)
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    query = db.query(User).options(joinedload(User.profile)).filter(User.id == user_id)
+    if token_role == UserRole.SUPER_ADMIN:
+        query = query.filter(User.role == UserRole.SUPER_ADMIN)
+    else:
+        if college_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        query = query.filter(User.college_id == college_id)
+
+    user = query.first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Account is inactive")
     return user
+
 
 def get_connection_status(db: Session, user1_id: int, user2_id: int) -> str:
     """Get connection status between two users. Returns: 'self' | 'none' | 'pending' | 'connected'"""
@@ -52,6 +70,7 @@ def get_connection_status(db: Session, user1_id: int, user2_id: int) -> str:
         return "pending"
     else:  # REJECTED
         return "none"
+
 
 def format_post(db: Session, post: Post, current_user: User):
     user = db.query(User).filter(User.id == post.user_id).first()
@@ -89,6 +108,7 @@ def format_post(db: Session, post: Post, current_user: User):
         "connection_status": connection_status
     }
 
+
 def format_posts_bulk(rows, like_counts, comment_counts, liked_posts, current_user_id: int, db: Session):
     result = []
 
@@ -110,6 +130,7 @@ def format_posts_bulk(rows, like_counts, comment_counts, liked_posts, current_us
         })
 
     return result
+
 
 def format_connection(conn, current_user):
     other_user = (

@@ -6,7 +6,7 @@ export default function RequestCollege() {
       <main className="app-main-wide space-y-6">
         <div className="page-heading">
           <h1 className="page-title">College Onboarding</h1>
-          <p className="page-subtitle">Submit a college and its first admin for super admin review.</p>
+          <p className="page-subtitle">Request to add your college and create an admin account. Approval from SUPER_ADMIN required.</p>
         </div>
 
         <RequestCollegeForm />

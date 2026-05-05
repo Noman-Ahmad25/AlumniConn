@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum, ForeignKey, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 from datetime import datetime
  
@@ -29,10 +38,19 @@ class User(Base):
     activation_token_hash = Column(String, nullable=True, unique=True, index=True)
     activation_token_expires_at = Column(DateTime, nullable=True)
  
-    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=False)
+    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=True)
  
     # Role
-    role = Column(Enum(UserRole), default=UserRole.STUDENT)
+    role = Column(
+        Enum(
+            UserRole,
+            name="userrole",
+            native_enum=True,
+            validate_strings=True,
+        ),
+        default=UserRole.STUDENT,
+        nullable=False,
+    )
  
     # Status
     is_active = Column(Boolean, default=True)

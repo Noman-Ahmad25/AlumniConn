@@ -61,6 +61,7 @@ def colleges(db_session: Session) -> dict[str, College]:
         established_year=2001,
         domain="test.edu",
         description="Primary test tenant",
+        is_approved=True,
     )
     college_two = College(
         name="Other College",
@@ -68,6 +69,7 @@ def colleges(db_session: Session) -> dict[str, College]:
         established_year=2002,
         domain="other.edu",
         description="Secondary test tenant",
+        is_approved=True,
     )
     db_session.add_all([college_one, college_two])
     db_session.commit()

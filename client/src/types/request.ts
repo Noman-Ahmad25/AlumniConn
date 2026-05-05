@@ -8,6 +8,7 @@ export interface CollegeRequestCreate {
   description?: string
   adminName: string
   adminEmail: string
+  adminPassword: string
 }
 
 export interface CollegeRequest {

@@ -14,5 +14,6 @@ class CollegeResponse(BaseModel):
     established_year: int | None = None
     domain: str
     description: str | None = None
+    is_approved: bool
 
     model_config = ConfigDict(from_attributes=True)

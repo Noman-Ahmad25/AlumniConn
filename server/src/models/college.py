@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from src.database import Base
@@ -12,6 +12,7 @@ class College(Base):
     established_year = Column(Integer, nullable=True)
     description = Column(String, nullable=True)
     domain = Column(String, unique=True, index=True, nullable=False)
+    is_approved = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
  
     # Relationships

@@ -19,6 +19,8 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
     description: "",
     adminName: "",
     adminEmail: "",
+    adminPassword: "",
+    adminPasswordConfirm: "",
   })
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -31,9 +33,21 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setError("")
     setSuccess(false)
+
+    // Validate passwords
+    if (formData.adminPassword.length < 8) {
+      setError("Admin password must be at least 8 characters")
+      return
+    }
+
+    if (formData.adminPassword !== formData.adminPasswordConfirm) {
+      setError("Admin passwords do not match")
+      return
+    }
+
+    setLoading(true)
 
     try {
       await collegeRequestsAPI.requestCollege({
@@ -44,6 +58,7 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
         description: formData.description.trim() || undefined,
         adminName: formData.adminName.trim(),
         adminEmail: formData.adminEmail.trim(),
+        adminPassword: formData.adminPassword,
       })
 
       setSuccess(true)
@@ -55,6 +70,8 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
         description: "",
         adminName: "",
         adminEmail: "",
+        adminPassword: "",
+        adminPasswordConfirm: "",
       })
 
       onSuccess?.()
@@ -79,7 +96,8 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
 
       {success && (
         <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-          College request submitted successfully! Awaiting SUPER_ADMIN approval.
+          <p className="font-semibold">College request submitted successfully!</p>
+          <p className="text-sm mt-1">Awaiting SUPER_ADMIN approval. Once approved, the college and admin account will be activated immediately.</p>
         </div>
       )}
 
@@ -178,6 +196,37 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
         </div>
 
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Admin Password *
+          </label>
+          <input
+            type="password"
+            name="adminPassword"
+            value={formData.adminPassword}
+            onChange={handleChange}
+            required
+            className="form-field"
+            placeholder="At least 8 characters"
+          />
+          <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Confirm Password *
+          </label>
+          <input
+            type="password"
+            name="adminPasswordConfirm"
+            value={formData.adminPasswordConfirm}
+            onChange={handleChange}
+            required
+            className="form-field"
+            placeholder="Re-enter password"
+          />
+        </div>
+
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <textarea
             name="description"
@@ -199,11 +248,13 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
       </form>
 
       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
-        <p className="font-semibold mb-1">Note:</p>
+        <p className="font-semibold mb-1">What happens next:</p>
         <ul className="list-disc list-inside space-y-1">
-          <li>A SUPER_ADMIN will review the college request</li>
-          <li>If approved, an inactive ADMIN account is created for the admin email</li>
-          <li>The admin sets their password through a one-time activation link</li>
+          <li>A SUPER_ADMIN will review your college request</li>
+          <li>If approved, the college is activated immediately</li>
+          <li>The admin account is created with the password you provided</li>
+          <li>Admin can login right away using the email and password</li>
+          <li>Recommend changing the password after first login for security</li>
         </ul>
       </div>
     </div>

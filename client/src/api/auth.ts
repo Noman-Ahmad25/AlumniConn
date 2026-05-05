@@ -1,8 +1,6 @@
 import { API } from "./index";
 import { notifyAuthChanged } from "../utils/auth";
 import type {
-    ActivationPayload,
-    ActivationVerifyResponse,
     RegisterPayload,
     SuperAdminLoginPayload,
     TokenResponse,
@@ -24,12 +22,12 @@ export const registerUser = async (data: RegisterPayload): Promise<UserResponse>
     return response.data;
 }
 
-export const verifyActivationToken = async (token: string): Promise<ActivationVerifyResponse> => {
+export const verifyActivationToken = async (token: string): Promise<{ valid: boolean; detail: string }> => {
     const response = await API.get('/auth/activate/verify', { params: { token } });
     return response.data;
 }
 
-export const activateAccount = async (data: ActivationPayload): Promise<UserResponse> => {
+export const activateAccount = async (data: { token: string; password: string }): Promise<UserResponse> => {
     const response = await API.post('/auth/activate', data);
     return response.data;
 }

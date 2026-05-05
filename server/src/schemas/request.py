@@ -12,6 +12,7 @@ class CollegeRequestCreate(BaseModel):
     description: Optional[str] = None
     admin_name: str = Field(alias="adminName")
     admin_email: EmailStr = Field(alias="adminEmail")
+    admin_password: str = Field(alias="adminPassword", min_length=8)
 
     model_config = ConfigDict(populate_by_name=True)
 

@@ -3,7 +3,6 @@ import { useEffect, useState, type ReactNode } from "react"
 import Register from "./pages/Register"
 import Login from "./pages/Login"
 import SuperAdminLogin from "./pages/SuperAdminLogin"
-import ActivateAccount from "./pages/ActivateAccount"
 import CreateProfile from "./pages/CreateProfile"
 import Feed from "./pages/Feed"
 import Connections from "./pages/Connections"
@@ -80,7 +79,6 @@ function App() {
           path="/request-college"
           element={<RequestCollege />}
         />
-        <Route path="/activate" element={<ActivateAccount />} />
 
         {/* Protected routes */}
         <Route

@@ -15,7 +15,7 @@ class Profile(Base):
         unique=True,
         nullable=False,
     )
-    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=False)
+    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=True)
     full_name = Column(String, nullable=True)
     profile_picture = Column(String, nullable=True)
     bio = Column(String, nullable=True)

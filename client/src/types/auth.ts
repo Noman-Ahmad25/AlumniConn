@@ -2,7 +2,7 @@ export type UserRole = "super_admin" | "admin" | "alumni" | "student"
 
 export interface AuthTokenPayload {
   user_id: number
-  college_id: number
+  college_id: number | null
   role: UserRole
   exp?: number
 }
@@ -17,6 +17,7 @@ export interface RegisterPayload {
   email: string
   password: string
   college_id: number
+  role: "student" | "alumni"
 }
 
 export interface SuperAdminLoginPayload {
@@ -30,14 +31,4 @@ export interface UserResponse {
   email: string
   role: UserRole
   is_active: boolean
-}
-
-export interface ActivationVerifyResponse {
-  valid: boolean
-  detail: string
-}
-
-export interface ActivationPayload {
-  token: string
-  password: string
 }
