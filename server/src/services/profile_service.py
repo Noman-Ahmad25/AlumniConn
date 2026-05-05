@@ -1,6 +1,9 @@
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session, joinedload
 
+from fastapi import UploadFile
+from src.services.cloudinary_service import upload_image
+
 from src.models.connection import Connection, ConnectionStatus
 from src.models.profile import Profile
 from src.schemas.profile import ProfileCreate, ProfileUpdate
@@ -102,13 +105,30 @@ def create_profile(db: Session, profile: ProfileCreate, current_user: User) -> d
     return format_profile(db_profile, user, "self")
 
 
-def update_profile(db: Session, profile_data: ProfileUpdate, current_user: User) -> dict | None:
+def update_profile(
+    db: Session, 
+    profile_data: ProfileUpdate, 
+    current_user: User, 
+    image_file: UploadFile | None = None # Added support for file upload
+) -> dict | None:
     user = _get_user_with_profile(db, current_user.id, current_user.college_id)
     if not user:
         return None
 
     db_profile = ensure_profile_exists(db, user)
-    _apply_profile_update(db_profile, profile_data.model_dump(exclude_unset=True))
+    
+    # 1. Convert schema to dict
+    update_data = profile_data.model_dump(exclude_unset=True)
+    
+    # 2. If a file was uploaded, send to Cloudinary and update the dict
+    if image_file:
+        cloud_url = upload_image(image_file, folder="alumniconn/profiles")
+        if cloud_url:
+            update_data["profile_picture"] = cloud_url
+
+    # 3. Apply updates to the DB model
+    _apply_profile_update(db_profile, update_data)
+    
     db.commit()
     db.refresh(db_profile)
     return format_profile(db_profile, user, "self")

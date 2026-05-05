@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from fastapi import UploadFile
+from src.services.cloudinary_service import upload_image
 from src.schemas.post import PostCreate
 from src.models.post import Post
 from src.models.user import User
@@ -9,14 +11,21 @@ from src.models.comment import Comment
 from src.utils.dependency import format_post, format_posts_bulk
 
 
-def create_post(db: Session, user_id: int, data: PostCreate):
-    if not data.content and not data.image_url:
-        raise ValueError("Post must have content or image")
+def create_post(db: Session, user_id: int, data: PostCreate, image_file: Optional[UploadFile] = None):
+    final_image_url = None
+
+    # Handle Cloudinary Upload
+    if image_file:
+        final_image_url = upload_image(image_file, folder="alumniconn/posts")
+
+    # Validation: Must have text OR an uploaded image
+    if not data.content and not final_image_url:
+        raise ValueError("Post must have content or an image file")
 
     post = Post(
         user_id=user_id,
         content=data.content,
-        image_url=data.image_url,
+        image_url=final_image_url, # Stores the Cloudinary HTTPS link
         is_opportunity=data.is_opportunity
     )
 
@@ -25,10 +34,7 @@ def create_post(db: Session, user_id: int, data: PostCreate):
     db.refresh(post)
     
     current_user = db.query(User).filter(User.id == user_id).first()
-    if not current_user:
-        raise ValueError("User not found")
     return format_post(db, post, current_user)
-
    
 
 

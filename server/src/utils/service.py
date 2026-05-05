@@ -1,7 +1,4 @@
 from pathlib import Path
-import os
-import shutil
-import uuid
 
 from fastapi import WebSocket
 
@@ -33,16 +30,3 @@ class ConnectionManager:
 
 # Initialize the instance
 manager = ConnectionManager()
-
-
-def save_uploads(file, folder: str):
-    base = Path(__file__).resolve().parents[2] / "static" / "uploads" / folder
-    os.makedirs(base, exist_ok=True)
-    extension = os.path.splitext(file.filename)[1]
-    filename = f"{uuid.uuid4()}{extension}"
-    path = base / filename
-    
-    with open(path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
-    return f"/static/uploads/{folder}/{filename}"

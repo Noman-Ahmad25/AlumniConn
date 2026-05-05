@@ -5,8 +5,8 @@ from src.models.user import User
 from src.models.connection import Connection, ConnectionStatus
 from src.models.conversation import Conversation
 from src.models.profile import Profile
-from src.utils.service import save_uploads, manager
-
+from src.utils.service import manager
+from src.services.cloudinary_service import upload_image
 
 async def send_message(
     db: Session,
@@ -31,7 +31,7 @@ async def send_message(
 
     url = None
     if image:
-        url = save_uploads(image, "messages")
+        url = upload_image(image, "alumniconn/messages")
 
     msg = Message(
         conversation_id=conversation_id,

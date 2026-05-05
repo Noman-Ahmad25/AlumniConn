@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
+
 from src.database.base import Base
 from src.database.session import engine, SessionLocal
 from src.database.seed import seed_super_admin 
@@ -45,18 +46,22 @@ async def lifespan(app: FastAPI):
 
 # 3. Update the FastAPI initialization
 app = FastAPI(title="AlumniConn API", lifespan=lifespan)
-STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+allowed_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    os.getenv("FRONTEND_URL", ""), # Add this for Vercel
+]
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173",
-                   "http://127.0.0.1:5173"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
 )
 
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 Base.metadata.create_all(bind=engine)
 app.include_router(college_router, prefix="/colleges", tags=["Colleges"])

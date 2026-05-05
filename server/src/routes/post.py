@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
 from src.schemas.post import PostCreate, PostResponse
@@ -16,12 +16,25 @@ from src.models.user import User
 router = APIRouter()
 
 @router.post("/", response_model=PostResponse)
-def create_new_post(post_data: PostCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def api_create_post(
+    # Use 'str | None' instead of 'Optional[str]'
+    content: str | None = Form(None), 
+    is_opportunity: bool = Form(False),
+    # Use 'UploadFile | None' instead of 'Optional[UploadFile]'
+    file: UploadFile | None = File(None), 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     try:
-        post = create_post(db, current_user.id, post_data)
-        return post
+        # Pydantic is much better at resolving these native types
+        post_data = PostCreate(content=content, is_opportunity=is_opportunity)
+        return create_post(db, current_user.id, post_data, image_file=file)
+    
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) 
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        print(f"Post creation error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
     
 
 @router.get("/feed", response_model=list[PostResponse])

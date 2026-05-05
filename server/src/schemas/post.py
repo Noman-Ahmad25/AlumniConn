@@ -3,7 +3,6 @@ from datetime import datetime
 
 class PostCreate(BaseModel):
     content: str | None = None
-    image_url: str | None = None
     is_opportunity: bool = False
 
     @model_validator(mode="after")

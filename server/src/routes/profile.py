@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Form, UploadFile, File
 from sqlalchemy.orm import Session
 
 from src.models.user import User
@@ -24,17 +24,24 @@ def create_user_profile(
 
 @router.put("/me", response_model=ProfileResponse, status_code=status.HTTP_200_OK)
 @router.patch("/me", response_model=ProfileResponse, status_code=status.HTTP_200_OK)
-def update_user_profile(
-    profile: ProfileUpdate,
+async def api_update_profile(
+    full_name: str | None = Form(None),
+    bio: str | None = Form(None),
+    company: str | None = Form(None),
+    job_title: str | None = Form(None),
+    location: str | None = Form(None),
+    file: UploadFile | None = File(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    updated_profile = update_profile(db, profile, current_user)
-
-    if not updated_profile:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
-
-    return updated_profile
+    profile_data = ProfileUpdate(
+        full_name=full_name,
+        bio=bio,
+        company=company,
+        job_title=job_title,
+        location=location
+    )
+    return update_profile(db, profile_data, current_user, image_file=file)
 
 @router.get("/me", response_model=ProfileResponse, status_code=status.HTTP_200_OK)
 def get_current_user_profile(
