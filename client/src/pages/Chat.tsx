@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { getMessages, sendMessage } from "../api/message"
-import type { MessageResponse } from "../api/message"
+import type { MessageResponse, MessageSocketEvent } from "../api/message"
+import { useMessagesSocket } from "../hooks/useMessagesSocket"
 import { getCurrentUserIdFromToken } from "../utils/auth"
 import { getApiErrorMessage } from "../utils/error"
 
@@ -94,41 +95,17 @@ export default function Chat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
   }, [messages.length])
 
-  // WebSocket
-  useEffect(() => {
-    if (!isReady || !currentUserId) return
-
-    const apiUrl = import.meta.env.VITE_API_URL
-    if (!apiUrl) return
-
-    const wsUrl = `${apiUrl.replace(/^http/, "ws")}/messages/ws/${currentUserId}`
-    const socket = new WebSocket(wsUrl)
-
-    const pingInterval = setInterval(() => {
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ type: "ping" }))
+  const handleSocketEvent = useCallback(
+    (data: MessageSocketEvent) => {
+      if (data.type === "pong") return
+      if (data.payload.conversation_id === parsedConversationId) {
+        setMessages((prev) => appendUniqueMessage(prev, data.payload))
       }
-    }, 25_000)
+    },
+    [parsedConversationId],
+  )
 
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        if (data.type === "pong") return
-        if (data.type === "new_msg" && data.payload?.conversation_id === parsedConversationId) {
-          setMessages((prev) => appendUniqueMessage(prev, data.payload))
-        }
-      } catch (err) {
-        console.error("Failed to parse WebSocket message", err)
-      }
-    }
-
-    socket.onerror = (e) => console.error("WebSocket error:", e)
-
-    return () => {
-      clearInterval(pingInterval)
-      if (socket.readyState === WebSocket.OPEN) socket.close()
-    }
-  }, [currentUserId, isReady, parsedConversationId])
+  useMessagesSocket(isReady, handleSocketEvent)
 
   // Fetch messages
   useEffect(() => {

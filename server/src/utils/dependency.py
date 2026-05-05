@@ -39,7 +39,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     else:
         if college_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
-        query = query.filter(User.college_id == college_id)
+        query = query.filter(User.college_id == college_id, User.role == token_role)
 
     user = query.first()
     if not user:

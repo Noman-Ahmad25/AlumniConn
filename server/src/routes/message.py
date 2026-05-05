@@ -1,4 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from sqlalchemy.orm import Session
 from src.schemas.message import MessageResponse, InboxMessage
 from src.utils.dependency import get_current_user
@@ -16,11 +26,31 @@ import json
 router = APIRouter()
 
 
-@router.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: int):
-    """WebSocket endpoint for real-time messaging."""
+def _get_websocket_user(token: str | None, db: Session) -> User | None:
+    if not token:
+        return None
     try:
-        await manager.connect(websocket, user_id)
+        return get_current_user(token=token, db=db)
+    except HTTPException:
+        return None
+
+
+@router.websocket("/ws")
+@router.websocket("/ws/{user_id}")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    user_id: int | None = None,
+    token: str | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    """WebSocket endpoint for real-time messaging."""
+    current_user = _get_websocket_user(token, db)
+    if not current_user or (user_id is not None and user_id != current_user.id):
+        await websocket.close(code=1008)
+        return
+
+    try:
+        await manager.connect(websocket, current_user.id)
         while True:
             try:
                 data = await websocket.receive_text()
@@ -34,14 +64,14 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
             except WebSocketDisconnect:
                 break
             except Exception as e:
-                print(f"WebSocket receive error for user {user_id}: {e}")
+                print(f"WebSocket receive error for user {current_user.id}: {e}")
                 break
     except WebSocketDisconnect:
         pass
     except Exception as e:
-        print(f"WebSocket connection error for user {user_id}: {e}")
+        print(f"WebSocket connection error for user {current_user.id}: {e}")
     finally:
-        manager.disconnect(user_id)
+        manager.disconnect(current_user.id, websocket)
 
 
 @router.post("/conversation/{user_id}")

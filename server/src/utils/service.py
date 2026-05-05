@@ -1,32 +1,46 @@
-import os, uuid, shutil
+from pathlib import Path
+import os
+import shutil
+import uuid
+
 from fastapi import WebSocket
+
 
 class ConnectionManager:
     def __init__(self):
-        # Stores active connections: {user_id: WebSocket}
-        self.active_connections: dict[int, WebSocket] = {}
+        # A user can be online from multiple tabs/devices at once.
+        self.active_connections: dict[int, list[WebSocket]] = {}
 
     async def connect(self, websocket: WebSocket, user_id: int):
         await websocket.accept()
-        self.active_connections[user_id] = websocket
+        self.active_connections.setdefault(user_id, []).append(websocket)
 
-    def disconnect(self, user_id: int):
-        self.active_connections.pop(user_id, None)
+    def disconnect(self, user_id: int, websocket: WebSocket):
+        sockets = self.active_connections.get(user_id)
+        if not sockets:
+            return
+        if websocket in sockets:
+            sockets.remove(websocket)
+        if not sockets:
+            self.active_connections.pop(user_id, None)
 
     async def send_private_json(self, user_id: int, data: dict):
-        if user_id in self.active_connections:
-            await self.active_connections[user_id].send_json(data)
+        for websocket in list(self.active_connections.get(user_id, [])):
+            try:
+                await websocket.send_json(data)
+            except RuntimeError:
+                self.disconnect(user_id, websocket)
 
 # Initialize the instance
 manager = ConnectionManager()
 
+
 def save_uploads(file, folder: str):
-    base = f"static/uploads/{folder}"
+    base = Path(__file__).resolve().parents[2] / "static" / "uploads" / folder
     os.makedirs(base, exist_ok=True)
-    # Corrected splittext to splitext
     extension = os.path.splitext(file.filename)[1]
     filename = f"{uuid.uuid4()}{extension}"
-    path = os.path.join(base, filename)
+    path = base / filename
     
     with open(path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)

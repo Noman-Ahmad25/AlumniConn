@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { getInbox, getMessages, sendMessage } from "../api/message"
-import type { MessageResponse, InboxMessage } from "../api/message"
+import type { MessageResponse, InboxMessage, MessageSocketEvent } from "../api/message"
+import { useMessagesSocket } from "../hooks/useMessagesSocket"
 import { getCurrentUserIdFromToken } from "../utils/auth"
 import { getApiErrorMessage } from "../utils/error"
 
@@ -169,54 +170,26 @@ export default function Messages() {
     fetchInbox()
   }, [])
 
-  // WebSocket
-  useEffect(() => {
-    if (!currentUserId) return
+  const handleSocketEvent = useCallback(
+    (data: MessageSocketEvent) => {
+      if (data.type === "pong") return
 
-    const apiUrl = import.meta.env.VITE_API_URL
-    if (!apiUrl) return
-
-    const wsUrl = `${apiUrl.replace(/^http/, "ws")}/messages/ws/${currentUserId}`
-    const socket = new WebSocket(wsUrl)
-
-    // Keep-alive ping every 25 s
-    const pingInterval = setInterval(() => {
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ type: "ping" }))
+      const msg = data.payload
+      if (msg.conversation_id === parsedConversationId) {
+        setMessages((prev) => appendUniqueMessage(prev, msg))
       }
-    }, 25_000)
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat.conversation_id === msg.conversation_id
+            ? { ...chat, last_message: msg.content, last_time: msg.timestamp }
+            : chat,
+        ),
+      )
+    },
+    [parsedConversationId],
+  )
 
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        if (data.type === "pong") return
-        if (data.type === "new_msg" && data.payload) {
-          const msg: MessageResponse = data.payload
-          // Update chat if open
-          if (msg.conversation_id === parsedConversationId) {
-            setMessages((prev) => appendUniqueMessage(prev, msg))
-          }
-          // Always update inbox preview
-          setChats((prev) =>
-            prev.map((chat) =>
-              chat.conversation_id === msg.conversation_id
-                ? { ...chat, last_message: msg.content, last_time: msg.timestamp }
-                : chat
-            )
-          )
-        }
-      } catch (err) {
-        console.error("Failed to parse WebSocket message", err)
-      }
-    }
-
-    socket.onerror = (e) => console.error("WebSocket error:", e)
-
-    return () => {
-      clearInterval(pingInterval)
-      if (socket.readyState === WebSocket.OPEN) socket.close()
-    }
-  }, [currentUserId, parsedConversationId])
+  useMessagesSocket(Boolean(currentUserId), handleSocketEvent)
 
   // Fetch messages for selected conversation
   useEffect(() => {

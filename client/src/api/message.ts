@@ -1,4 +1,5 @@
 import { API } from "./index"
+import { getAuthToken } from "../utils/auth"
 
 export interface MessageResponse {
   id: number
@@ -20,6 +21,21 @@ export interface InboxMessage {
   username: string
   last_message?: string | null
   last_time?: string | null
+}
+
+export type MessageSocketEvent =
+  | { type: "pong" }
+  | { type: "new_msg"; payload: MessageResponse }
+
+export const createMessagesSocket = (): WebSocket | null => {
+  const apiUrl = import.meta.env.VITE_API_URL
+  const token = getAuthToken()
+  if (!apiUrl || !token) return null
+
+  const normalizedApiUrl = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl
+  const socketUrl = new URL(`${normalizedApiUrl.replace(/^http/, "ws")}/messages/ws`)
+  socketUrl.searchParams.set("token", token)
+  return new WebSocket(socketUrl.toString())
 }
 
 export const getMessages = async (conversationId: number): Promise<MessageResponse[]> => {
