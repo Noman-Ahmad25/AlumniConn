@@ -14,14 +14,14 @@
 AlumniConn is a comprehensive networking platform designed to connect students with alumni from their respective colleges. Built with a **multi-tenant architecture**, it allows each college to operate as an isolated network, maintaining clear boundaries between different educational institutions.
 
 ### Key Features:
-✅ **Multi-Tenant Architecture** - Each college operates as a separate tenant
-✅ **Role-Based Access** - Students, Alumni, College Admins, and Super Admins with distinct permissions
-✅ **College Onboarding** - Super Admins review and approve college registration requests
-✅ **Alumni Role Upgrade** - Students can apply to become alumni with admin approval
-✅ **Social Feed** - Posts, likes, comments, and opportunity posts (Alumni-only)
-✅ **Connections** - Send, accept, and reject connection requests within your college
-✅ **Real-Time Messaging** - WebSocket-based one-to-one chat with image support
-✅ **Profile Management** - Career details with Cloudinary-hosted profile pictures
+✅ **Multi-Tenant Architecture** - Each college operates as a separate tenant<br>
+✅ **Role-Based Access** - Students, Alumni, College Admins, and Super Admins with distinct permissions<br>
+✅ **College Onboarding** - Super Admins review and approve college registration requests<br>
+✅ **Alumni Role Upgrade** - Students can apply to become alumni with admin approval<br>
+✅ **Social Feed** - Posts, likes, comments, and opportunity posts (Alumni-only)<br>
+✅ **Connections** - Send, accept, and reject connection requests within your college<br>
+✅ **Real-Time Messaging** - WebSocket-based one-to-one chat with image support<br>
+✅ **Profile Management** - Career details with Cloudinary-hosted profile pictures<br>
 
 ### Who This Project Is For:
 - **Developers** looking to build a scalable social networking platform
