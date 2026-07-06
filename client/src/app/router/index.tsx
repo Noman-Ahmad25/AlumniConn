@@ -1,21 +1,21 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { useEffect, useState, type ReactNode } from "react"
-import Register from "./features/auth/pages/Register"
-import Login from "./features/auth/pages/Login"
-import SuperAdminLogin from "./features/admin/pages/SuperAdminLogin"
+import Register from "../../features/auth/pages/Register"
+import Login from "../../features/auth/pages/Login"
+import SuperAdminLogin from "../../features/admin/pages/SuperAdminLogin"
 
-import CreateProfile from "./features/profile/pages/CreateProfile"
-import Feed from "./features/feed/pages/Feed"
-import Connections from "./features/connections/pages/Connections"
-import Profile from "./features/profile/pages/Profile"
-import Chat from "./features/messages/pages/Chat"
-import Messages from "./features/messages/pages/Messages"
-import RequestCollege from "./features/college/pages/RequestCollege"
-import SuperAdminCollegeRequests from "./features/admin/pages/SuperAdminCollegeRequests"
-import AdminAlumniRequests from "./features/admin/pages/AdminAlumniRequests"
-import Topbar from "./layouts/AppShell/Topbar"
-import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken } from "./features/auth/utils/auth"
-import type { UserRole } from "./features/auth/types/auth"
+import CreateProfile from "../../features/profile/pages/CreateProfile"
+import Feed from "../../features/feed/pages/Feed"
+import Connections from "../../features/connections/pages/Connections"
+import Profile from "../../features/profile/pages/Profile"
+import Chat from "../../features/messages/pages/Chat"
+import Messages from "../../features/messages/pages/Messages"
+import RequestCollege from "../../features/college/pages/RequestCollege"
+import SuperAdminCollegeRequests from "../../features/admin/pages/SuperAdminCollegeRequests"
+import AdminAlumniRequests from "../../features/admin/pages/AdminAlumniRequests"
+import Topbar from "../../layouts/AppShell/Topbar"
+import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken } from "../../features/auth/utils/auth"
+import type { UserRole } from "../../features/auth/types/auth"
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(hasAuthToken)
@@ -54,7 +54,7 @@ function RoleRoute({ children, roles }: { children: ReactNode; roles: UserRole[]
   return <>{children}</>
 }
 
-function App() {
+export default function AppRouter() {
   const [showNavbar, setShowNavbar] = useState(hasAuthToken)
 
   useEffect(() => {
@@ -146,4 +146,4 @@ function App() {
   )
 }
 
-export default App
+
