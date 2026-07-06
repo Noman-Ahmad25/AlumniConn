@@ -12,7 +12,7 @@ import Messages from "./pages/Messages"
 import RequestCollege from "./pages/RequestCollege"
 import SuperAdminCollegeRequests from "./pages/SuperAdminCollegeRequests"
 import AdminAlumniRequests from "./pages/AdminAlumniRequests"
-import Navbar from "./components/Navbar"
+import Topbar from "./layouts/AppShell/Topbar"
 import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken } from "./utils/auth"
 import type { UserRole } from "./types/auth"
 
@@ -68,7 +68,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      {showNavbar && <Navbar />}
+      {showNavbar && <Topbar />}
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Navigate to="/register" replace />} />
