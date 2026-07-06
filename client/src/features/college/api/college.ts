@@ -12,6 +12,9 @@ export interface College {
 const getColleges = async (): Promise<College[]> => {
     const response = await API.get('/colleges/');
     console.log(response.data)
+    if (!Array.isArray(response.data)) {
+        return [];
+    }
     return response.data;
 }
 
