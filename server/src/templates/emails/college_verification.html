@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>College Onboarding Request</h2>
+<p>Hello,</p>
+<p>You have submitted a request to add <strong>{{ college_name }}</strong> to AlumniConn.</p>
+<p>Before our super admins review your request, you must verify your email address. Please click the link below to confirm:</p>
+<p style="text-align: center; margin: 30px 0;">
+    <a href="{{ verification_link }}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Verify College Request</a>
+</p>
+<p>If you did not submit this request, please ignore this email.</p>
+<p>This link will expire in 24 hours.</p>
+{% endblock %}

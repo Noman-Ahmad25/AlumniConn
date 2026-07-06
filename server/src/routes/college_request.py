@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from src.database.session import get_db
 from src.utils.rbac import require_super_admin
+from src.utils.dispatcher import AbstractTaskDispatcher, get_task_dispatcher
 from src.schemas.request import (
     CollegeRequestCreate,
     CollegeRequestResponse,
@@ -11,6 +13,12 @@ from src.schemas.request import (
 from src.services import college_request_service
 
 router = APIRouter()
+
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+class ResendVerificationRequest(BaseModel):
+    request_id: int
 
 
 @router.post(
@@ -22,15 +30,45 @@ router = APIRouter()
 def request_college_creation(
     college_data: CollegeRequestCreate,
     db: Session = Depends(get_db),
+    task_dispatcher: AbstractTaskDispatcher = Depends(get_task_dispatcher)
 ):
     """
     Anyone can request to onboard a college.
-    Creates a CollegeRequest with PENDING status.
+    Creates a CollegeRequest with PENDING status, awaiting email verification.
     """
     try:
-        return college_request_service.create_college_request(db, college_data)
+        return college_request_service.create_college_request(db, college_data, task_dispatcher)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.post(
+    "/verify-email",
+    status_code=status.HTTP_200_OK,
+    tags=["College Requests"],
+)
+def verify_email(
+    request: VerifyEmailRequest,
+    db: Session = Depends(get_db)
+):
+    success = college_request_service.verify_college_email(db, request.token)
+    if not success:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired verification token")
+    return {"message": "Email verified successfully"}
+
+
+@router.post(
+    "/resend-verification",
+    status_code=status.HTTP_200_OK,
+    tags=["College Requests"],
+)
+def resend_verification(
+    request: ResendVerificationRequest,
+    db: Session = Depends(get_db),
+    task_dispatcher: AbstractTaskDispatcher = Depends(get_task_dispatcher)
+):
+    college_request_service.resend_college_verification(db, request.request_id, task_dispatcher)
+    return {"message": "If the request exists and is unverified, a new verification link has been sent."}
 
 
 @router.get(
@@ -47,7 +85,7 @@ def list_college_requests(
     db: Session = Depends(get_db),
 ):
     """
-    Only SUPER_ADMIN can view all college requests.
+    Only SUPER_ADMIN can view all verified college requests.
     """
     return college_request_service.list_college_requests_for_super_admin(
         db, status=status_filter, skip=skip, limit=limit
@@ -75,7 +113,7 @@ def get_college_request(
     return college_req
 
 
-@router.post(
+@router.patch(
     "/{request_id}/approve",
     response_model=CollegeRequestResponse,
     status_code=status.HTTP_200_OK,
@@ -92,8 +130,7 @@ def approve_college_request(
     
     On approval:
     - Creates the actual College
-    - Creates inactive ADMIN user
-    - Sends activation link
+    - Creates active ADMIN user and Profile
     """
     try:
         return college_request_service.approve_college_request(db, request_id, current_user.id)
@@ -101,7 +138,7 @@ def approve_college_request(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.post(
+@router.patch(
     "/{request_id}/reject",
     response_model=CollegeRequestResponse,
     status_code=status.HTTP_200_OK,

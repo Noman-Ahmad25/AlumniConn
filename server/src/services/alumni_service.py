@@ -1,21 +1,22 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from src.models.alumni_request import AlumniRequest, AlumniRequestStatus
-from src.models.user import User, UserRole
+from src.models.user import User, UserRole, AlumniStatus
+from src.utils.event_bus import event_bus
+from src.models.notification import NotificationType
 
 
 def create_alumni_request(
     db: Session,
     user_id: int,
     college_id: int
-) -> AlumniRequest | dict:
+) -> User | dict:
     """
     Create a request to become ALUMNI.
     
     SECURITY:
     - Only STUDENT can apply for ALUMNI role
     - Can only apply for the college they're currently associated with
-    - Cannot have multiple pending requests for same college
+    - Cannot have multiple pending requests
     
     Args:
         db: Database session
@@ -23,7 +24,7 @@ def create_alumni_request(
         college_id: ID of college to apply for
     
     Returns:
-        AlumniRequest object or error dict
+        Updated User object
     
     Raises:
         ValueError: If security checks fail
@@ -40,34 +41,31 @@ def create_alumni_request(
     if user.college_id != college_id:
         raise ValueError("You can only apply for your own college.")
     
-    # Check if already ALUMNI
-    if user.role == UserRole.ALUMNI:
+    # Check if already ALUMNI or requested
+    if user.alumni_status == AlumniStatus.APPROVED or user.role == UserRole.ALUMNI:
         raise ValueError("You are already an alumni.")
+        
+    if user.alumni_status == AlumniStatus.PENDING:
+        raise ValueError("You already have a pending alumni request.")
     
-    # Check for existing pending or approved request
-    existing_request = db.query(AlumniRequest).filter(
-        AlumniRequest.user_id == user_id,
-        AlumniRequest.college_id == college_id,
-        AlumniRequest.status.in_([AlumniRequestStatus.PENDING, AlumniRequestStatus.APPROVED])
-    ).first()
-    if existing_request:
-        raise ValueError("You already have a pending or approved alumni request.")
+    user.alumni_status = AlumniStatus.PENDING
+    user.alumni_requested_at = func.now()
+    user.alumni_reviewed_at = None
+    user.reviewed_by_id = None
+    user.review_notes = None
     
-    db_request = AlumniRequest(
-        user_id=user_id,
-        college_id=college_id,
-        status=AlumniRequestStatus.PENDING
-    )
-    db.add(db_request)
     db.commit()
-    db.refresh(db_request)
-    return db_request
+    db.refresh(user)
+    
+    # Optional: trigger an event for ALUMNI_REQUEST_SUBMITTED if needed
+    
+    return user
 
 
-def get_alumni_request(db: Session, request_id: int) -> AlumniRequest | None:
-    """Get an alumni request by ID."""
-    return db.query(AlumniRequest).filter(
-        AlumniRequest.id == request_id
+def get_alumni_request(db: Session, user_id: int) -> User | None:
+    """Get a user by ID to inspect their alumni request."""
+    return db.query(User).filter(
+        User.id == user_id
     ).first()
 
 
@@ -78,7 +76,7 @@ def list_alumni_requests_for_admin(
     status: str | None = None,
     skip: int = 0,
     limit: int = 100
-) -> list[AlumniRequest]:
+) -> list[User]:
     """
     List alumni requests for an ADMIN of a specific college.
     
@@ -94,7 +92,7 @@ def list_alumni_requests_for_admin(
         limit: Pagination limit
     
     Returns:
-        List of AlumniRequest objects
+        List of User objects
     
     Raises:
         ValueError: If admin is not of the specified college
@@ -107,126 +105,143 @@ def list_alumni_requests_for_admin(
     if admin.college_id != college_id:
         raise ValueError("You can only view requests for your own college.")
     
-    query = db.query(AlumniRequest).filter(
-        AlumniRequest.college_id == college_id
+    query = db.query(User).filter(
+        User.college_id == college_id,
+        User.alumni_status != AlumniStatus.NOT_REQUESTED
     )
     
     if status:
-        query = query.filter(AlumniRequest.status == status)
+        query = query.filter(User.alumni_status == status)
     
-    return query.order_by(AlumniRequest.created_at.desc()).offset(skip).limit(limit).all()
+    return query.order_by(User.alumni_requested_at.desc()).offset(skip).limit(limit).all()
 
 
 def approve_alumni_request(
     db: Session,
-    request_id: int,
+    user_id: int,
     reviewer_id: int
-) -> AlumniRequest:
+) -> User:
     """
     Approve an alumni request and update user role.
     
     SECURITY:
     - Only ADMIN of the same college can approve
     - ADMIN cannot approve their own request
-    - Request must be PENDING
+    - User's status must be PENDING
     
     Args:
         db: Database session
-        request_id: ID of request to approve
+        user_id: ID of user to approve
         reviewer_id: ID of user approving (should be ADMIN of the college)
     
     Returns:
-        Updated AlumniRequest object
+        Updated User object
     
     Raises:
         ValueError: If security checks fail
     """
-    alumni_req = get_alumni_request(db, request_id)
-    if not alumni_req:
-        raise ValueError("Request not found.")
+    target_user = get_alumni_request(db, user_id)
+    if not target_user:
+        raise ValueError("User not found.")
     
     reviewer = db.query(User).filter(User.id == reviewer_id).first()
     if not reviewer:
         raise ValueError("Reviewer not found.")
     
     # Security: Reviewer must be ADMIN of the college
-    if reviewer.role != UserRole.ADMIN or reviewer.college_id != alumni_req.college_id:
+    if reviewer.role != UserRole.ADMIN or reviewer.college_id != target_user.college_id:
         raise ValueError("You are not an admin of this college.")
     
     # Security: Cannot approve own request
-    if alumni_req.user_id == reviewer_id:
+    if target_user.id == reviewer_id:
         raise ValueError("You cannot approve your own alumni request.")
     
     # Security: Can only approve PENDING requests
-    if alumni_req.status != AlumniRequestStatus.PENDING:
-        raise ValueError(f"Cannot approve request with status '{alumni_req.status}'.")
+    if target_user.alumni_status != AlumniStatus.PENDING:
+        raise ValueError(f"Cannot approve user with alumni status '{target_user.alumni_status}'.")
     
-    # Update user role
-    student = db.query(User).filter(User.id == alumni_req.user_id).first()
-    if student:
-        student.role = UserRole.ALUMNI
-    
-    # Update request
-    alumni_req.status = AlumniRequestStatus.APPROVED
-    alumni_req.reviewed_by = reviewer_id
-    alumni_req.reviewed_at = func.now()
+    # Update user role and status
+    target_user.role = UserRole.ALUMNI
+    target_user.alumni_status = AlumniStatus.APPROVED
+    target_user.reviewed_by_id = reviewer_id
+    target_user.alumni_reviewed_at = func.now()
     
     db.commit()
-    db.refresh(alumni_req)
-    return alumni_req
+    db.refresh(target_user)
+    
+    event_bus.publish(NotificationType.ALUMNI_REQUEST_APPROVED.value, {
+        "recipient_id": target_user.id,
+        "notification_type": NotificationType.ALUMNI_REQUEST_APPROVED,
+        "title": "Alumni Request Approved",
+        "message": "Your request to become an alumni has been approved.",
+        "actor_id": reviewer_id,
+        "metadata_": {"user_id": target_user.id}
+    })
+    
+    return target_user
 
 
 def reject_alumni_request(
     db: Session,
-    request_id: int,
+    user_id: int,
     reviewer_id: int,
     rejection_reason: str | None = None
-) -> AlumniRequest:
+) -> User:
     """
     Reject an alumni request.
     
     SECURITY:
     - Only ADMIN of the same college can reject
     - ADMIN cannot reject their own request
-    - Request must be PENDING
+    - User's status must be PENDING
     
     Args:
         db: Database session
-        request_id: ID of request to reject
+        user_id: ID of user to reject
         reviewer_id: ID of user rejecting (should be ADMIN of the college)
         rejection_reason: Optional reason for rejection
     
     Returns:
-        Updated AlumniRequest object
+        Updated User object
     
     Raises:
         ValueError: If security checks fail
     """
-    alumni_req = get_alumni_request(db, request_id)
-    if not alumni_req:
-        raise ValueError("Request not found.")
+    target_user = get_alumni_request(db, user_id)
+    if not target_user:
+        raise ValueError("User not found.")
     
     reviewer = db.query(User).filter(User.id == reviewer_id).first()
     if not reviewer:
         raise ValueError("Reviewer not found.")
     
     # Security: Reviewer must be ADMIN of the college
-    if reviewer.role != UserRole.ADMIN or reviewer.college_id != alumni_req.college_id:
+    if reviewer.role != UserRole.ADMIN or reviewer.college_id != target_user.college_id:
         raise ValueError("You are not an admin of this college.")
     
     # Security: Cannot reject own request
-    if alumni_req.user_id == reviewer_id:
+    if target_user.id == reviewer_id:
         raise ValueError("You cannot reject your own alumni request.")
     
     # Security: Can only reject PENDING requests
-    if alumni_req.status != AlumniRequestStatus.PENDING:
-        raise ValueError(f"Cannot reject request with status '{alumni_req.status}'.")
+    if target_user.alumni_status != AlumniStatus.PENDING:
+        raise ValueError(f"Cannot reject user with alumni status '{target_user.alumni_status}'.")
     
-    alumni_req.status = AlumniRequestStatus.REJECTED
-    alumni_req.reviewed_by = reviewer_id
-    alumni_req.reviewed_at = func.now()
-    alumni_req.rejection_reason = rejection_reason
+    target_user.alumni_status = AlumniStatus.REJECTED
+    target_user.reviewed_by_id = reviewer_id
+    target_user.alumni_reviewed_at = func.now()
+    target_user.review_notes = rejection_reason
     
     db.commit()
-    db.refresh(alumni_req)
-    return alumni_req
+    db.refresh(target_user)
+    
+    event_bus.publish(NotificationType.ALUMNI_REQUEST_REJECTED.value, {
+        "recipient_id": target_user.id,
+        "notification_type": NotificationType.ALUMNI_REQUEST_REJECTED,
+        "title": "Alumni Request Rejected",
+        "message": "Your request to become an alumni has been rejected.",
+        "actor_id": reviewer_id,
+        "metadata_": {"user_id": target_user.id}
+    })
+    
+    return target_user

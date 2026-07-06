@@ -65,3 +65,5 @@ urllib3==2.6.3
 uvicorn==0.44.0
 watchfiles==1.1.1
 websockets==16.0
+pgvector==0.2.5
+sentence-transformers==3.0.1

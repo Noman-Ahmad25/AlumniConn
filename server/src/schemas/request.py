@@ -51,23 +51,7 @@ class CollegeRequestResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class AlumniRequestCreate(BaseModel):
-    """Request body for applying to become alumni"""
-    pass  # Only needs user_id and college_id from context
 
-
-class AlumniRequestResponse(BaseModel):
-    """Response model for alumni requests"""
-    id: int
-    user_id: int
-    college_id: int
-    status: str  # "pending", "approved", "rejected"
-    reviewed_by: Optional[int] = None
-    rejection_reason: Optional[str] = None
-    created_at: datetime
-    reviewed_at: Optional[datetime] = None
-    
-    model_config = ConfigDict(from_attributes=True)
 
 
 class RequestApprovalPayload(BaseModel):

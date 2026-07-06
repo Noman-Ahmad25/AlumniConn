@@ -18,6 +18,10 @@ PROFILE_FIELDS = (
     "job_industry",
     "job_description",
     "location",
+    "skills",
+    "interests",
+    "major",
+    "grad_year",
 )
 
 
@@ -60,6 +64,10 @@ def format_profile(profile: Profile, user: User, connection_status: str = "self"
         "job_industry": profile.job_industry,
         "job_description": profile.job_description,
         "location": profile.location,
+        "skills": profile.skills,
+        "interests": profile.interests,
+        "major": profile.major,
+        "grad_year": profile.grad_year,
     }
 
 
@@ -93,7 +101,7 @@ def _apply_profile_update(db_profile: Profile, data: dict) -> None:
             setattr(db_profile, field, value)
 
 
-def create_profile(db: Session, profile: ProfileCreate, current_user: User) -> dict | None:
+def create_profile(db: Session, profile: ProfileCreate, current_user: User, task_dispatcher: AbstractTaskDispatcher) -> dict | None:
     user = _get_user_with_profile(db, current_user.id, current_user.college_id)
     if not user:
         return None
@@ -102,14 +110,21 @@ def create_profile(db: Session, profile: ProfileCreate, current_user: User) -> d
     _apply_profile_update(db_profile, profile.model_dump(exclude_unset=True))
     db.commit()
     db.refresh(db_profile)
+    
+    task_dispatcher.dispatch(trigger_embedding_generation, db, current_user.id)
     return format_profile(db_profile, user, "self")
 
+
+from fastapi import UploadFile
+from src.services.recommendation_service import trigger_embedding_generation
+from src.utils.dispatcher import AbstractTaskDispatcher
 
 def update_profile(
     db: Session, 
     profile_data: ProfileUpdate, 
     current_user: User, 
-    image_file: UploadFile | None = None # Added support for file upload
+    task_dispatcher: AbstractTaskDispatcher,
+    image_file: UploadFile | None = None
 ) -> dict | None:
     user = _get_user_with_profile(db, current_user.id, current_user.college_id)
     if not user:
@@ -131,6 +146,10 @@ def update_profile(
     
     db.commit()
     db.refresh(db_profile)
+    
+    # Trigger semantic embedding update in background
+    task_dispatcher.dispatch(trigger_embedding_generation, db, current_user.id)
+    
     return format_profile(db_profile, user, "self")
 
 

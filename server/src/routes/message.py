@@ -59,6 +59,9 @@ async def websocket_endpoint(
                     parsed = json.loads(data)
                     if parsed.get("type") == "ping":
                         await websocket.send_json({"type": "pong"})
+                    elif parsed.get("type") == "presence":
+                        from src.utils.presence import presence_manager
+                        presence_manager.set_presence(current_user.id, parsed.get("context", {}))
                 except (json.JSONDecodeError, AttributeError):
                     pass
             except WebSocketDisconnect:
@@ -72,6 +75,11 @@ async def websocket_endpoint(
         print(f"WebSocket connection error for user {current_user.id}: {e}")
     finally:
         manager.disconnect(current_user.id, websocket)
+        
+        # If this was their last connection, clear presence
+        if current_user.id not in manager.active_connections:
+            from src.utils.presence import presence_manager
+            presence_manager.clear_presence(current_user.id)
 
 
 @router.post("/conversation/{user_id}")

@@ -5,6 +5,8 @@ from src.models.profile import Profile
 
 
 from sqlalchemy.orm import Session
+from src.utils.event_bus import event_bus
+from src.models.notification import NotificationType
 
 def create_comment(db: Session, current_user: User, content: str, post_id: int):
     post = db.query(Post).join(User).filter(
@@ -24,6 +26,16 @@ def create_comment(db: Session, current_user: User, content: str, post_id: int):
     db.add(comment)
     db.commit()
     db.refresh(comment)
+
+    if post.author_id != current_user.id:
+        event_bus.publish(NotificationType.POST_COMMENTED.value, {
+            "recipient_id": post.author_id,
+            "notification_type": NotificationType.POST_COMMENTED,
+            "title": "New Comment",
+            "message": f"{current_user.username} commented on your post.",
+            "actor_id": current_user.id,
+            "metadata_": {"post_id": post.id, "comment_id": comment.id}
+        })
 
     # 🔥 Fetch enriched data (same structure as get_comments)
     row = db.query(Comment, User, Profile).join(

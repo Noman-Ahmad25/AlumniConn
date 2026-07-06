@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session, joinedload
 from src.models.connection import Connection, ConnectionStatus
 from src.models.user import User
 from src.utils.dependency import format_connection
+from src.utils.event_bus import event_bus
+from src.models.notification import NotificationType
 
 
 # send connection request
@@ -29,15 +31,25 @@ def send_request(db: Session, current_user: User, receiver_id: int):
         raise ValueError("Connection request already exists.")
         
     # INJECT TENANT ID: Auto-assign the college_id so the frontend can't spoof it
-    connection = Connection(
+    new_conn = Connection(
         sender_id=current_user.id, 
         receiver_id=receiver_id,
         college_id=current_user.college_id 
     )
-    db.add(connection)
+    db.add(new_conn)
     db.commit()
-    db.refresh(connection)
-    return format_connection( connection, current_user)
+    db.refresh(new_conn)
+    
+    event_bus.publish(NotificationType.CONNECTION_RECEIVED.value, {
+        "recipient_id": receiver_id,
+        "notification_type": NotificationType.CONNECTION_RECEIVED,
+        "title": "New Connection Request",
+        "message": f"{current_user.username} sent you a connection request.",
+        "actor_id": current_user.id,
+        "metadata_": {"connection_id": new_conn.id}
+    })
+    
+    return format_connection(new_conn, current_user)
 
 # accept connection request
 def accept_request(db: Session, connection_id: int, current_user: User):
@@ -56,6 +68,16 @@ def accept_request(db: Session, connection_id: int, current_user: User):
     connection.status = ConnectionStatus.ACCEPTED
     db.commit()
     db.refresh(connection)
+    
+    event_bus.publish(NotificationType.CONNECTION_ACCEPTED.value, {
+        "recipient_id": connection.sender_id,
+        "notification_type": NotificationType.CONNECTION_ACCEPTED,
+        "title": "Connection Request Accepted",
+        "message": f"{current_user.username} accepted your connection request.",
+        "actor_id": current_user.id,
+        "metadata_": {"connection_id": connection.id}
+    })
+    
     return format_connection(connection, current_user)
 
 # reject connection request
@@ -75,6 +97,16 @@ def reject_request(db: Session, connection_id: int, current_user: User):
     connection.status = ConnectionStatus.REJECTED
     db.commit()
     db.refresh(connection)
+    
+    event_bus.publish(NotificationType.CONNECTION_REJECTED.value, {
+        "recipient_id": connection.sender_id,
+        "notification_type": NotificationType.CONNECTION_REJECTED,
+        "title": "Connection Request Rejected",
+        "message": f"{current_user.username} rejected your connection request.",
+        "actor_id": current_user.id,
+        "metadata_": {"connection_id": connection.id}
+    })
+    
     return format_connection(connection, current_user)
 
 

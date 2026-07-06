@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from src.database.session import get_db
 from src.models.college import College
-from src.schemas.college import CollegeCreate, CollegeResponse
+from src.schemas.college import CollegeCreate, CollegeResponse, CollegePublicResponse
 from src.services import college_service
 
 router = APIRouter()
@@ -18,6 +18,13 @@ def create_college(college: CollegeCreate, db: Session = Depends(get_db)):
 @router.get("/", response_model=list[CollegeResponse], status_code=status.HTTP_200_OK)
 def list_colleges(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return college_service.list_colleges(db, skip, limit)
+
+@router.get("/slug/{slug}", response_model=CollegePublicResponse, status_code=status.HTTP_200_OK)
+def get_college_by_slug(slug: str, db: Session = Depends(get_db)):    
+    college = college_service.get_college_by_slug(db, slug)
+    if not college:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="College not found")
+    return college
 
 @router.get("/domain/{domain}", response_model=CollegeResponse, status_code=status.HTTP_200_OK)
 def get_college_by_domain(domain: str, db: Session = Depends(get_db)):    

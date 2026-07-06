@@ -11,6 +11,11 @@ class ProfileBase(BaseModel):
     job_description: str | None = None
 
     location: str | None = None
+    
+    skills: list[str] | None = None
+    interests: list[str] | None = None
+    grad_year: int | None = None
+    major: str | None = None
 
 class ProfileCreate(ProfileBase):
     pass
@@ -32,6 +37,12 @@ class ProfileResponse(ProfileBase):
     job_description: str | None = None
 
     location: str | None = None
+    
+    skills: list[str] | None = None
+    interests: list[str] | None = None
+    grad_year: int | None = None
+    major: str | None = None
+    
     username: str = ""
 
     model_config = ConfigDict(from_attributes=True)

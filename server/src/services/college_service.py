@@ -32,6 +32,9 @@ def get_college_by_id(db: Session, college_id: int) -> College | None:
 def get_college_by_domain(db: Session, domain: str) -> College | None:
     return db.query(College).filter(College.domain == domain).first()
 
+def get_college_by_slug(db: Session, slug: str) -> College | None:
+    return db.query(College).filter(College.slug == slug).first()
+
 
 def list_colleges(db: Session, skip: int = 0, limit: int = 100) -> list[College]:
     return db.query(College).offset(skip).limit(limit).all()

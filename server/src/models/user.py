@@ -21,6 +21,12 @@ class UserRole(str, enum.Enum):
     ADMIN = "admin"
     ALUMNI = "alumni"
     STUDENT = "student"
+
+class AlumniStatus(str, enum.Enum):
+    NOT_REQUESTED = "not_requested"
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
  
  
 class User(Base):
@@ -35,8 +41,13 @@ class User(Base):
  
     # Auth
     password_hash = Column(String, nullable=False)
-    activation_token_hash = Column(String, nullable=True, unique=True, index=True)
-    activation_token_expires_at = Column(DateTime, nullable=True)
+    password_reset_token_hash = Column(String, nullable=True, unique=True, index=True)
+    password_reset_expires_at = Column(DateTime, nullable=True)
+    
+    email_verified = Column(Boolean, default=False, nullable=False, index=True)
+    email_verified_at = Column(DateTime, nullable=True)
+    verification_token_hash = Column(String, nullable=True, unique=True, index=True)
+    verification_token_expires_at = Column(DateTime, nullable=True)
  
     college_id = Column(Integer, ForeignKey("colleges.id"), nullable=True)
  
@@ -54,6 +65,13 @@ class User(Base):
  
     # Status
     is_active = Column(Boolean, default=True)
+
+    # Alumni Request State
+    alumni_status = Column(Enum(AlumniStatus), default=AlumniStatus.NOT_REQUESTED, nullable=False, index=True)
+    alumni_requested_at = Column(DateTime, nullable=True)
+    alumni_reviewed_at = Column(DateTime, nullable=True)
+    reviewed_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    review_notes = Column(String, nullable=True)
  
     # Timestamp
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -79,6 +97,12 @@ class User(Base):
         foreign_keys="Connection.receiver_id",
         back_populates="receiver",
         cascade="all, delete",
+    )
+    
+    reviewed_by = relationship(
+        "User",
+        remote_side=[id],
+        foreign_keys=[reviewed_by_id]
     )
  
 

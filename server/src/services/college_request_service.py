@@ -10,17 +10,20 @@ from src.models.user import User, UserRole
 from src.models.profile import Profile
 from src.schemas.request import CollegeRequestCreate
 from src.utils.security import hash_password
+from src.utils.event_bus import event_bus
+from src.models.notification import NotificationType
+from src.utils.tokens import generate_verification_token, hash_token, verify_token
+from src.utils.dispatcher import AbstractTaskDispatcher
+from src.services.email.service import EmailService
 
 
 def create_college_request(
     db: Session, 
     college_data: CollegeRequestCreate,
+    task_dispatcher: AbstractTaskDispatcher
 ) -> CollegeRequest:
     """
     Create a new college request.
-    
-    Creates a User record (is_active=False) immediately with the provided password.
-    Links the CollegeRequest to this user via requested_by.
     
     Args:
         db: Database session
@@ -45,6 +48,10 @@ def create_college_request(
     if existing_college:
         raise ValueError("Domain already in use by an existing college.")
     
+    existing_user = db.query(User).filter(func.lower(User.email) == admin_email).first()
+    if existing_user:
+        raise ValueError("Admin email already registered as a user.")
+    
     existing_request = db.query(CollegeRequest).filter(
         CollegeRequest.status == CollegeRequestStatus.PENDING,
         (
@@ -55,26 +62,10 @@ def create_college_request(
     if existing_request:
         raise ValueError("This college or admin already has a pending request.")
     
-    # Create the admin user with is_active=False
-    admin_user = User(
-        username=_username_from_admin_name(college_data.admin_name),
-        email=admin_email,
-        password_hash=hash_password(college_data.admin_password),
-        role=UserRole.ADMIN,
-        is_active=False  # Not active until college is approved
-    )
-    db.add(admin_user)
-    db.flush()  # Get the user ID
+    raw_token = generate_verification_token()
+    token_hash = hash_token(raw_token)
+    expires_at = datetime.utcnow() + timedelta(hours=24)
     
-    # Create profile for the user
-    profile = Profile(
-        user_id=admin_user.id,
-        full_name=college_data.admin_name,
-    )
-    db.add(profile)
-    db.flush()
-    
-    # Create the college request linked to this user
     db_request = CollegeRequest(
         name=college_data.name,
         domain=domain,
@@ -83,13 +74,66 @@ def create_college_request(
         description=college_data.description,
         admin_name=college_data.admin_name,
         admin_email=admin_email,
-        requested_by=admin_user.id,  # Link to the created user
-        status=CollegeRequestStatus.PENDING
+        password_hash=hash_password(college_data.admin_password),
+        status=CollegeRequestStatus.PENDING,
+        email_verified=False,
+        verification_token_hash=token_hash,
+        verification_token_expires_at=expires_at
     )
+    
     db.add(db_request)
     db.commit()
     db.refresh(db_request)
+    
+    task_dispatcher.dispatch(EmailService.send_college_verification, admin_email, raw_token, college_data.name)
+    
     return db_request
+
+
+def verify_college_email(db: Session, token: str) -> bool:
+    """
+    Verifies the college request's admin email.
+    """
+    hashed = hash_token(token)
+    req = db.query(CollegeRequest).filter(CollegeRequest.verification_token_hash == hashed).first()
+    
+    if not req:
+        return False
+        
+    if req.verification_token_expires_at and req.verification_token_expires_at < datetime.utcnow():
+        return False
+        
+    req.email_verified = True
+    req.email_verified_at = datetime.utcnow()
+    req.verification_token_hash = None
+    req.verification_token_expires_at = None
+    
+    db.commit()
+    
+    event_bus.publish("college_request_email_verified", {
+        "request_id": req.id,
+        "college_name": req.name
+    })
+    
+    return True
+
+
+def resend_college_verification(db: Session, request_id: int, task_dispatcher: AbstractTaskDispatcher) -> bool:
+    """
+    Resends the verification email for an unverified college request.
+    """
+    req = db.query(CollegeRequest).filter(CollegeRequest.id == request_id).first()
+    if not req or req.email_verified:
+        return False
+        
+    raw_token = generate_verification_token()
+    req.verification_token_hash = hash_token(raw_token)
+    req.verification_token_expires_at = datetime.utcnow() + timedelta(hours=24)
+    
+    db.commit()
+    
+    task_dispatcher.dispatch(EmailService.send_college_verification, req.admin_email, raw_token, req.name)
+    return True
 
 
 def get_college_request(db: Session, request_id: int) -> CollegeRequest | None:
@@ -106,18 +150,9 @@ def list_college_requests_for_super_admin(
     limit: int = 100
 ) -> list[CollegeRequest]:
     """
-    List college requests for SUPER_ADMIN.
-    
-    Args:
-        db: Database session
-        status: Filter by status (optional)
-        skip: Pagination offset
-        limit: Pagination limit
-    
-    Returns:
-        List of CollegeRequest objects
+    List verified college requests for SUPER_ADMIN.
     """
-    query = db.query(CollegeRequest)
+    query = db.query(CollegeRequest).filter(CollegeRequest.email_verified == True)
     
     if status:
         query = query.filter(CollegeRequest.status == status)
@@ -131,81 +166,78 @@ def approve_college_request(
     reviewer_id: int
 ) -> CollegeRequest:
     """
-    Approve a college request and create the college.
-    
-    Activates the existing admin user and links them to the new college.
-    College is marked as APPROVED and admin can login immediately.
-    
-    SECURITY:
-    - Only SUPER_ADMIN can call this
-    - Request must be PENDING
-    - User must exist (created during request)
-    
-    Args:
-        db: Database session
-        request_id: ID of request to approve
-        reviewer_id: ID of user approving (should be SUPER_ADMIN)
-    
-    Returns:
-        Updated CollegeRequest object
-    
-    Raises:
-        ValueError: If security checks fail
+    Approve a college request and create the college, user, and profile atomically.
     """
     college_req = get_college_request(db, request_id)
     if not college_req:
         raise ValueError("Request not found.")
     
-    # Security: Can only approve PENDING requests
     if college_req.status != CollegeRequestStatus.PENDING:
         raise ValueError(f"Cannot approve request with status '{college_req.status}'.")
-    
-    # Get the admin user who requested this college
-    if not college_req.requested_by:
-        raise ValueError("Request does not have an associated user.")
-    
-    admin_user = db.query(User).filter(User.id == college_req.requested_by).first()
-    if not admin_user:
-        raise ValueError("Requested admin user not found.")
+        
+    if not college_req.email_verified:
+        raise ValueError("Cannot approve unverified requests.")
     
     existing_college = db.query(College).filter(
         func.lower(College.domain) == college_req.domain.lower()
     ).first()
     if existing_college:
         raise ValueError("Domain already in use by an existing college.")
+        
+    existing_user = db.query(User).filter(func.lower(User.email) == college_req.admin_email.lower()).first()
+    if existing_user:
+        raise ValueError("Admin email already registered as a user.")
 
-    # Create the college with is_approved=True
+    # Begin atomic inserts
     new_college = College(
         name=college_req.name,
         domain=college_req.domain,
         location=college_req.location,
         established_year=college_req.established_year,
         description=college_req.description,
-        is_approved=True  # College is approved and can accept users
+        is_approved=True
     )
     db.add(new_college)
-    db.flush()  # Flush to get the college ID
+    db.flush()
     
-    # Activate the existing admin user and link to college
-    admin_user.is_active = True
-    admin_user.college_id = new_college.id
+    admin_user = User(
+        username=_username_from_admin_name(college_req.admin_name),
+        email=college_req.admin_email,
+        password_hash=college_req.password_hash,
+        role=UserRole.ADMIN,
+        is_active=True,
+        email_verified=True,
+        email_verified_at=datetime.utcnow(),
+        college_id=new_college.id
+    )
+    db.add(admin_user)
+    db.flush()
     
-    # Update the user's profile with college_id
-    profile = db.query(Profile).filter(Profile.user_id == admin_user.id).first()
-    if profile:
-        profile.college_id = new_college.id
+    profile = Profile(
+        user_id=admin_user.id,
+        college_id=new_college.id,
+        full_name=college_req.admin_name,
+    )
+    db.add(profile)
     
-    # Update request
     college_req.status = CollegeRequestStatus.APPROVED
-    college_req.reviewed_by = reviewer_id
+    college_req.reviewed_by_id = reviewer_id
     college_req.reviewed_at = func.now()
     college_req.college_id = new_college.id
     
     db.commit()
     db.refresh(college_req)
 
-    # Log approval
     print(f"[COLLEGE_APPROVED] College: {new_college.name}, Admin Email: {admin_user.email}")
+
+    event_bus.publish(NotificationType.COLLEGE_REQUEST_APPROVED.value, {
+        "recipient_id": admin_user.id,
+        "notification_type": NotificationType.COLLEGE_REQUEST_APPROVED,
+        "title": "College Request Approved",
+        "message": f"Your request to add {new_college.name} has been approved.",
+        "actor_id": reviewer_id,
+        "metadata_": {"request_id": college_req.id, "college_id": new_college.id}
+    })
 
     return college_req
 
@@ -218,41 +250,26 @@ def reject_college_request(
 ) -> CollegeRequest:
     """
     Reject a college request.
-    
-    SECURITY:
-    - Only SUPER_ADMIN can call this
-    - Request must be PENDING
-    
-    Args:
-        db: Database session
-        request_id: ID of request to reject
-        reviewer_id: ID of user rejecting (should be SUPER_ADMIN)
-        rejection_reason: Optional reason for rejection
-    
-    Returns:
-        Updated CollegeRequest object
-    
-    Raises:
-        ValueError: If security checks fail
     """
     college_req = get_college_request(db, request_id)
     if not college_req:
         raise ValueError("Request not found.")
     
-    # Security: Can only reject PENDING requests
     if college_req.status != CollegeRequestStatus.PENDING:
         raise ValueError(f"Cannot reject request with status '{college_req.status}'.")
     
     college_req.status = CollegeRequestStatus.REJECTED
-    college_req.reviewed_by = reviewer_id
+    college_req.reviewed_by_id = reviewer_id
     college_req.reviewed_at = func.now()
     college_req.rejection_reason = rejection_reason
     
     db.commit()
     db.refresh(college_req)
     
-    # Log rejection (no email sending)
     print(f"[COLLEGE_REJECTED] College request ID: {request_id}, Reason: {rejection_reason}")
+    
+    # We do not have a User to notify yet, so no in-app notification can be sent via WebSockets.
+    # We can send an email via EventBus in a future iteration.
     
     return college_req
 

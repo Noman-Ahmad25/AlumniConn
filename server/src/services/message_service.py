@@ -7,6 +7,8 @@ from src.models.conversation import Conversation
 from src.models.profile import Profile
 from src.utils.service import manager
 from src.services.cloudinary_service import upload_image
+from src.utils.event_bus import event_bus
+from src.models.notification import NotificationType
 
 async def send_message(
     db: Session,
@@ -64,6 +66,16 @@ async def send_message(
 
     await manager.send_private_json(recipient_id, {"type": "new_msg", "payload": payload})
     await manager.send_private_json(current_user.id, {"type": "new_msg", "payload": payload})
+    
+    event_bus.publish(NotificationType.MESSAGE_RECEIVED.value, {
+        "recipient_id": recipient_id,
+        "notification_type": NotificationType.MESSAGE_RECEIVED,
+        "title": "New Message",
+        "message": f"{current_user.username} sent you a message.",
+        "actor_id": current_user.id,
+        "metadata_": {"conversation_id": conversation_id, "message_id": msg.id}
+    })
+    
     return msg
 
 

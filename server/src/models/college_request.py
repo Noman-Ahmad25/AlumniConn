@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship, foreign
 from datetime import datetime
 from src.database import Base
@@ -24,6 +24,13 @@ class CollegeRequest(Base):
     description = Column(Text, nullable=True)
     admin_name = Column(String, nullable=False)
     admin_email = Column(String, nullable=False, index=True)
+    
+    # Auth & Verification
+    password_hash = Column(String, nullable=False)
+    email_verified = Column(Boolean, default=False, nullable=False, index=True)
+    email_verified_at = Column(DateTime, nullable=True)
+    verification_token_hash = Column(String, nullable=True, unique=True, index=True)
+    verification_token_expires_at = Column(DateTime, nullable=True)
     
     # Request metadata
     requested_by = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)

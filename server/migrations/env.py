@@ -19,12 +19,13 @@ from src.models.profile import Profile
 from src.models.connection import Connection
 from src.models.message import Message
 from src.models.college import College  
+from src.models.college_branding import CollegeBranding
 from src.models.post import Post
 from src.models.like import Like
 from src.models.comment import Comment
 from src.models.conversation import Conversation
 from src.models.college_request import CollegeRequest
-from src.models.alumni_request import AlumniRequest
+from src.models.notification import Notification
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
