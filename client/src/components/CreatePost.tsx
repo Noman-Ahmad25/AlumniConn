@@ -11,6 +11,7 @@ export default function CreatePost({ onPostCreated }: {
     const [selectedFile, setSelectedFile] = useState<File | null>(null) // State for the actual file
     const [previewUrl, setPreviewUrl] = useState<string>("") // State for the preview URL
     const [loading, setLoading] = useState<boolean>(false)
+    // @ts-expect-error unused variable
     const [error, setError] = useState<string>("")
     const [showPreview, setShowPreview] = useState<boolean>(false)
     const [isOpportunity, setIsOpportunity] = useState<boolean>(false)
