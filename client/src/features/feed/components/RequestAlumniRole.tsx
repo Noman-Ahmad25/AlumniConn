@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { alumniRequestsAPI } from "../api/requests"
-import { getApiErrorMessage } from "../utils/error"
+import { alumniRequestsAPI } from "../../../api/requests"
+import { getApiErrorMessage } from "../../../utils/error"
 
 interface RequestAlumniRoleProps {
   onSuccess?: () => void

@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getMyProfile, getUserProfile, updateProfile } from "../api/profile"
-import { getUserPosts } from "../../../api/post"
+import { getUserPosts } from "../../feed/api/post"
 import { startConversation } from "../../../api/message"
-import PostCard from "../../../components/PostCard"
+import PostCard from "../../feed/components/PostCard"
 import ConnectionButton from "../../../components/ConnectionButton"
 import ProfileForm from "../components/ProfileForm"
 import {
@@ -12,7 +12,7 @@ import {
   type ProfileFormValues,
 } from "../components/profileFormUtils"
 import type { Profile as ProfileType } from "../types/profile"
-import type { Post } from "../../../types/post"
+import type { Post } from "../../feed/types/post"
 import { getApiErrorMessage } from "../../../utils/error"
 import { getAuthToken, getCurrentUserIdFromToken } from "../../auth/utils/auth"
 

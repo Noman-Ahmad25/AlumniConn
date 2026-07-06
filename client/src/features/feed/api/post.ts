@@ -1,4 +1,4 @@
-import { API } from "../services/api";
+import { API } from "../../../services/api";
 import type { Post } from "../types/post";
 
 export const getFeed = async (): Promise<Post[]> => {

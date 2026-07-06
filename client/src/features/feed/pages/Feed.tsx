@@ -5,8 +5,8 @@ import PostCard from "../components/PostCard"
 import CreatePost from "../components/CreatePost"
 import RequestAlumniRole from "../components/RequestAlumniRole"
 import type { Post } from "../types/post"
-import { getApiErrorMessage } from "../utils/error"
-import { getCurrentUserRoleFromToken } from "../features/auth/utils/auth"
+import { getApiErrorMessage } from "../../../utils/error"
+import { getCurrentUserRoleFromToken } from "../../auth/utils/auth"
 
 export default function Feed() {
   const [posts, setPosts] = useState<Post[]>([])
