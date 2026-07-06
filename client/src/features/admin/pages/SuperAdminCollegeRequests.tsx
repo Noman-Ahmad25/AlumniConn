@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
-import { alumniRequestsAPI } from "../api/requests"
-import { getApiErrorMessage } from "../utils/error"
-import type { AlumniRequest, RequestStatus } from "../types/request"
+import { collegeRequestsAPI } from "../api/requests"
+import { getApiErrorMessage } from "../../../utils/error"
+import type { CollegeRequest, RequestStatus } from "../types/request"
 
-export default function AdminAlumniRequests() {
-  const [requests, setRequests] = useState<AlumniRequest[]>([])
+export default function SuperAdminCollegeRequests() {
+  const [requests, setRequests] = useState<CollegeRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [statusFilter, setStatusFilter] = useState<RequestStatus | undefined>(undefined)
@@ -19,10 +19,10 @@ export default function AdminAlumniRequests() {
       setError("")
 
       try {
-        const data = await alumniRequestsAPI.getAlumniRequests(statusFilter)
+        const data = await collegeRequestsAPI.getCollegeRequests(statusFilter)
         if (!cancelled) setRequests(data)
       } catch (err: unknown) {
-        if (!cancelled) setError(getApiErrorMessage(err, "Failed to fetch alumni requests"))
+        if (!cancelled) setError(getApiErrorMessage(err, "Failed to fetch college requests"))
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -37,7 +37,7 @@ export default function AdminAlumniRequests() {
   const handleApprove = async (requestId: number) => {
     setActionLoading(requestId)
     try {
-      const updatedRequest = await alumniRequestsAPI.approveAlumniRequest(requestId)
+      const updatedRequest = await collegeRequestsAPI.approveCollegeRequest(requestId)
       setRequests((current) => current.map((request) => (request.id === requestId ? updatedRequest : request)))
     } catch (err: unknown) {
       setError(getApiErrorMessage(err, "Failed to approve request"))
@@ -49,7 +49,7 @@ export default function AdminAlumniRequests() {
   const handleReject = async (requestId: number) => {
     setActionLoading(requestId)
     try {
-      const updatedRequest = await alumniRequestsAPI.rejectAlumniRequest(requestId, rejectionReason || undefined)
+      const updatedRequest = await collegeRequestsAPI.rejectCollegeRequest(requestId, rejectionReason || undefined)
       setRequests((current) => current.map((request) => (request.id === requestId ? updatedRequest : request)))
       setRejectingId(null)
       setRejectionReason("")
@@ -73,14 +73,12 @@ export default function AdminAlumniRequests() {
     }
   }
 
-  const pendingCount = requests.filter((r) => r.status === "pending").length
-
   return (
     <div className="app-page">
       <main className="app-main-wide">
         <div className="page-heading">
-          <h1 className="page-title">Alumni Requests</h1>
-          <p className="page-subtitle">Manage student alumni upgrade requests for your college.</p>
+          <h1 className="page-title">College Requests</h1>
+          <p className="page-subtitle">Review pending college creation requests.</p>
         </div>
 
       {error && (
@@ -89,27 +87,22 @@ export default function AdminAlumniRequests() {
         </div>
       )}
 
-      <div className="mb-6 flex flex-wrap gap-2 items-center">
+      <div className="mb-6 flex flex-wrap gap-2">
         <button
           onClick={() => setStatusFilter(undefined)}
           className={`px-4 py-2 rounded ${
             statusFilter === undefined ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
         >
-          All ({requests.length})
+          All
         </button>
         <button
           onClick={() => setStatusFilter("pending")}
-          className={`px-4 py-2 rounded flex items-center gap-2 ${
+          className={`px-4 py-2 rounded ${
             statusFilter === "pending" ? "bg-yellow-500 text-white" : "bg-gray-200"
           }`}
         >
           Pending
-          {pendingCount > 0 && (
-            <span className="bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold">
-              {pendingCount}
-            </span>
-          )}
         </button>
         <button
           onClick={() => setStatusFilter("approved")}
@@ -132,29 +125,40 @@ export default function AdminAlumniRequests() {
       {loading ? (
         <div className="text-center py-8">Loading...</div>
       ) : requests.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No alumni requests found</div>
+        <div className="text-center py-8 text-gray-500">No college requests found</div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {requests.map((request) => (
-            <div key={request.id} className="border rounded-lg p-4 bg-white shadow hover:shadow-md transition-shadow">
+            <div key={request.id} className="border rounded-lg p-4 bg-white shadow">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1">
-                  <p className="text-lg font-semibold">User ID: {request.user_id}</p>
-                  <p className="text-sm text-gray-600">College ID: {request.college_id}</p>
+                  <h3 className="text-lg font-bold">{request.name}</h3>
+                  <p className="text-sm text-gray-600">Domain: {request.domain}</p>
+                  <p className="text-sm text-gray-600">Admin: {request.admin_name}</p>
+                  <p className="text-sm text-gray-600">Email: {request.admin_email}</p>
                 </div>
                 <span className={`px-3 py-1 rounded text-sm font-semibold ${getStatusColor(request.status)}`}>
                   {request.status.toUpperCase()}
                 </span>
               </div>
 
+              <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                {request.location && <p>Location: {request.location}</p>}
+                {request.established_year && <p>Established: {request.established_year}</p>}
+              </div>
+
+              {request.description && (
+                <p className="text-sm text-gray-700 mb-3">{request.description}</p>
+              )}
+
               <div className="text-xs text-gray-500 mb-3">
-                Requested: {new Date(request.created_at).toLocaleDateString()}
-                {request.reviewed_at && (
+                {request.requested_by && (
                   <>
+                    Requested by: User #{request.requested_by}
                     <br />
-                    Reviewed: {new Date(request.reviewed_at).toLocaleDateString()}
                   </>
                 )}
+                Created: {new Date(request.created_at).toLocaleDateString()}
               </div>
 
               {request.rejection_reason && (
@@ -169,14 +173,14 @@ export default function AdminAlumniRequests() {
                   <button
                     onClick={() => handleApprove(request.id)}
                     disabled={actionLoading === request.id}
-                    className="btn btn-success flex-1 text-sm"
+                    className="btn btn-success flex-1"
                   >
-                    {actionLoading === request.id ? "Approving..." : "Approve Alumni Role"}
+                    {actionLoading === request.id ? "Approving..." : "Approve"}
                   </button>
                   <button
                     onClick={() => setRejectingId(request.id)}
                     disabled={actionLoading === request.id}
-                    className="btn btn-danger flex-1 text-sm"
+                    className="btn btn-danger flex-1"
                   >
                     Reject
                   </button>

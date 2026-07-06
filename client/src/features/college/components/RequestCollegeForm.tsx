@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
-import { collegeRequestsAPI } from "../api/requests"
-import { getApiErrorMessage } from "../utils/error"
+import { collegeRequestsAPI } from "../../admin/api/requests"
+import { getApiErrorMessage } from "../../../utils/error"
 
 interface RequestCollegeFormProps {
   onSuccess?: () => void
