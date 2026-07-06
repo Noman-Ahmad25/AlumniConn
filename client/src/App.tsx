@@ -6,7 +6,7 @@ import SuperAdminLogin from "./pages/SuperAdminLogin"
 
 import CreateProfile from "./features/profile/pages/CreateProfile"
 import Feed from "./features/feed/pages/Feed"
-import Connections from "./pages/Connections"
+import Connections from "./features/connections/pages/Connections"
 import Profile from "./features/profile/pages/Profile"
 import Chat from "./features/messages/pages/Chat"
 import Messages from "./features/messages/pages/Messages"

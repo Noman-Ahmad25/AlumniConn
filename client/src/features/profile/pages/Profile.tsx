@@ -4,7 +4,7 @@ import { getMyProfile, getUserProfile, updateProfile } from "../api/profile"
 import { getUserPosts } from "../../feed/api/post"
 import { startConversation } from "../../messages/api/message"
 import PostCard from "../../feed/components/PostCard"
-import ConnectionButton from "../../../components/ConnectionButton"
+import ConnectionButton from "../../connections/components/ConnectionButton"
 import ProfileForm from "../components/ProfileForm"
 import {
   formToProfilePayload,

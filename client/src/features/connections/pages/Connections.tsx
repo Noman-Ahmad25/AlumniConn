@@ -8,9 +8,9 @@ import {
   rejectRequest,
   sendRequest,
 } from "../api/connection"
-import UserCard from "../features/profile/components/UserCard"
+import UserCard from "../../profile/components/UserCard"
 import type { Connection, DiscoverUser } from "../types/connection"
-import { getApiErrorMessage } from "../utils/error"
+import { getApiErrorMessage } from "../../../utils/error"
 
 function connectionToDiscoverUser(connection: Connection): DiscoverUser {
   return {

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toggleLike } from "../api/post"
 import CommentSection from "./CommentSection"
-import ConnectionButton from "../../../components/ConnectionButton"
+import ConnectionButton from "../../connections/components/ConnectionButton"
 import type { Post } from "../types/post"
 
 

@@ -1,6 +1,6 @@
 import { acceptRequest, rejectRequest } from "../api/connection"
 import { useState } from "react"
-import { getApiErrorMessage } from "../utils/error"
+import { getApiErrorMessage } from "../../../utils/error"
 
 interface Connection {
   id: number

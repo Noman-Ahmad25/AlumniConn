@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { sendRequest } from "../api/connection"
-import { getApiErrorMessage } from "../utils/error"
+import { getApiErrorMessage } from "../../../utils/error"
 
 type ConnectionButtonStatus = "self" | "none" | "pending" | "connected"
 
