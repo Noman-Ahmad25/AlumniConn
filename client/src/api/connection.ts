@@ -1,4 +1,4 @@
-import { API } from "./index"
+import { API } from "../services/api"
 import type { Connection, DiscoverUser } from "../types/connection"
 
 export const getDiscoverUsers = async (): Promise<DiscoverUser[]> => {

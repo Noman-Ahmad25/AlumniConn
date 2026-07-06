@@ -1,4 +1,4 @@
-import { API } from "./index"
+import { API } from "../services/api"
 import type {
   AlumniRequest,
   CollegeRequest,

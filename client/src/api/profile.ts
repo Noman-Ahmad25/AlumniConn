@@ -1,4 +1,4 @@
-import { API } from "./index";
+import { API } from "../services/api";
 import type { Profile, ProfileUpdateInput } from "../types/profile";
 
 export const getMyProfile = async (): Promise<Profile> => {

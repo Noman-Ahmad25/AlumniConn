@@ -1,4 +1,4 @@
-import { API } from "./index"
+import { API } from "../services/api"
 
 export interface CommentResponse {
     id: number

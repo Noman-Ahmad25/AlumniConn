@@ -1,4 +1,4 @@
-import { API } from "./index"
+import { API } from "../services/api"
 import { getAuthToken } from "../utils/auth"
 
 export interface MessageResponse {
