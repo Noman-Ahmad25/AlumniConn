@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom"
 import { getMessages, sendMessage } from "../api/message"
 import type { MessageResponse, MessageSocketEvent } from "../api/message"
 import { useMessagesSocket } from "../hooks/useMessagesSocket"
-import { getCurrentUserIdFromToken } from "../features/auth/utils/auth"
-import { getApiErrorMessage } from "../utils/error"
+import { getCurrentUserIdFromToken } from "../../auth/utils/auth"
+import { getApiErrorMessage } from "../../../utils/error"
 
 function getInitials(username?: string | null) {
   if (!username) return "U"

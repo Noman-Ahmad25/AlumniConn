@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getInbox } from "../api/message"
-import { getApiErrorMessage } from "../utils/error"
+import { getApiErrorMessage } from "../../../utils/error"
 import type { InboxMessage } from "../api/message"
 
 function getInitials(username?: string | null) {
