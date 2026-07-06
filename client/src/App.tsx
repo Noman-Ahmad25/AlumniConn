@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { useEffect, useState, type ReactNode } from "react"
-import Register from "./pages/Register"
-import Login from "./pages/Login"
+import Register from "./features/auth/pages/Register"
+import Login from "./features/auth/pages/Login"
 import SuperAdminLogin from "./pages/SuperAdminLogin"
+
 import CreateProfile from "./pages/CreateProfile"
 import Feed from "./pages/Feed"
 import Connections from "./pages/Connections"
@@ -13,8 +14,8 @@ import RequestCollege from "./pages/RequestCollege"
 import SuperAdminCollegeRequests from "./pages/SuperAdminCollegeRequests"
 import AdminAlumniRequests from "./pages/AdminAlumniRequests"
 import Topbar from "./layouts/AppShell/Topbar"
-import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken } from "./utils/auth"
-import type { UserRole } from "./types/auth"
+import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken } from "./features/auth/utils/auth"
+import type { UserRole } from "./features/auth/types/auth"
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(hasAuthToken)

@@ -2,7 +2,7 @@ import { useState, type ChangeEvent } from "react" // Added ChangeEvent
 import { createPost } from "../api/post"
 import type { Post } from "../types/post"
 import { getApiErrorMessage } from "../utils/error"
-import { getCurrentUserRoleFromToken } from "../utils/auth"
+import { getCurrentUserRoleFromToken } from "../features/auth/utils/auth"
 
 export default function CreatePost({ onPostCreated }: {
     onPostCreated: (post: Post) => void

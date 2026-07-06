@@ -14,7 +14,7 @@ import {
 import type { Profile as ProfileType } from "../types/profile"
 import type { Post } from "../types/post"
 import { getApiErrorMessage } from "../utils/error"
-import { getAuthToken, getCurrentUserIdFromToken } from "../utils/auth"
+import { getAuthToken, getCurrentUserIdFromToken } from "../features/auth/utils/auth"
 
 function getInitials(username: string) {
   return username

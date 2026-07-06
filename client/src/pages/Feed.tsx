@@ -6,7 +6,7 @@ import CreatePost from "../components/CreatePost"
 import RequestAlumniRole from "../components/RequestAlumniRole"
 import type { Post } from "../types/post"
 import { getApiErrorMessage } from "../utils/error"
-import { getCurrentUserRoleFromToken } from "../utils/auth"
+import { getCurrentUserRoleFromToken } from "../features/auth/utils/auth"
 
 export default function Feed() {
   const [posts, setPosts] = useState<Post[]>([])

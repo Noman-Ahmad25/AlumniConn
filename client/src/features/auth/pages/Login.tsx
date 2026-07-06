@@ -1,8 +1,8 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { loginUser } from "../api/auth"
-import { getColleges, type College } from "../api/college"
-import { getApiErrorMessage } from "../utils/error"
+import { getColleges, type College } from "../../../api/college"
+import { getApiErrorMessage } from "../../../utils/error"
 import { getCurrentUserRoleFromToken, getRoleHomePath, setAuthToken } from "../utils/auth"
 
 interface LoginForm {

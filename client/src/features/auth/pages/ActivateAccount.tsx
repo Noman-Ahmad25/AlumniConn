@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { activateAccount, verifyActivationToken } from "../api/auth"
-import { getApiErrorMessage } from "../utils/error"
+import { getApiErrorMessage } from "../../../utils/error"
 
 export default function ActivateAccount() {
   const navigate = useNavigate()

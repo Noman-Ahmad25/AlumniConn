@@ -1,8 +1,8 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
-import { loginSuperAdmin } from "../api/auth"
+import { loginSuperAdmin } from "../features/auth/api/auth"
 import { getApiErrorMessage } from "../utils/error"
-import { setAuthToken } from "../utils/auth"
+import { setAuthToken } from "../features/auth/utils/auth"
 
 interface SuperAdminLoginForm {
   email: string

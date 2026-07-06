@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
-import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken, logout } from "../../utils/auth"
+import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken, logout } from "../../features/auth/utils/auth"
 
 export default function Topbar() {
   const location = useLocation()

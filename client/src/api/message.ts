@@ -1,5 +1,5 @@
 import { API } from "../services/api"
-import { getAuthToken } from "../utils/auth"
+import { getAuthToken } from "../features/auth/utils/auth"
 
 export interface MessageResponse {
   id: number
