@@ -8,7 +8,7 @@ import {
   rejectRequest,
   sendRequest,
 } from "../api/connection"
-import UserCard from "../components/UserCard"
+import UserCard from "../features/profile/components/UserCard"
 import type { Connection, DiscoverUser } from "../types/connection"
 import { getApiErrorMessage } from "../utils/error"
 

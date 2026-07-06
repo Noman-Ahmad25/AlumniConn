@@ -7,7 +7,7 @@ import {
   profileToForm,
   type ProfileFormValues,
 } from "../components/profileFormUtils"
-import { getApiErrorMessage } from "../utils/error"
+import { getApiErrorMessage } from "../../../utils/error"
 
 export default function CreateProfile() {
   const navigate = useNavigate()

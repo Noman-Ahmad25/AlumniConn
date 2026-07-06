@@ -3,7 +3,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { vi } from "vitest"
 import Profile from "./Profile"
 import { getMyProfile, getUserProfile } from "../api/profile"
-import { getUserPosts } from "../api/post"
+import { getUserPosts } from "../../../api/post"
 
 vi.mock("../api/profile", () => ({
   getMyProfile: vi.fn(),
