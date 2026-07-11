@@ -97,7 +97,7 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
       {success && (
         <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
           <p className="font-semibold">College request submitted successfully!</p>
-          <p className="text-sm mt-1">Awaiting SUPER_ADMIN approval. Once approved, the college and admin account will be activated immediately.</p>
+          <p className="text-sm mt-1">Please check your admin email inbox for a verification link. You must verify your email before a Super Admin can approve the request.</p>
         </div>
       )}
 
@@ -250,11 +250,11 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
         <p className="font-semibold mb-1">What happens next:</p>
         <ul className="list-disc list-inside space-y-1">
-          <li>A SUPER_ADMIN will review your college request</li>
-          <li>If approved, the college is activated immediately</li>
-          <li>The admin account is created with the password you provided</li>
-          <li>Admin can login right away using the email and password</li>
-          <li>Recommend changing the password after first login for security</li>
+          <li>Check your email and click the verification link.</li>
+          <li>A SUPER_ADMIN will review your verified request.</li>
+          <li>If approved, the college is activated immediately.</li>
+          <li>The admin account is created with the password you provided.</li>
+          <li>Admin can login right away using the email and password.</li>
         </ul>
       </div>
     </div>

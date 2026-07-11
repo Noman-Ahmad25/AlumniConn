@@ -12,16 +12,21 @@ export default function SuperAdminCollegeRequests() {
   const [rejectionReason, setRejectionReason] = useState<string>("")
   const [rejectingId, setRejectingId] = useState<number | null>(null)
 
+  console.log("Component rendered");
   useEffect(() => {
+    console.log("useEffect started");
     let cancelled = false
     const fetchRequests = async () => {
+      console.log("Before API call");
       setLoading(true)
       setError("")
 
       try {
         const data = await collegeRequestsAPI.getCollegeRequests(statusFilter)
+        console.log("After API call", data);
         if (!cancelled) setRequests(data)
       } catch (err: unknown) {
+        console.error("API Error", err);
         if (!cancelled) setError(getApiErrorMessage(err, "Failed to fetch college requests"))
       } finally {
         if (!cancelled) setLoading(false)
@@ -30,6 +35,7 @@ export default function SuperAdminCollegeRequests() {
 
     fetchRequests()
     return () => {
+      
       cancelled = true
     }
   }, [statusFilter])
@@ -37,6 +43,7 @@ export default function SuperAdminCollegeRequests() {
   const handleApprove = async (requestId: number) => {
     setActionLoading(requestId)
     try {
+  
       const updatedRequest = await collegeRequestsAPI.approveCollegeRequest(requestId)
       setRequests((current) => current.map((request) => (request.id === requestId ? updatedRequest : request)))
     } catch (err: unknown) {

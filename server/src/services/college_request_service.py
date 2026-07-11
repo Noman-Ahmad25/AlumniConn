@@ -228,8 +228,7 @@ def approve_college_request(
     db.commit()
     db.refresh(college_req)
 
-    print(f"[COLLEGE_APPROVED] College: {new_college.name}, Admin Email: {admin_user.email}")
-
+    task_dispatcher = get_task_dispatcher() # We need the task_dispatcher. Oh wait! It's not passed in!
     event_bus.publish(NotificationType.COLLEGE_REQUEST_APPROVED.value, {
         "recipient_id": admin_user.id,
         "notification_type": NotificationType.COLLEGE_REQUEST_APPROVED,

@@ -16,13 +16,29 @@ export interface RegisterPayload {
   username: string
   email: string
   password: string
-  college_id: number
+  college_slug: string
   role: "student" | "alumni"
+}
+
+export interface LoginPayload {
+  username_or_email: string
+  password: string
+  college_slug: string
 }
 
 export interface SuperAdminLoginPayload {
   email: string
   password: string
+}
+
+export interface ForgotPasswordPayload {
+  username_or_email: string
+  college_slug: string
+}
+
+export interface ResetPasswordPayload {
+  token: string
+  new_password: string
 }
 
 export interface UserResponse {

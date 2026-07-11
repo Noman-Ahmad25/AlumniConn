@@ -6,6 +6,7 @@ import type {
   RequestStatus,
 } from "../types/request"
 
+
 function buildRequestParams(status?: RequestStatus, skip: number = 0, limit: number = 100) {
   return {
     ...(status ? { status_filter: status } : {}),
@@ -17,6 +18,16 @@ function buildRequestParams(status?: RequestStatus, skip: number = 0, limit: num
 export const collegeRequestsAPI = {
   requestCollege: async (collegeData: CollegeRequestCreate): Promise<CollegeRequest> => {
     const response = await API.post("/college-requests/", collegeData)
+    return response.data
+  },
+
+  verifyEmail: async (token: string): Promise<{ message: string }> => {
+    const response = await API.post("/college-requests/verify-email", { token })
+    return response.data
+  },
+
+  resendVerification: async (requestId: number): Promise<{ message: string }> => {
+    const response = await API.post("/college-requests/resend-verification", { request_id: requestId })
     return response.data
   },
 

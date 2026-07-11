@@ -1,47 +1,28 @@
-import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
+import { useState, type ChangeEvent, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { loginUser } from "../api/auth"
-import { getColleges, type College } from "../../college/api/college"
 import { getApiErrorMessage } from "../../../utils/error"
 import { getCurrentUserRoleFromToken, getRoleHomePath, setAuthToken } from "../utils/auth"
+import { useTenant } from "../../../providers/TenantProvider"
 
 interface LoginForm {
-  email: string
+  username_or_email: string
   password: string
-  college_id: string
 }
 
 export default function Login() {
     const navigate = useNavigate();
+    const { tenant } = useTenant();
     const [form, setForm] = useState<LoginForm>({
-        email: "",
+        username_or_email: "",
         password: "",
-        college_id: "",
     }); 
-    const [colleges, setColleges] = useState<College[]>([])
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
 
-  useEffect(() => {
-        const fetchColleges = async () => {
-            try {
-                const response = await getColleges()
-                setColleges(response)
-            } catch (error) {
-                console.error('Error fetching colleges:', error)
-            }
-        }
-
-        fetchColleges()
-    }, [])
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-
-        setForm({
-        ...form,
-        [name]: value
-        });
+        setForm(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e: FormEvent) => {
@@ -49,13 +30,19 @@ export default function Login() {
         setLoading(true);
         setError("");
 
+        if (!tenant) {
+            setError("Invalid tenant");
+            setLoading(false);
+            return;
+        }
+
         try {
             const response = await loginUser({
               ...form,
-              college_id: Number(form.college_id),
+              college_slug: tenant.slug,
             });
             setAuthToken(response.access_token);
-            navigate(getRoleHomePath(getCurrentUserRoleFromToken()));
+            navigate(`/c/${tenant.slug}` + getRoleHomePath(getCurrentUserRoleFromToken()));
         } catch (error: unknown) {
             const message = getApiErrorMessage(error, "Invalid email or password");
             // Handle specific college approval error
@@ -76,15 +63,19 @@ export default function Login() {
         className="auth-card px-7 py-7 space-y-5"
       >
         <div className="text-center">
-          <div className="brand-mark mx-auto mb-4" aria-hidden="true">
-            <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m3 8.5 9-4 9 4-9 4-9-4Z" />
-              <path d="M7 11v4.5c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V11" />
-              <path d="M21 8.5v5" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-slate-950">Welcome back</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-500">Sign in to continue your campus network.</p>
+          {tenant?.branding?.logo_url ? (
+             <img src={tenant.branding.logo_url} alt={`${tenant.name} Logo`} className="mx-auto h-12 w-auto mb-4" />
+          ) : (
+            <div className="brand-mark mx-auto mb-4" aria-hidden="true">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m3 8.5 9-4 9 4-9-4Z" />
+                <path d="M7 11v4.5c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V11" />
+                <path d="M21 8.5v5" />
+              </svg>
+            </div>
+          )}
+          <h1 className="text-2xl font-bold text-slate-950">Welcome to {tenant?.name || "Campus Network"}</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-500">Sign in to continue.</p>
         </div>
 
         {error && (
@@ -92,12 +83,12 @@ export default function Login() {
         )}
 
         <label>
-          <span className="field-label">Email</span>
+          <span className="field-label">Email or Username</span>
           <input
-            type="email"
-            name="email"
+            type="text"
+            name="username_or_email"
             placeholder="you@example.com"
-            value={form.email}
+            value={form.username_or_email}
             onChange={handleChange}
             className="form-field"
             required
@@ -117,23 +108,15 @@ export default function Login() {
           />
         </label>
 
-        <label>
-          <span className="field-label">College</span>
-          <select
-            name="college_id"
-            value={form.college_id}
-            onChange={handleChange}
-            className="form-field"
-            required
+        <div className="flex justify-end">
+          <button
+            type="button"
+            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+            onClick={() => navigate(`/c/${tenant?.slug}/forgot-password`)}
           >
-            <option value="">Select college</option>
-            {colleges.map((college) => (
-              <option key={college.id} value={college.id}>
-                {college.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            Forgot password?
+          </button>
+        </div>
 
         <button
           type="submit"
@@ -148,19 +131,11 @@ export default function Login() {
           <button
             type="button"
             className="font-bold text-blue-700 transition-colors hover:text-blue-800"
-            onClick={() => navigate("/register")}
+            onClick={() => navigate(`/c/${tenant?.slug}/register`)}
           >
             Register
           </button>
         </p>
-
-        <button
-          type="button"
-          className="w-full text-center text-sm font-bold text-blue-700 transition-colors hover:text-blue-800"
-          onClick={() => navigate("/request-college")}
-        >
-          Request college onboarding
-        </button>
       </form>
     </div>
   )
