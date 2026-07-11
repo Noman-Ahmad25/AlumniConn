@@ -81,6 +81,7 @@ export default function SuperAdminLogin() {
             placeholder="Your password"
             value={form.password}
             onChange={handleChange}
+            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}"
             className="form-field"
             required
           />

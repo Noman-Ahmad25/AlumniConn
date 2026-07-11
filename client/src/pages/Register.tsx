@@ -129,6 +129,7 @@ return (
                 value={form.password}
                 onChange={handleChange}
                 className="form-field"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}"
                 required
               />
             </div>

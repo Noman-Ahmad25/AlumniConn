@@ -28,6 +28,15 @@ class CollegeRequestCreate(BaseModel):
     @classmethod
     def normalize_domain(cls, value: str) -> str:
         return value.strip().lower()
+    
+    @field_validator("admin_password")
+    @classmethod
+    def validate_password_complexity(cls, value: str) -> str:
+        if not any(char.isdigit() for char in value):
+            raise ValueError("Password must contain at least one number.")
+        if not any(char.isupper() for char in value):
+            raise ValueError("Password must contain at least one uppercase letter.")
+        return value
 
 
 class CollegeRequestResponse(BaseModel):
