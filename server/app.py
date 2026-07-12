@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import os
+from alembic.config import Config
+from alembic import command
 
 from src.database.base import Base
 from src.database.session import engine, SessionLocal
@@ -32,17 +34,24 @@ from src.routes.like import router as like_router
 from src.routes.comment import router as comment_router
 from src.routes.user import router as user_router
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # This block runs on startup
+    # 1. Run Alembic migrations programmatically on startup
+    try:
+        # Assumes alembic.ini is in your /server project root directory
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+        print("Database migrations applied successfully.")
+    except Exception as e:
+        print(f"Error running migrations on startup: {e}")
+
+    # 2. Run the seeding logic safely
     db = SessionLocal()
     try:
         seed_super_admin(db)
     finally:
         db.close()
     yield
-    # Any cleanup code (shutdown) goes here
 
 # 3. Update the FastAPI initialization
 app = FastAPI(title="AlumniConn API", lifespan=lifespan)
