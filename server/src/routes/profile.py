@@ -8,7 +8,14 @@ from src.database.session import get_db
 from src.utils.dispatcher import get_task_dispatcher
 from src.services.profile_service import create_profile, get_my_profile, get_other_profile, update_profile
 
+from src.utils.dispatcher import (
+    AbstractTaskDispatcher,
+    get_task_dispatcher,
+)
+import json
+
 router = APIRouter()
+
 
 @router.post("/", response_model=ProfileResponse, status_code=status.HTTP_201_CREATED)
 def create_user_profile(
@@ -23,10 +30,6 @@ def create_user_profile(
     return result
 
 
-from fastapi import BackgroundTasks
-import json
-
-from src.utils.dispatcher import AbstractTaskDispatcher, get_task_dispatcher
 
 @router.put("/me", response_model=ProfileResponse, status_code=status.HTTP_200_OK)
 @router.patch("/me", response_model=ProfileResponse, status_code=status.HTTP_200_OK)
