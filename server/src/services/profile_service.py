@@ -8,6 +8,9 @@ from src.models.connection import Connection, ConnectionStatus
 from src.models.profile import Profile
 from src.schemas.profile import ProfileCreate, ProfileUpdate
 from src.models.user import User
+from fastapi import UploadFile
+from src.services.recommendation_service import trigger_embedding_generation
+from src.utils.dispatcher import AbstractTaskDispatcher
 
 PROFILE_FIELDS = (
     "full_name",
@@ -115,9 +118,7 @@ def create_profile(db: Session, profile: ProfileCreate, current_user: User, task
     return format_profile(db_profile, user, "self")
 
 
-from fastapi import UploadFile
-from src.services.recommendation_service import trigger_embedding_generation
-from src.utils.dispatcher import AbstractTaskDispatcher
+
 
 def update_profile(
     db: Session, 
