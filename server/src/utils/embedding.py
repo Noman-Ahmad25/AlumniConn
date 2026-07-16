@@ -1,15 +1,16 @@
-from sentence_transformers import SentenceTransformer
 import hashlib
 from typing import List, Dict, Any
 
 # Load the model lazily to avoid startup overhead if not used immediately
 _model = None
 
-def get_embedding_model() -> SentenceTransformer:
+def get_embedding_model():
     global _model
+
     if _model is None:
-        # Use a small, fast model suitable for CPU inference
-        _model = SentenceTransformer('all-MiniLM-L6-v2')
+        from sentence_transformers import SentenceTransformer
+        _model = SentenceTransformer("all-MiniLM-L6-v2")
+
     return _model
 
 def generate_semantic_text(profile: Any) -> str:
