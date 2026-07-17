@@ -9,7 +9,7 @@ from src.models.like import Like
 from src.models.profile import Profile
 from src.models.comment import Comment
 from src.utils.dependency import format_post, format_posts_bulk
-
+from typing import Optional
 
 def create_post(db: Session, user_id: int, data: PostCreate, image_file: Optional[UploadFile] = None):
     final_image_url = None

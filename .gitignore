@@ -58,9 +58,6 @@ Thumbs.db
 docs
 
 
-# Alembic configuration and versions
-alembic.ini
-!server/migrations/versions/*.py
 
 
 # Ignore all files in the static folder and its subfolders
