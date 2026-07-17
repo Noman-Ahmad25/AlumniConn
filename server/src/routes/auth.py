@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 from src.services.auth_service import (
     login_super_admin,
@@ -53,14 +53,22 @@ def register(
     return result
 
 
-@router.post("/verify-email", status_code=status.HTTP_200_OK)
+
+
+
+@router.get("/verify-email", status_code=status.HTTP_200_OK)
 def verify_email(
-    request: VerifyEmailRequest,
-    db: Session = Depends(get_db)
+    token: str = Query(...),
+    db: Session = Depends(get_db),
 ):
-    success = verify_user_email(db, request.token)
+    success = verify_user_email(db, token)
+
     if not success:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired verification token")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification token",
+        )
+
     return {"message": "Email verified successfully"}
 
 

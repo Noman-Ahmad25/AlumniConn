@@ -47,13 +47,24 @@ def request_college_creation(
     status_code=status.HTTP_200_OK,
     tags=["College Requests"],
 )
+
+@router.get(
+    "/verify-email",
+    status_code=status.HTTP_200_OK,
+    tags=["College Requests"],
+)
 def verify_email(
-    request: VerifyEmailRequest,
-    db: Session = Depends(get_db)
+    token: str,
+    db: Session = Depends(get_db),
 ):
-    success = college_request_service.verify_college_email(db, request.token)
+    success = college_request_service.verify_college_email(db, token)
+
     if not success:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired verification token")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification token",
+        )
+
     return {"message": "Email verified successfully"}
 
 
