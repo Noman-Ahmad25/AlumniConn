@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import logging
 import os
 import re
 
@@ -16,6 +17,7 @@ from src.utils.tokens import generate_verification_token, hash_token, verify_tok
 from src.utils.dispatcher import AbstractTaskDispatcher
 from src.services.email.service import EmailService
 
+logger = logging.getLogger(__name__)
 
 def create_college_request(
     db: Session, 
@@ -159,11 +161,11 @@ def list_college_requests_for_super_admin(
     
     return query.order_by(CollegeRequest.created_at.desc()).offset(skip).limit(limit).all()
 
-
 def approve_college_request(
     db: Session,
     request_id: int,
-    reviewer_id: int
+    reviewer_id: int,
+    task_dispatcher: AbstractTaskDispatcher,
 ) -> CollegeRequest:
     """
     Approve a college request and create the college, user, and profile atomically.
@@ -228,7 +230,7 @@ def approve_college_request(
     db.commit()
     db.refresh(college_req)
 
-    task_dispatcher = get_task_dispatcher() # We need the task_dispatcher. Oh wait! It's not passed in!
+    # Publish notification AFTER commit — admin_user.id is now guaranteed to exist in the DB.
     event_bus.publish(NotificationType.COLLEGE_REQUEST_APPROVED.value, {
         "recipient_id": admin_user.id,
         "notification_type": NotificationType.COLLEGE_REQUEST_APPROVED,
@@ -239,6 +241,7 @@ def approve_college_request(
     })
 
     return college_req
+
 
 
 def reject_college_request(
@@ -265,7 +268,7 @@ def reject_college_request(
     db.commit()
     db.refresh(college_req)
     
-    print(f"[COLLEGE_REJECTED] College request ID: {request_id}, Reason: {rejection_reason}")
+    logger.info("[COLLEGE_REJECTED] College request ID: %s, Reason: %s", request_id, rejection_reason)
     
     # We do not have a User to notify yet, so no in-app notification can be sent via WebSockets.
     # We can send an email via EventBus in a future iteration.

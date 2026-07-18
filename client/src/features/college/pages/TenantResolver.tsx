@@ -3,6 +3,7 @@ import { Outlet, useParams } from "react-router-dom";
 import { getCollegeBySlug, type CollegePublicResponse } from "../../college/api/college";
 import { TenantProvider } from "../../../providers/TenantProvider";
 import NotFound from "../../../shared/pages/NotFound";
+import Topbar from "../../../layouts/AppShell/Topbar";
 
 export default function TenantResolver() {
     const { collegeSlug } = useParams<{ collegeSlug: string }>();
@@ -53,6 +54,7 @@ export default function TenantResolver() {
 
     return (
         <TenantProvider tenant={tenant}>
+            <Topbar />
             <Outlet />
         </TenantProvider>
     );

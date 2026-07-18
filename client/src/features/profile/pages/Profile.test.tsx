@@ -11,7 +11,7 @@ vi.mock("../api/profile", () => ({
   updateProfile: vi.fn(),
 }))
 
-vi.mock("../api/post", () => ({
+vi.mock("../../feed/api/post", () => ({
   getUserPosts: vi.fn(),
   toggleLike: vi.fn(),
 }))

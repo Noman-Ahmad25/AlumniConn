@@ -1,12 +1,15 @@
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken, logout } from "../../features/auth/utils/auth"
 
 export default function Topbar() {
+  const { collegeSlug } = useParams<{ collegeSlug: string }>()
   const location = useLocation()
   const navigate = useNavigate()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [role, setRole] = useState(getCurrentUserRoleFromToken)
+
+  console.log("Topbar collegeSlug:", collegeSlug);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -27,7 +30,7 @@ export default function Topbar() {
     logout()
     setIsLoggedIn(false)
     setRole(null)
-    navigate("/login")
+    navigate(collegeSlug ? `/c/${collegeSlug}/login` : "/login")
   }
 
   const isActive = (path: string) => {
@@ -36,15 +39,17 @@ export default function Topbar() {
       : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
   }
 
-  const homePath = getRoleHomePath(role)
+  const prefix = collegeSlug ? `/c/${collegeSlug}` : ""
+  const homePath = role === "super_admin" ? "/super-admin/college-requests" : `${prefix}${getRoleHomePath(role)}`
+
   const mainLinks = role === "super_admin"
     ? [{ to: "/super-admin/college-requests", label: "College Approvals" }]
     : [
-        { to: "/feed", label: "Feed" },
-        { to: "/connections", label: "Connections" },
-        { to: "/profile", label: "Profile" },
-        { to: "/messages", label: "Messages" },
-        ...(role === "admin" ? [{ to: "/admin/alumni-requests", label: "Alumni Requests" }] : []),
+        { to: `${prefix}/feed`, label: "Feed" },
+        { to: `${prefix}/connections`, label: "Connections" },
+        { to: `${prefix}/profile`, label: "Profile" },
+        { to: `${prefix}/messages`, label: "Messages" },
+        ...(role === "admin" ? [{ to: `${prefix}/admin/alumni-requests`, label: "Alumni Requests" }] : []),
       ]
 
   return (
@@ -80,7 +85,7 @@ export default function Topbar() {
             {isLoggedIn && role !== "super_admin" && (
               <>
                 <Link
-                  to="/messages"
+                  to={`${prefix}/messages`}
                   className="icon-button"
                   title="Messages"
                 >

@@ -25,10 +25,15 @@ export const registerUser = async (data: RegisterPayload): Promise<UserResponse>
     return response.data;
 }
 
-export const verifyEmail = async (data: { token: string }): Promise<{ message: string }> => {
-    const response = await API.post('/auth/verify-email', data);
-    return response.data;
-}
+export const verifyEmail = async (
+  token: string
+): Promise<{ message: string }> => {
+  const response = await API.get("/auth/verify-email", {
+    params: { token },
+  });
+
+  return response.data;
+};
 
 export const resendVerification = async (data: { user_id: number }): Promise<{ message: string }> => {
     const response = await API.post('/auth/resend-verification', data);

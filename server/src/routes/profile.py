@@ -5,13 +5,11 @@ from src.models.user import User
 from src.schemas.profile import ProfileCreate, ProfileUpdate, ProfileResponse
 from src.utils.dependency import get_current_user
 from src.database.session import get_db
-from src.utils.dispatcher import get_task_dispatcher
-from src.services.profile_service import create_profile, get_my_profile, get_other_profile, update_profile
-
 from src.utils.dispatcher import (
     AbstractTaskDispatcher,
     get_task_dispatcher,
 )
+from src.services.profile_service import create_profile, get_my_profile, get_other_profile, update_profile
 import json
 
 router = APIRouter()

@@ -35,7 +35,7 @@ export default function VerifyEmail() {
             }
 
             try {
-                const response = await verifyEmail({ token });
+               const response = await verifyEmail(token);
                 if (isMounted) {
                     setMessage(response.message || "Email verified successfully.");
                     setLoading(false);

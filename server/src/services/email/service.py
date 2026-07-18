@@ -1,4 +1,5 @@
 import os
+import logging
 from jinja2 import Environment, FileSystemLoader
 from src.services.email.provider import EmailProvider
 from src.services.email.mock_provider import MockEmailProvider
@@ -41,7 +42,9 @@ template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../t
 env = Environment(loader=FileSystemLoader(template_dir))
 
 
-print(f"Email provider: {type(_provider).__name__}")
+logger = logging.getLogger(__name__)
+
+logger.info("Email provider: %s", type(_provider).__name__)
 
 class EmailService:
     """
@@ -71,7 +74,7 @@ class EmailService:
         Sends the email verification link for a college request.
         """
         frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
-        verification_link = f"{frontend_url}/verify-college?token={token}"
+        verification_link = f"{frontend_url}/verify-college-email?token={token}"
         
         template = env.get_template("college_verification.html")
         html_body = template.render(college_name=college_name, verification_link=verification_link)

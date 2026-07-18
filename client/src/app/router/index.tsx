@@ -18,8 +18,8 @@ import RequestCollege from "../../features/college/pages/RequestCollege"
 import VerifyCollegeEmail from "../../features/college/pages/VerifyCollegeEmail"
 import SuperAdminCollegeRequests from "../../features/admin/pages/SuperAdminCollegeRequests"
 import AdminAlumniRequests from "../../features/admin/pages/AdminAlumniRequests"
-import Topbar from "../../layouts/AppShell/Topbar"
 import TenantResolver from "../../features/college/pages/TenantResolver"
+import TenantHome from "../../features/college/pages/TenantHome"
 import LandingPage from "../../shared/pages/LandingPage"
 import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken } from "../../features/auth/utils/auth"
 import type { UserRole } from "../../features/auth/types/auth"
@@ -71,21 +71,10 @@ function RoleRoute({ children, roles }: { children: ReactNode; roles: UserRole[]
 }
 
 export default function AppRouter() {
-  const [showNavbar, setShowNavbar] = useState(hasAuthToken)
-
-  useEffect(() => {
-    const handleAuthChange = () => setShowNavbar(hasAuthToken())
-    window.addEventListener("storage", handleAuthChange)
-    window.addEventListener(AUTH_CHANGE_EVENT, handleAuthChange)
-    return () => {
-      window.removeEventListener("storage", handleAuthChange)
-      window.removeEventListener(AUTH_CHANGE_EVENT, handleAuthChange)
-    }
-  }, [])
-
+  
   return (
     <BrowserRouter>
-      {showNavbar && <Topbar />}
+
       <Routes>
         {/* Global Public routes */}
         <Route path="/" element={<LandingPage />} />
@@ -102,6 +91,7 @@ export default function AppRouter() {
         {/* Tenant Routes */}
         <Route path="/c/:collegeSlug" element={<TenantResolver />}>
             {/* Public Tenant Routes */}
+            <Route index element={<TenantHome />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="forgot-password" element={<ForgotPassword />} />
@@ -148,7 +138,7 @@ export default function AppRouter() {
             />
             
             {/* Catch-all for Tenant Routes */}
-            <Route path="*" element={<Navigate to="login" replace />} />
+            <Route path="*" element={<Navigate to="" replace />} />
         </Route>
 
         {/* Global Catch-all */}

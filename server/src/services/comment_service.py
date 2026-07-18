@@ -27,9 +27,9 @@ def create_comment(db: Session, current_user: User, content: str, post_id: int):
     db.commit()
     db.refresh(comment)
 
-    if post.author_id != current_user.id:
+    if post.user_id != current_user.id:
         event_bus.publish(NotificationType.POST_COMMENTED.value, {
-            "recipient_id": post.author_id,
+            "recipient_id": post.user_id,
             "notification_type": NotificationType.POST_COMMENTED,
             "title": "New Comment",
             "message": f"{current_user.username} commented on your post.",

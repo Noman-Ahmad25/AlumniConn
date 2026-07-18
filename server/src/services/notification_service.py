@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any, Dict, Optional
 from datetime import datetime
 from sqlalchemy.orm import Session
@@ -93,14 +94,19 @@ async def create_and_dispatch_notification(
     finally:
         db.close()
 
+def _log_notification_task_error(t: asyncio.Task) -> None:
+    if t.cancelled():
+        return
+    if t.exception():
+        logger.error(f"Error executing async notification task: {t.exception()}", exc_info=t.exception())
+
+
 def handle_notification_event(event_data: Dict[str, Any]):
     """
-    Called by EventBus synchronously. Since websocket dispatch is async,
-    we create a background task using asyncio if there's a running loop,
-    or we can dispatch it asynchronously.
+    Called by EventBus synchronously after db.commit().
+    Schedules the async WebSocket notification onto the running event loop
+    and attaches an error callback to ensure exceptions are never swallowed.
     """
-    import asyncio
-    
     async def task():
         await create_and_dispatch_notification(
             recipient_id=event_data["recipient_id"],
@@ -112,7 +118,9 @@ def handle_notification_event(event_data: Dict[str, Any]):
         )
         
     try:
-        loop = asyncio.get_running_loop()
-        loop.create_task(task())
-    except RuntimeError:
-        asyncio.run(task())
+        loop = asyncio.get_event_loop()
+        t = loop.create_task(task())
+        t.add_done_callback(_log_notification_task_error)
+    except RuntimeError as e:
+        logger.error(f"Cannot dispatch notification, no event loop running: {e}")
+

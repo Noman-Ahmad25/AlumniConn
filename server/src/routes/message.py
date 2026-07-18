@@ -21,7 +21,12 @@ from src.services.message_service import (
     get_or_create_conversation,
 )
 from src.utils.service import manager
+from src.utils.presence import presence_manager
 import json
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 router = APIRouter()
 
@@ -60,25 +65,23 @@ async def websocket_endpoint(
                     if parsed.get("type") == "ping":
                         await websocket.send_json({"type": "pong"})
                     elif parsed.get("type") == "presence":
-                        from src.utils.presence import presence_manager
                         presence_manager.set_presence(current_user.id, parsed.get("context", {}))
                 except (json.JSONDecodeError, AttributeError):
                     pass
             except WebSocketDisconnect:
                 break
             except Exception as e:
-                print(f"WebSocket receive error for user {current_user.id}: {e}")
+                logger.error("WebSocket receive error for user %s: %s", current_user.id, e)
                 break
     except WebSocketDisconnect:
         pass
     except Exception as e:
-        print(f"WebSocket connection error for user {current_user.id}: {e}")
+        logger.error("WebSocket connection error for user %s: %s", current_user.id, e)
     finally:
         manager.disconnect(current_user.id, websocket)
         
         # If this was their last connection, clear presence
         if current_user.id not in manager.active_connections:
-            from src.utils.presence import presence_manager
             presence_manager.clear_presence(current_user.id)
 
 

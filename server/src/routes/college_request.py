@@ -134,6 +134,7 @@ def approve_college_request(
     request_id: int,
     current_user = Depends(require_super_admin),
     db: Session = Depends(get_db),
+    task_dispatcher: AbstractTaskDispatcher = Depends(get_task_dispatcher),
 ):
     """
     Approve a college request.
@@ -144,7 +145,9 @@ def approve_college_request(
     - Creates active ADMIN user and Profile
     """
     try:
-        return college_request_service.approve_college_request(db, request_id, current_user.id)
+        return college_request_service.approve_college_request(
+            db, request_id, current_user.id, task_dispatcher
+        )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 

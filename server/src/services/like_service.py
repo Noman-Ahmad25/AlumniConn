@@ -28,9 +28,9 @@ def toggle_like(db: Session, user: User, post_id: int):
     db.commit()
     db.refresh(new_like)
     
-    if post.author_id != user.id:
+    if post.user_id != user.id:
         event_bus.publish(NotificationType.POST_LIKED.value, {
-            "recipient_id": post.author_id,
+            "recipient_id": post.user_id,
             "notification_type": NotificationType.POST_LIKED,
             "title": "New Like",
             "message": f"{user.username} liked your post.",

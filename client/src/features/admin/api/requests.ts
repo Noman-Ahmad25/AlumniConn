@@ -22,10 +22,11 @@ export const collegeRequestsAPI = {
   },
 
   verifyEmail: async (token: string): Promise<{ message: string }> => {
-    const response = await API.post("/college-requests/verify-email", { token })
-    return response.data
+    const response = await API.get("/college-requests/verify-email", {
+      params: { token },
+    });
+    return response.data;
   },
-
   resendVerification: async (requestId: number): Promise<{ message: string }> => {
     const response = await API.post("/college-requests/resend-verification", { request_id: requestId })
     return response.data
@@ -48,13 +49,13 @@ export const collegeRequestsAPI = {
   },
 
   approveCollegeRequest: async (requestId: number): Promise<CollegeRequest> => {
-    const response = await API.post(`/college-requests/${requestId}/approve`)
+    const response = await API.patch(`/college-requests/${requestId}/approve`)
     return response.data
   },
 
   rejectCollegeRequest: async (requestId: number, reason?: string): Promise<CollegeRequest> => {
     const payload = reason ? { reason } : undefined
-    const response = await API.post(`/college-requests/${requestId}/reject`, payload)
+    const response = await API.patch(`/college-requests/${requestId}/reject`, payload)
     return response.data
   },
 }

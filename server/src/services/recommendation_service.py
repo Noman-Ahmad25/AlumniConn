@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import text, and_, or_, select
 from typing import List, Tuple
-from fastapi import BackgroundTasks
 
+from src.database.session import SessionLocal
 from src.models.user import User, UserRole
 from src.models.profile import Profile
 from src.models.connection import Connection, ConnectionStatus
@@ -181,26 +181,36 @@ def get_recommendations(db: Session, current_user: User, cursor: float, limit: i
         
     return response_items, next_cursor
 
-def trigger_embedding_generation(db: Session, user_id: int):
-    """Background task to generate and update profile embedding."""
-    profile = db.query(Profile).filter(Profile.user_id == user_id).first()
-    if not profile:
-        return
-        
-    semantic_text = generate_semantic_text(profile)
-    new_hash = compute_semantic_hash(semantic_text)
-    
-    if profile.semantic_hash != new_hash:
-        embedding = get_embedding(semantic_text)
-        profile.semantic_hash = new_hash
-        profile.embedding = embedding
-        db.commit()
-        
-        event_bus.publish(NotificationType.RECOMMENDATIONS_AVAILABLE.value, {
-            "recipient_id": user_id,
-            "notification_type": NotificationType.RECOMMENDATIONS_AVAILABLE,
-            "title": "New Recommendations",
-            "message": "Your profile has been updated and new alumni recommendations are available.",
-            "actor_id": None,
-            "metadata_": {"recommendation_batch_id": new_hash}
-        })
+def trigger_embedding_generation(user_id: int) -> None:
+    """
+    Background task to generate and update profile embedding.
+
+    IMPORTANT: This function opens its own database session. It must only receive
+    scalar arguments (user_id: int) — never a request-scoped Session, which will
+    be closed before this task executes.
+    """
+    db = SessionLocal()
+    try:
+        profile = db.query(Profile).filter(Profile.user_id == user_id).first()
+        if not profile:
+            return
+
+        semantic_text = generate_semantic_text(profile)
+        new_hash = compute_semantic_hash(semantic_text)
+
+        if profile.semantic_hash != new_hash:
+            embedding = get_embedding(semantic_text)
+            profile.semantic_hash = new_hash
+            profile.embedding = embedding
+            db.commit()
+
+            event_bus.publish(NotificationType.RECOMMENDATIONS_AVAILABLE.value, {
+                "recipient_id": user_id,
+                "notification_type": NotificationType.RECOMMENDATIONS_AVAILABLE,
+                "title": "New Recommendations",
+                "message": "Your profile has been updated and new alumni recommendations are available.",
+                "actor_id": None,
+                "metadata_": {"recommendation_batch_id": new_hash}
+            })
+    finally:
+        db.close()
