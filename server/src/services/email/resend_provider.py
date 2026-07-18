@@ -26,8 +26,8 @@ class ResendEmailProvider(EmailProvider):
             # For this MVP we'll call it directly. In production, this can be wrapped in run_in_executor
             # if the SDK is strictly synchronous.
             email = resend.Emails.send(params)
-            logger.info(f"Successfully sent email via Resend to {to_email}. ID: {email.get('id', 'unknown')}")
+            logger.info("Successfully sent email via Resend", extra={"to_email": to_email, "email_id": email.get('id', 'unknown')})
             return True
         except Exception as e:
-            logger.error(f"Failed to send email via Resend to {to_email}: {str(e)}")
+            logger.exception("Failed to send email via Resend", extra={"to_email": to_email})
             return False

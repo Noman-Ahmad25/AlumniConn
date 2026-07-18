@@ -30,8 +30,8 @@ class SMTPEmailProvider(EmailProvider):
                 server.login(self.username, self.password)
                 server.send_message(msg)
                 
-            logger.info(f"Successfully sent email via Gmail SMTP to {to_email}")
+            logger.info("Successfully sent email via Gmail SMTP", extra={"to_email": to_email})
             return True
         except Exception as e:
-            logger.error(f"Failed to send email via Gmail SMTP to {to_email}: {str(e)}")
+            logger.exception("Failed to send email via Gmail SMTP", extra={"to_email": to_email})
             return False

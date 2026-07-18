@@ -35,10 +35,10 @@ from src.routes.user import router as user_router
 from src.routes.recommendation import router as recommendation_router
 from src.utils.event_bus import event_bus
 from src.services.notification_service import handle_notification_event
-import logging
+from src.utils.logger import setup_logging
 
 
-logging.getLogger().setLevel(logging.INFO)
+setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

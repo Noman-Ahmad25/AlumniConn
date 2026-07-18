@@ -68,7 +68,7 @@ async def create_and_dispatch_notification(
     if notification_type == NotificationType.MESSAGE_RECEIVED:
         presence = presence_manager.get_presence(recipient_id)
         if presence.get("page") == "messages" and presence.get("conversation_id") == metadata_.get("conversation_id"):
-            logger.info(f"Skipping notification for user {recipient_id}, active in conversation.")
+            logger.info("Skipping notification for user, active in conversation.", extra={"recipient_id": recipient_id})
             return
 
     db = SessionLocal()
@@ -98,7 +98,7 @@ def _log_notification_task_error(t: asyncio.Task) -> None:
     if t.cancelled():
         return
     if t.exception():
-        logger.error(f"Error executing async notification task: {t.exception()}", exc_info=t.exception())
+        logger.exception("Error executing async notification task", exc_info=t.exception())
 
 
 def handle_notification_event(event_data: Dict[str, Any]):
@@ -122,5 +122,5 @@ def handle_notification_event(event_data: Dict[str, Any]):
         t = loop.create_task(task())
         t.add_done_callback(_log_notification_task_error)
     except RuntimeError as e:
-        logger.error(f"Cannot dispatch notification, no event loop running: {e}")
+        logger.exception("Cannot dispatch notification, no event loop running")
 

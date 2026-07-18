@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Query
+from typing import Annotated
 from sqlalchemy.orm import Session
 
 from src.database.session import get_db
@@ -16,7 +17,7 @@ def create_college(college: CollegeCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 @router.get("/", response_model=list[CollegeResponse], status_code=status.HTTP_200_OK)
-def list_colleges(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_colleges(skip: Annotated[int, Query(ge=0)] = 0, limit: int = Query(default=100, gt=0, le=100), db: Session = Depends(get_db)):
     return college_service.list_colleges(db, skip, limit)
 
 @router.get("/slug/{slug}", response_model=CollegePublicResponse, status_code=status.HTTP_200_OK)

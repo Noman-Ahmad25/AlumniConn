@@ -71,12 +71,12 @@ async def websocket_endpoint(
             except WebSocketDisconnect:
                 break
             except Exception as e:
-                logger.error("WebSocket receive error for user %s: %s", current_user.id, e)
+                logger.exception("WebSocket receive error", extra={"user_id": current_user.id})
                 break
     except WebSocketDisconnect:
         pass
     except Exception as e:
-        logger.error("WebSocket connection error for user %s: %s", current_user.id, e)
+        logger.exception("WebSocket connection error", extra={"user_id": current_user.id})
     finally:
         manager.disconnect(current_user.id, websocket)
         
