@@ -1,8 +1,22 @@
 from enum import Enum
 from typing import Literal
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict, field_validator
 from datetime import datetime
+import re
 
+def _validate_password_complexity(v: str) -> str:
+    """Shared helper function to enforce password complexity rules."""
+    if len(v) < 8:
+        raise ValueError("Password must be at least 8 characters long")
+    if not re.search(r"[A-Z]", v):
+        raise ValueError("Password must contain at least one uppercase letter")
+    if not re.search(r"[a-z]", v):
+        raise ValueError("Password must contain at least one lowercase letter")
+    if not re.search(r"\d", v):
+        raise ValueError("Password must contain at least one digit")
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>_+-]", v):
+        raise ValueError("Password must contain at least one special character")
+    return v
 
 class UserRole(str, Enum):
 
@@ -17,11 +31,20 @@ class UserCreate(BaseModel):
     password: str
     college_slug: str
     role: UserRole
+    @field_validator("password")
+    @classmethod
+    def check_password(cls, v: str) -> str:
+        return _validate_password_complexity(v)
 
 class UserLogin(BaseModel):
     username_or_email: str
     password: str
     college_slug: str
+
+    @field_validator("password")
+    @classmethod
+    def check_password(cls, v: str) -> str:
+        return _validate_password_complexity(v)
 
 class SuperAdminLogin(BaseModel):
     email: EmailStr

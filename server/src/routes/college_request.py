@@ -42,12 +42,6 @@ def request_college_creation(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.post(
-    "/verify-email",
-    status_code=status.HTTP_200_OK,
-    tags=["College Requests"],
-)
-
 @router.get(
     "/verify-email",
     status_code=status.HTTP_200_OK,
