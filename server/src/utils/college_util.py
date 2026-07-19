@@ -7,7 +7,7 @@ def generate_unique_college_slug(db: Session, college_name: str) -> str:
     slug = base_slug
     counter = 1
 
-    while db.query(College).filter(College.college_slug == slug).first():
+    while db.query(College).filter(College.slug == slug).first():
         counter += 1
         slug = f"{base_slug}-{counter}"
 
