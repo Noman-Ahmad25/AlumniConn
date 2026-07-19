@@ -7,7 +7,7 @@ from src.database.session import get_db
 from src.utils.dependency import get_current_user
 from src.models.user import User
 from src.models.notification import NotificationType
-from src.schemas.notification import PaginatedNotifications, NotificationResponse
+from src.schemas.notification import PaginatedNotifications
 from src.services.notification_service import (
     get_notifications,
     get_unread_count,

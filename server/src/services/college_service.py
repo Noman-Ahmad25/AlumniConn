@@ -2,7 +2,7 @@
 from src.models.college import College
 from src.schemas.college import CollegeCreate
 from sqlalchemy.orm import Session
-
+from src.utils.college_util import generate_unique_college_slug
 
 def create_college(db: Session, college: CollegeCreate) -> College:
     # Check if college with same name or domain already exists
@@ -12,12 +12,14 @@ def create_college(db: Session, college: CollegeCreate) -> College:
     if existing_college:
         raise ValueError("College with the same name or domain already exists.")
     
+    slug = generate_unique_college_slug(db, college.name)
     db_college = College(
         name=college.name,
         location=college.location,
         established_year=college.established_year,
         description=college.description,
-        domain=college.domain
+        domain=college.domain,
+        slug= slug
     )
     db.add(db_college)
     db.commit()

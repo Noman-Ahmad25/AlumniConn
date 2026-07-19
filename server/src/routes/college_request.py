@@ -166,7 +166,7 @@ def reject_college_request(
     reason = payload.reason if payload else None
     try:
         return college_request_service.reject_college_request(
-            db, request_id, current_user.id, reason, task_dispatcher
+            db, request_id, current_user.id, task_dispatcher, reason
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

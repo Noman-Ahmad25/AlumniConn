@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 import logging
-import os
 import re
 
 from sqlalchemy.orm import Session
@@ -16,6 +15,7 @@ from src.models.notification import NotificationType
 from src.utils.tokens import generate_verification_token, hash_token, verify_token
 from src.utils.dispatcher import AbstractTaskDispatcher
 from src.services.email.service import EmailService
+from src.utils.college_util import generate_unique_college_slug
 
 logger = logging.getLogger(__name__)
 
@@ -190,9 +190,12 @@ def approve_college_request(
     if existing_user:
         raise ValueError("Admin email already registered as a user.")
 
+    slug = generate_unique_college_slug(db, college_req.name)
+
     # Begin atomic inserts
     new_college = College(
         name=college_req.name,
+        slug= slug,
         domain=college_req.domain,
         location=college_req.location,
         established_year=college_req.established_year,
@@ -202,7 +205,7 @@ def approve_college_request(
     db.add(new_college)
     db.flush()
 
-    logger.info(f'College {new_college.name} Created')
+    logger.info("Created college '%s'", new_college.name)
     
     admin_user = User(
         username=_username_from_admin_name(college_req.admin_name),
@@ -217,7 +220,11 @@ def approve_college_request(
     db.add(admin_user)
     db.flush()
 
-    logger.info("Admin Registered")
+    logger.info(
+        "Created admin user '%s' for college '%s'",
+        admin_user.email,
+        new_college.name,
+    )
     
     profile = Profile(
         user_id=admin_user.id,
@@ -234,9 +241,9 @@ def approve_college_request(
     db.commit()
     db.refresh(college_req)
 
-    logger.info("college and user are registered")
+    logger.info("Sending College Approval Email")
 
-    task_dispatcher.dispatch(EmailService.send_college_approval_email, new_college.name, new_college.slug)
+    task_dispatcher.dispatch(EmailService.send_college_approval_email,college_req.admin_email, new_college.name, new_college.slug)
 
     # Publish notification AFTER commit — admin_user.id is now guaranteed to exist in the DB.
     event_bus.publish(NotificationType.COLLEGE_REQUEST_APPROVED.value, {
@@ -256,8 +263,8 @@ def reject_college_request(
     db: Session,
     request_id: int,
     reviewer_id: int,
-    rejection_reason: str | None = None,
     task_dispatcher: AbstractTaskDispatcher,
+    rejection_reason: str | None = None,
 ) -> CollegeRequest:
     """
     Reject a college request.
@@ -281,7 +288,9 @@ def reject_college_request(
     
     # We do not have a User to notify yet, so no in-app notification can be sent via WebSockets.
     # We can send an email via EventBus in a future iteration.
-    task_dispatcher.dispatch(EmailService.send_college_rejection_email, college_req.c, rejection_reason)
+    task_dispatcher.dispatch(EmailService.send_college_rejection_email, college_req.admin_email, college_req.name, rejection_reason)
+    
+
     return college_req
 
 
