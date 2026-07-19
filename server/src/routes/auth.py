@@ -136,6 +136,7 @@ def token_for_swagger(user: OAuth2PasswordRequestForm = Depends(), db: Session =
     Swagger UI 'Authorize' button endpoint.
     Enter college_slug in the 'client_id' field in the Authorize dialog.
     """
+
     college_slug = user.client_id
     if not college_slug:
         raise HTTPException(
@@ -156,3 +157,5 @@ def token_for_swagger(user: OAuth2PasswordRequestForm = Depends(), db: Session =
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     return {"access_token": token, "token_type": "bearer"}
+
+

@@ -52,12 +52,12 @@ class EmailService:
     """
     
     @classmethod
-    async def send_user_verification(cls, to_email: str, token: str, username: str) -> bool:
+    async def send_user_verification(cls, to_email: str, token: str, username: str,  college_slug: str) -> bool:
         """
         Sends the email verification link to a normal user.
         """
         frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
-        verification_link = f"{frontend_url}/verify-email?token={token}"
+        verification_link = f"{frontend_url}/c/{college_slug}/verify-email?token={token}"
         
         template = env.get_template("verification.html")
         html_body = template.render(username=username, verification_link=verification_link)
@@ -92,7 +92,7 @@ class EmailService:
         """
         frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
         # Route respects the college slug
-        reset_link = f"{frontend_url}/{college_slug}/reset-password?token={token}"
+        reset_link = f"{frontend_url}/c/{college_slug}/reset-password?token={token}"
         
         template = env.get_template("password_reset.html")
         html_body = template.render(username=username, reset_link=reset_link)
@@ -104,52 +104,32 @@ class EmailService:
         )
 
     @classmethod
-    async def send_admin_credentials_email(cls, to_email: str, college_name: str, email: str, password: str) -> bool:
+    async def send_college_approval_email(cls, to_email: str, college_name: str, college_slug: str):
         """
-        Sends admin credentials email after college approval.
+        Sends college approval email.
         """
+        template = env.get_template("college_approval.html")
+
         frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
-        login_url = f"{frontend_url}/super-admin/login"
-        
-        template = env.get_template("college_approval_credentials.html")
+        login_url = f"{frontend_url}/c/{college_slug}/login"
         html_body = template.render(
             college_name=college_name,
-            email=email,
-            password=password,
-            login_url=login_url
+            login_url = login_url
         )
         
         return await _provider.send_email(
             to_email=to_email,
-            subject=f"{college_name} has been approved on AlumniConn!",
+            subject=f"{college_name} college request - Further information needed",
             html_body=html_body
         )
-
-    @classmethod
-    async def send_admin_activation_email(cls, to_email: str, college_name: str, token: str) -> bool:
-        """
-        Sends admin activation email with a token after college approval.
-        """
-        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
-        activation_link = f"{frontend_url}/activate?token={token}"
-        
-        template = env.get_template("college_approval_activation.html")
-        html_body = template.render(
-            college_name=college_name,
-            activation_link=activation_link
-        )
-        
-        return await _provider.send_email(
-            to_email=to_email,
-            subject=f"{college_name} has been approved on AlumniConn!",
-            html_body=html_body
-        )
-
+         
     @classmethod
     async def send_college_rejection_email(cls, to_email: str, college_name: str, reason: str | None = None) -> bool:
         """
         Sends college rejection email.
         """
+        template = env.get_template("college_rejection.html")
+        
         reason_text = f"Reason: {reason}" if reason else "Please contact our support team for more details."
         
         template = env.get_template("college_rejection.html")

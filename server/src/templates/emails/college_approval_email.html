@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ college_name }} has been approved on AlumniConn!</h2>
+
+<p>Congratulations! Your request to onboard <strong>{{ college_name }}</strong> has been approved.</p>
+
+<p>Your administrator account is now active, and you can sign in using the email address you provided during registration.</p>
+
+<p>
+    <a href="{{ login_url }}">{{ login_url }}</a>
+</p>
+
+<p>After signing in, you can:</p>
+
+<ul>
+    <li>Complete your college profile.</li>
+    <li>Manage students, alumni, and staff.</li>
+    <li>Invite additional administrators.</li>
+    <li>Configure your college settings.</li>
+</ul>
+
+<p>If you did not submit this request or believe this approval was made in error, please contact our support team immediately.</p>
+
+<p>Welcome to AlumniConn!</p>
+{% endblock %}

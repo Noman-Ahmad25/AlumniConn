@@ -201,6 +201,8 @@ def approve_college_request(
     )
     db.add(new_college)
     db.flush()
+
+    logger.info(f'College {new_college.name} Created')
     
     admin_user = User(
         username=_username_from_admin_name(college_req.admin_name),
@@ -214,6 +216,8 @@ def approve_college_request(
     )
     db.add(admin_user)
     db.flush()
+
+    logger.info("Admin Registered")
     
     profile = Profile(
         user_id=admin_user.id,
@@ -229,6 +233,10 @@ def approve_college_request(
     
     db.commit()
     db.refresh(college_req)
+
+    logger.info("college and user are registered")
+
+    task_dispatcher.dispatch(EmailService.send_college_approval_email, new_college.name, new_college.slug)
 
     # Publish notification AFTER commit — admin_user.id is now guaranteed to exist in the DB.
     event_bus.publish(NotificationType.COLLEGE_REQUEST_APPROVED.value, {
@@ -248,7 +256,8 @@ def reject_college_request(
     db: Session,
     request_id: int,
     reviewer_id: int,
-    rejection_reason: str | None = None
+    rejection_reason: str | None = None,
+    task_dispatcher: AbstractTaskDispatcher,
 ) -> CollegeRequest:
     """
     Reject a college request.
@@ -272,7 +281,7 @@ def reject_college_request(
     
     # We do not have a User to notify yet, so no in-app notification can be sent via WebSockets.
     # We can send an email via EventBus in a future iteration.
-    
+    task_dispatcher.dispatch(EmailService.send_college_rejection_email, college_req.c, rejection_reason)
     return college_req
 
 

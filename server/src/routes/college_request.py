@@ -157,6 +157,7 @@ def reject_college_request(
     payload: RequestRejectionPayload | None = None,
     current_user = Depends(require_super_admin),
     db: Session = Depends(get_db),
+    task_dispatcher: AbstractTaskDispatcher = Depends(get_task_dispatcher),
 ):
     """
     Reject a college request.
@@ -165,7 +166,7 @@ def reject_college_request(
     reason = payload.reason if payload else None
     try:
         return college_request_service.reject_college_request(
-            db, request_id, current_user.id, reason
+            db, request_id, current_user.id, reason, task_dispatcher
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

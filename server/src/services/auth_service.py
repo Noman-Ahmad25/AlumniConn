@@ -76,7 +76,7 @@ def register_user(db, user_data, task_dispatcher: AbstractTaskDispatcher):
         db.refresh(new_user)
         
         # Dispatch email task
-        task_dispatcher.dispatch(EmailService.send_user_verification, new_user.email, raw_token, new_user.username)
+        task_dispatcher.dispatch(EmailService.send_user_verification, new_user.email, raw_token, new_user.username,  user_data.college_slug)
         
         return new_user
     except IntegrityError:
