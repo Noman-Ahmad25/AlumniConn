@@ -93,7 +93,7 @@ def get_recommendations(db: Session, current_user: User, cursor: float, limit: i
     current_profile = db.query(Profile).filter(Profile.user_id == current_user.id).first()
     
     # If the user has no profile or embedding, we fallback to just rule-based or recent active
-    if not current_profile or not current_profile.embedding:
+    if current_profile is None or current_profile.embedding is None or len(current_profile.embedding) == 0:
         return [], None
         
     # 1. Candidate Filtering (SQL Level)

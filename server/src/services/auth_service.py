@@ -214,5 +214,6 @@ def resend_user_verification(db, user_id: int, task_dispatcher: AbstractTaskDisp
     
     db.commit()
     
-    task_dispatcher.dispatch(EmailService.send_user_verification, user.email, raw_token, user.username)
+    college_slug = user.college.slug if user.college else ""
+    task_dispatcher.dispatch(EmailService.send_user_verification, user.email, raw_token, user.username, college_slug)
     return True

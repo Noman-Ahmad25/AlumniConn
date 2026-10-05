@@ -135,3 +135,42 @@ def get_pending_requests(db: Session, current_user: User):
     ).all()
     
     return [format_connection(c, current_user) for c in connections]
+
+
+# withdraw/cancel a pending connection request (only by sender)
+def withdraw_request(db: Session, connection_id: int, current_user: User):
+    connection = db.query(Connection).filter(
+        Connection.id == connection_id,
+        Connection.college_id == current_user.college_id
+    ).first()
+
+    if not connection:
+        raise ValueError("Connection request not found.")
+    if connection.status != ConnectionStatus.PENDING:
+        raise ValueError("Only pending requests can be withdrawn.")
+    if connection.sender_id != current_user.id:
+        raise ValueError("Only the sender can withdraw a connection request.")
+
+    db.delete(connection)
+    db.commit()
+    return {"detail": "Connection request withdrawn successfully", "connection_id": connection_id}
+
+
+# disconnect/remove an active accepted connection (by either participant)
+def disconnect(db: Session, connection_id: int, current_user: User):
+    connection = db.query(Connection).filter(
+        Connection.id == connection_id,
+        Connection.college_id == current_user.college_id
+    ).first()
+
+    if not connection:
+        raise ValueError("Connection not found.")
+    if connection.status != ConnectionStatus.ACCEPTED:
+        raise ValueError("Only accepted connections can be removed.")
+    if current_user.id not in [connection.sender_id, connection.receiver_id]:
+        raise ValueError("Not authorized to remove this connection.")
+
+    db.delete(connection)
+    db.commit()
+    return {"detail": "Connection removed successfully", "connection_id": connection_id}
+

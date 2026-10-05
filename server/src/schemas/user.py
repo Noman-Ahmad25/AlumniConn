@@ -81,8 +81,12 @@ class TokenResponse(BaseModel):
 class DiscoverUserResponse(BaseModel):
     id: int
     username: str
+    full_name: str | None = None
+    job_title: str | None = None
+    company: str | None = None
+    location: str | None = None
     profile_picture: str | None = None
-    connection_status: Literal["none", "pending_sent", "pending_received"]
+    connection_status: Literal["none", "pending_sent", "pending_received"] = "none"
 
 class ForgotPasswordRequest(BaseModel):
     username_or_email: str

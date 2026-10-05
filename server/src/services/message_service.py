@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.orm import Session
 from fastapi import UploadFile
 from src.models.message import Message
@@ -191,8 +192,8 @@ def get_inbox(db: Session, current_user: User):
             }
         )
 
-    # Sort by most recent first
-    result.sort(key=lambda x: x["last_time"] or "", reverse=True)
+    # Sort by most recent first; conversations with no messages (last_time is None) are placed at the end
+    result.sort(key=lambda x: x["last_time"] if x["last_time"] is not None else datetime.min, reverse=True)
     return result
 
 

@@ -56,20 +56,20 @@ def delete_notification(db: Session, user_id: int, notification_id: int) -> bool
     db.commit()
     return True
 
-async def create_and_dispatch_notification(
+def persist_notification(
     recipient_id: int, 
     notification_type: NotificationType,
     title: str,
     message: str,
     actor_id: Optional[int] = None,
     metadata_: Optional[Dict[str, Any]] = None
-):
+) -> Optional[Notification]:
     # Presence check for messaging
-    if notification_type == NotificationType.MESSAGE_RECEIVED:
+    if notification_type == NotificationType.MESSAGE_RECEIVED and metadata_:
         presence = presence_manager.get_presence(recipient_id)
         if presence.get("page") == "messages" and presence.get("conversation_id") == metadata_.get("conversation_id"):
             logger.info("Skipping notification for user, active in conversation.", extra={"recipient_id": recipient_id})
-            return
+            return None
 
     db = SessionLocal()
     try:
@@ -84,15 +84,14 @@ async def create_and_dispatch_notification(
         db.add(notif)
         db.commit()
         db.refresh(notif)
-        
-        # Dispatch via WebSocket if online
-        payload = {
-            "type": "notification",
-            "payload": NotificationResponse.model_validate(notif).model_dump(mode="json")
-        }
-        await websocket_manager.send_private_json(recipient_id, payload)
+        return notif
+    except Exception as e:
+        db.rollback()
+        logger.exception("Failed to persist notification in database", exc_info=e)
+        return None
     finally:
         db.close()
+
 
 def _log_notification_task_error(t: asyncio.Task) -> None:
     if t.cancelled():
@@ -104,11 +103,11 @@ def _log_notification_task_error(t: asyncio.Task) -> None:
 def handle_notification_event(event_data: Dict[str, Any]):
     """
     Called by EventBus synchronously after db.commit().
-    Schedules the async WebSocket notification onto the running event loop
-    and attaches an error callback to ensure exceptions are never swallowed.
+    Persists the notification record synchronously to ensure database persistence,
+    then dispatches the real-time notification frame via WebSocket if the user is online.
     """
-    async def task():
-        await create_and_dispatch_notification(
+    try:
+        notif = persist_notification(
             recipient_id=event_data["recipient_id"],
             notification_type=event_data["notification_type"],
             title=event_data["title"],
@@ -116,11 +115,22 @@ def handle_notification_event(event_data: Dict[str, Any]):
             actor_id=event_data.get("actor_id"),
             metadata_=event_data.get("metadata_")
         )
-        
-    try:
-        loop = asyncio.get_event_loop()
-        t = loop.create_task(task())
-        t.add_done_callback(_log_notification_task_error)
-    except RuntimeError as e:
-        logger.exception("Cannot dispatch notification, no event loop running")
+        if not notif:
+            return
+
+        recipient_id = event_data["recipient_id"]
+        # Only dispatch WebSocket payload if recipient is currently connected
+        if recipient_id in websocket_manager.active_connections:
+            payload = {
+                "type": "notification",
+                "payload": NotificationResponse.model_validate(notif).model_dump(mode="json")
+            }
+            try:
+                loop = asyncio.get_running_loop()
+                t = loop.create_task(websocket_manager.send_private_json(recipient_id, payload))
+                t.add_done_callback(_log_notification_task_error)
+            except RuntimeError:
+                pass
+    except Exception as e:
+        logger.exception("Error handling notification event", exc_info=e)
 

@@ -26,10 +26,20 @@ async def api_create_post(
     current_user: User = Depends(get_current_user)
 ):
     try:
-        # Pydantic is much better at resolving these native types
-        post_data = PostCreate(content=content, is_opportunity=is_opportunity)
+        has_image_file = file is not None and bool(getattr(file, "filename", None))
+        cleaned_content = content.strip() if content else None
+        if not cleaned_content and not has_image_file:
+            raise HTTPException(status_code=400, detail="Post must have content or an image file")
+
+        post_data = PostCreate.model_construct(
+            content=cleaned_content,
+            is_opportunity=is_opportunity,
+            image_url=None
+        )
         return create_post(db, current_user.id, post_data, image_file=file)
     
+    except HTTPException:
+        raise
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

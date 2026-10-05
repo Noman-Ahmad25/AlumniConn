@@ -3,11 +3,13 @@ from datetime import datetime
 
 class PostCreate(BaseModel):
     content: str | None = None
+    image_url: str | None = None
     is_opportunity: bool = False
 
     @model_validator(mode="after")
     def validate_post(self):
-        if not self.content and not self.image_url:
+        cleaned_content = self.content.strip() if self.content else None
+        if not cleaned_content and not self.image_url:
             raise ValueError("Post must have content or image")
         return self
 

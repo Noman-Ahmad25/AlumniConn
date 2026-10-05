@@ -40,8 +40,7 @@ from src.utils.logger import setup_logging
 
 setup_logging()
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+def setup_notification_handlers():
     # Subscribe the notification handler to all relevant events
     events = [
         "connection_received", "connection_accepted", "connection_rejected",
@@ -51,8 +50,14 @@ async def lifespan(app: FastAPI):
         "recommendations_available"
     ]
     for ev in events:
-        event_bus.subscribe(ev, handle_notification_event)
-        
+        if handle_notification_event not in event_bus._subscribers.get(ev, []):
+            event_bus.subscribe(ev, handle_notification_event)
+
+setup_notification_handlers()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    setup_notification_handlers()
     print("Application started")
     # This block runs on startup
     db = SessionLocal()

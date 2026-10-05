@@ -19,12 +19,13 @@ def create_post(db: Session, user_id: int, data: PostCreate, image_file: Optiona
         final_image_url = upload_image(image_file, folder="alumniconn/posts")
 
     # Validation: Must have text OR an uploaded image
-    if not data.content and not final_image_url:
+    cleaned_content = data.content.strip() if data.content else None
+    if not cleaned_content and not final_image_url:
         raise ValueError("Post must have content or an image file")
 
     post = Post(
         user_id=user_id,
-        content=data.content,
+        content=cleaned_content,
         image_url=final_image_url, # Stores the Cloudinary HTTPS link
         is_opportunity=data.is_opportunity
     )

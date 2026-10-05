@@ -119,7 +119,7 @@ class EmailService:
         
         return await _provider.send_email(
             to_email=to_email,
-            subject=f"{college_name} college request - Further information needed",
+            subject=f"Your {college_name} registration request has been approved",
             html_body=html_body
         )
          
@@ -129,10 +129,7 @@ class EmailService:
         Sends college rejection email.
         """
         template = env.get_template("college_rejection.html")
-        
         reason_text = f"Reason: {reason}" if reason else "Please contact our support team for more details."
-        
-        template = env.get_template("college_rejection.html")
         html_body = template.render(
             college_name=college_name,
             reason_text=reason_text
@@ -140,6 +137,6 @@ class EmailService:
         
         return await _provider.send_email(
             to_email=to_email,
-            subject=f"{college_name} college request - Further information needed",
+            subject=f"{college_name} college request update",
             html_body=html_body
         )

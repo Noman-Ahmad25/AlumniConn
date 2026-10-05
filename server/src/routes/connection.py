@@ -63,6 +63,38 @@ def reject_connection_request(
 ):
     try:
         return connection_service.reject_request(
+             db=db,
+             connection_id=connection_id,
+             current_user=current_user
+         )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/withdraw/{connection_id}", response_model=dict)
+@router.delete("/withdraw/{connection_id}", response_model=dict)
+def withdraw_connection_request(
+    connection_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        return connection_service.withdraw_request(
+            db=db,
+            connection_id=connection_id,
+            current_user=current_user
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.delete("/{connection_id}", response_model=dict)
+@router.post("/disconnect/{connection_id}", response_model=dict)
+def remove_connection(
+    connection_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        return connection_service.disconnect(
             db=db,
             connection_id=connection_id,
             current_user=current_user

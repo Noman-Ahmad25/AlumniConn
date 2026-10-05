@@ -7,10 +7,16 @@ from src.models.college import College
 from src.schemas.college import CollegeCreate, CollegeResponse, CollegePublicResponse
 from src.services import college_service
 
+from src.utils.rbac import require_super_admin
+
 router = APIRouter()
 
 @router.post("/", response_model=CollegeResponse, status_code=status.HTTP_201_CREATED)
-def create_college(college: CollegeCreate, db: Session = Depends(get_db)):
+def create_college(
+    college: CollegeCreate,
+    current_user = Depends(require_super_admin),
+    db: Session = Depends(get_db)
+):
     try:
         return college_service.create_college(db, college)
     except ValueError as e:
