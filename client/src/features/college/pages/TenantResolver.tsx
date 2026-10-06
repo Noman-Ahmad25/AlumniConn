@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useLocation, useParams } from "react-router-dom";
 import { getCollegeBySlug, type CollegePublicResponse } from "../../college/api/college";
 import { TenantProvider } from "../../../providers/TenantProvider";
 import NotFound from "../../../shared/pages/NotFound";
 import Topbar from "../../../layouts/AppShell/Topbar";
+import Footer from "../../../layouts/AppShell/Footer";
 
 export default function TenantResolver() {
     const { collegeSlug } = useParams<{ collegeSlug: string }>();
+    const location = useLocation();
     const [tenant, setTenant] = useState<CollegePublicResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -52,10 +54,26 @@ export default function TenantResolver() {
         return <NotFound message={`Campus network for '${collegeSlug}' not found.`} />;
     }
 
+    const isLandingPage = location.pathname === `/c/${collegeSlug}` || location.pathname === `/c/${collegeSlug}/`;
+
+    if (isLandingPage) {
+        return (
+            <TenantProvider tenant={tenant}>
+                <Outlet />
+            </TenantProvider>
+        );
+    }
+
     return (
         <TenantProvider tenant={tenant}>
-            <Topbar />
-            <Outlet />
+            <div className="flex min-h-screen flex-col bg-slate-50">
+                <Topbar />
+                <main className="flex-1">
+                    <Outlet />
+                </main>
+                <Footer />
+            </div>
         </TenantProvider>
     );
 }
+

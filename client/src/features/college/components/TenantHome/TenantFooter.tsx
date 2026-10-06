@@ -13,9 +13,10 @@ export default function TenantFooter() {
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-6">
-                    <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                    <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-                    <a href="#" className="hover:text-white transition-colors">Contact Support</a>
+                    <a href="#about" className="hover:text-white transition-colors">About</a>
+                    <a href="#privacy" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#terms" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="#contact" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Contact Support</a>
                 </div>
 
                 <div className="text-center md:text-right text-xs text-slate-500">

@@ -11,6 +11,9 @@ import SuperAdminLogin from "../../features/admin/pages/SuperAdminLogin"
 import CreateProfile from "../../features/profile/pages/CreateProfile"
 import Feed from "../../features/feed/pages/Feed"
 import Connections from "../../features/connections/pages/Connections"
+import Discover from "../../features/connections/pages/Discover"
+import Recommendations from "../../features/recommendations/pages/Recommendations"
+import Notifications from "../../features/notifications/pages/Notifications"
 import Profile from "../../features/profile/pages/Profile"
 import Chat from "../../features/messages/pages/Chat"
 import Messages from "../../features/messages/pages/Messages"
@@ -107,6 +110,18 @@ export default function AppRouter() {
             <Route
               path="feed"
               element={<RoleRoute roles={["admin", "alumni", "student"]}><Feed /></RoleRoute>}
+            />
+            <Route
+              path="discover"
+              element={<RoleRoute roles={["admin", "alumni", "student"]}><Discover /></RoleRoute>}
+            />
+            <Route
+              path="recommendations"
+              element={<RoleRoute roles={["admin", "alumni", "student"]}><Recommendations /></RoleRoute>}
+            />
+            <Route
+              path="notifications"
+              element={<RoleRoute roles={["admin", "alumni", "student"]}><Notifications /></RoleRoute>}
             />
             <Route
               path="connections"
