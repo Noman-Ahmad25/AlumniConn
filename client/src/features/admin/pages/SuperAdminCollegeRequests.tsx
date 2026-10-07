@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { collegeRequestsAPI } from "../api/requests"
 import { getApiErrorMessage } from "../../../utils/error"
 import type { CollegeRequest, RequestStatus } from "../types/request"
+import Topbar from "../../../layouts/AppShell/Topbar"
+import Footer from "../../../layouts/AppShell/Footer"
 
 export default function SuperAdminCollegeRequests() {
   const [requests, setRequests] = useState<CollegeRequest[]>([])
@@ -81,8 +83,9 @@ export default function SuperAdminCollegeRequests() {
   }
 
   return (
-    <div className="app-page">
-      <main className="app-main-wide">
+    <div className="flex min-h-screen flex-col bg-slate-50">
+      <Topbar />
+      <main className="app-main-wide flex-1">
         <div className="page-heading">
           <h1 className="page-title">College Requests</h1>
           <p className="page-subtitle">Review pending college creation requests.</p>
@@ -225,6 +228,7 @@ export default function SuperAdminCollegeRequests() {
         </div>
       )}
       </main>
+      <Footer />
     </div>
   )
 }

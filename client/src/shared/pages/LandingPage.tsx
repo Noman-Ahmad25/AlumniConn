@@ -54,9 +54,10 @@ export default function LandingPage() {
             <footer className="mt-auto border-t border-slate-200 bg-white py-8">
                 <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 md:flex-row text-sm text-slate-500">
                     <p>© {new Date().getFullYear()} AlumniConn. All rights reserved.</p>
-                    <div className="flex gap-6">
-                        <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a>
+                    <div className="flex flex-wrap items-center justify-center gap-6">
+                        <a href="#privacy" onClick={(e) => e.preventDefault()} className="hover:text-slate-900 transition-colors">Privacy Policy</a>
+                        <a href="#terms" onClick={(e) => e.preventDefault()} className="hover:text-slate-900 transition-colors">Terms of Service</a>
+                        <a href="#contact" onClick={(e) => e.preventDefault()} className="hover:text-slate-900 transition-colors">Contact Support</a>
                         {/* Subtle Platform Admin Link */}
                         <Link to="/super-admin-login" className="hover:text-slate-900 transition-colors">
                             Platform Admin

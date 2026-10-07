@@ -46,24 +46,24 @@ export default function ConnectionCard({ req, refresh }: ConnectionCardProps) {
   }
 
   return (
-    <div className="surface-card flex items-center justify-between p-4">
-      <div>
-        <p className="font-bold text-slate-950">{req.username}</p>
+    <div className="surface-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 w-full">
+      <div className="min-w-0 flex-1">
+        <p className="font-bold text-slate-950 truncate">{req.username}</p>
         <p className="text-xs text-slate-500">wants to connect</p>
-        {error && <p className="mt-1 text-xs font-medium text-rose-500">{error}</p>}
+        {error && <p className="mt-1 text-xs font-medium text-rose-500 truncate">{error}</p>}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-shrink-0 justify-end pt-2 sm:pt-0 border-t border-slate-100 sm:border-0">
         <button
           onClick={handleAccept}
-          className="btn btn-success min-h-0 px-3 py-1.5"
+          className="btn btn-success min-h-0 px-3 py-1.5 text-xs flex-1 sm:flex-initial"
           disabled={loading}
         >
           Accept
         </button>
         <button
           onClick={handleReject}
-          className="btn btn-danger min-h-0 px-3 py-1.5"
+          className="btn btn-danger min-h-0 px-3 py-1.5 text-xs flex-1 sm:flex-initial"
           disabled={loading}
         >
           Reject

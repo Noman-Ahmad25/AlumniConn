@@ -45,17 +45,17 @@ export default function ConnectionButton({
   }
 
   return (
-    <div>
+    <div className="flex-shrink-0">
       <button
         onClick={handleConnect}
         disabled={status !== "none" || loading}
-        className={`btn min-h-0 rounded-full px-3 py-1.5 text-sm ${styles[status]}`}
+        className={`btn min-h-0 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap ${styles[status]}`}
         title={error ? error : ""}
       >
         {loading ? "..." : text[status]}
       </button>
       {error && (
-        <p className="mt-1 text-xs text-rose-600">{error}</p>
+        <p className="mt-1 text-xs text-rose-600 truncate max-w-[140px]">{error}</p>
       )}
     </div>
   )

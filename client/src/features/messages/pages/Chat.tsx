@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
+import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getMessages, sendMessage } from "../api/message"
 import type { MessageResponse, MessageSocketEvent } from "../api/message"
 import { useMessagesSocket } from "../hooks/useMessagesSocket"
@@ -74,7 +75,7 @@ function SendIcon() {
  */
 export default function Chat() {
   const { conversationId } = useParams<{ conversationId: string }>()
-  const navigate = useNavigate()
+  const { navigate } = useCollegeNavigation()
   const currentUserId = getCurrentUserIdFromToken()
 
   const [messages, setMessages] = useState<MessageResponse[]>([])

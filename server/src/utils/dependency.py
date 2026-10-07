@@ -110,10 +110,34 @@ def format_post(db: Session, post: Post, current_user: User):
 
 
 def format_posts_bulk(rows, like_counts, comment_counts, liked_posts, current_user_id: int, db: Session):
-    result = []
+    if not rows:
+        return []
 
+    target_user_ids = {row[0].user_id for row in rows if row[0].user_id != current_user_id}
+    connection_map = {}
+    if target_user_ids:
+        connections = db.query(Connection).filter(
+            or_(
+                and_(Connection.sender_id == current_user_id, Connection.receiver_id.in_(target_user_ids)),
+                and_(Connection.sender_id.in_(target_user_ids), Connection.receiver_id == current_user_id),
+            )
+        ).all()
+        for conn in connections:
+            other_id = conn.receiver_id if conn.sender_id == current_user_id else conn.sender_id
+            if conn.status == ConnectionStatus.ACCEPTED:
+                connection_map[other_id] = "connected"
+            elif conn.status == ConnectionStatus.PENDING:
+                connection_map[other_id] = "pending"
+            else:
+                connection_map[other_id] = "none"
+
+    result = []
     for post, user, profile in rows:
-        connection_status = get_connection_status(db, current_user_id, post.user_id)
+        if post.user_id == current_user_id:
+            connection_status = "none"
+        else:
+            connection_status = connection_map.get(post.user_id, "none")
+
         result.append({
             "id": post.id,
             "user_id": post.user_id,
@@ -126,7 +150,7 @@ def format_posts_bulk(rows, like_counts, comment_counts, liked_posts, current_us
             "likes_count": like_counts.get(post.id, 0),
             "comments_count": comment_counts.get(post.id, 0),
             "liked_by_current_user": post.id in liked_posts,
-            "connection_status": connection_status
+            "connection_status": connection_status,
         })
 
     return result

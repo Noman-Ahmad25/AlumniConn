@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams } from "react-router-dom"
+import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getMyProfile, getUserProfile, updateProfile } from "../api/profile"
 import { getUserPosts } from "../../feed/api/post"
 import { startConversation } from "../../messages/api/message"
@@ -40,7 +41,7 @@ function ProfileDetail({ label, value }: { label: string; value?: string | null 
 
 export default function Profile() {
   const { userId } = useParams<{ userId: string }>()
-  const navigate = useNavigate()
+  const { navigate } = useCollegeNavigation()
   const currentUserId = getCurrentUserIdFromToken()
   const [profile, setProfile] = useState<ProfileType | null>(null)
   const [posts, setPosts] = useState<Post[]>([])

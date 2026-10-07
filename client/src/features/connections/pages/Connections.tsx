@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
 import {
   acceptRequest,
   getConnections,
@@ -7,9 +6,11 @@ import {
   getRequests,
   rejectRequest,
   sendRequest,
+  disconnect,
 } from "../api/connection"
 import UserCard from "../../profile/components/UserCard"
 import type { Connection, DiscoverUser } from "../types/connection"
+import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getApiErrorMessage } from "../../../utils/error"
 
 function connectionToDiscoverUser(connection: Connection): DiscoverUser {
@@ -30,7 +31,7 @@ function connectionToCardUser(connection: Connection) {
 }
 
 export default function Connections() {
-  const navigate = useNavigate()
+  const { navigate } = useCollegeNavigation()
   const [discoverUsers, setDiscoverUsers] = useState<DiscoverUser[]>([])
   const [requests, setRequests] = useState<Connection[]>([])
   const [connections, setConnections] = useState<Connection[]>([])
@@ -47,7 +48,7 @@ export default function Connections() {
 
       try {
         const [discover, pendingRequests, acceptedConnections] = await Promise.all([
-          getDiscoverUsers(),
+          getDiscoverUsers({ limit: 12 }),
           getRequests(),
           getConnections(),
         ])
@@ -139,6 +140,22 @@ export default function Connections() {
     }
   }
 
+  const handleDisconnect = async (connection: Connection) => {
+    const key = `disc-${connection.id}`
+    setBusyKey(key)
+    setError("")
+
+    try {
+      await disconnect(connection.id)
+      setConnections((current) => current.filter((item) => item.id !== connection.id))
+    } catch (err: unknown) {
+      console.error("Failed to disconnect", err)
+      setError(getApiErrorMessage(err, "Failed to disconnect"))
+    } finally {
+      setBusyKey(null)
+    }
+  }
+
   const findReceivedRequest = (userId: number) =>
     requests.find((request) => request.user.id === userId)
 
@@ -156,12 +173,12 @@ export default function Connections() {
       if (!request) return null
 
       return (
-        <>
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <button
             type="button"
             onClick={() => handleAcceptRequest(request)}
             disabled={busyKey === `accept-${request.id}`}
-            className="btn btn-success min-h-0 px-3 py-2"
+            className="btn btn-success min-h-0 px-3 py-1.5 text-xs"
           >
             Accept
           </button>
@@ -169,11 +186,11 @@ export default function Connections() {
             type="button"
             onClick={() => handleRejectRequest(request)}
             disabled={busyKey === `reject-${request.id}`}
-            className="btn btn-secondary min-h-0 px-3 py-2"
+            className="btn btn-secondary min-h-0 px-3 py-1.5 text-xs"
           >
             Reject
           </button>
-        </>
+        </div>
       )
     }
 
@@ -182,7 +199,7 @@ export default function Connections() {
         type="button"
         onClick={() => handleSendRequest(user)}
         disabled={busyKey === `send-${user.id}`}
-        className="btn btn-primary min-h-0 px-4 py-2"
+        className="btn btn-primary min-h-0 px-3.5 py-1.5 text-xs"
       >
         {busyKey === `send-${user.id}` ? "Sending..." : "Connect"}
       </button>
@@ -191,12 +208,20 @@ export default function Connections() {
 
   return (
     <div className="app-page">
-      <main className="app-main-wide space-y-8">
-        <div className="page-heading">
-          <h1 className="page-title">Connections</h1>
-          <p className="page-subtitle">
-            Discover people in your college and manage your network.
-          </p>
+      <main className="app-main-wide space-y-8 max-w-6xl mx-auto px-4 sm:px-6 py-6 w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="page-title text-2xl font-bold text-slate-950">Connections & Network</h1>
+            <p className="page-subtitle text-sm text-slate-500 mt-1">
+              Manage your network, incoming requests, and connect with people from your college.
+            </p>
+          </div>
+          <button
+            onClick={() => navigate("/discover")}
+            className="btn btn-secondary text-xs px-3.5 py-2 self-start sm:self-auto flex-shrink-0"
+          >
+            🔍 Advanced People Search →
+          </button>
         </div>
 
         {error && (
@@ -211,16 +236,16 @@ export default function Connections() {
             <p className="mt-4 text-sm font-medium text-slate-500">Loading connections...</p>
           </div>
         ) : (
-          <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
-            <section className="space-y-3">
+          <div className="grid gap-8 grid-cols-1 lg:grid-cols-2 w-full">
+            <section className="space-y-3 min-w-0 w-full">
               <div className="flex items-end justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-950">Discover users</h2>
+                <div className="min-w-0">
+                  <h2 className="text-xl font-bold text-slate-950">Discover people</h2>
                   <p className="text-sm text-slate-500">
-                    People from your college who are not already connected.
+                    Alumni and students from your campus.
                   </p>
                 </div>
-                <span className="status-pill bg-white text-slate-600 ring-1 ring-slate-200">
+                <span className="status-pill bg-white text-slate-600 ring-1 ring-slate-200 flex-shrink-0">
                   {discoverUsers.length}
                 </span>
               </div>
@@ -235,7 +260,9 @@ export default function Connections() {
                     key={user.id}
                     user={user}
                     description={
-                      user.connection_status === "pending_received"
+                      user.job_title && user.company
+                        ? `${user.job_title} @ ${user.company}`
+                        : user.connection_status === "pending_received"
                         ? "Sent you a connection request"
                         : "Same college"
                     }
@@ -246,13 +273,13 @@ export default function Connections() {
               )}
             </section>
 
-            <section className="space-y-3">
+            <section className="space-y-3 min-w-0 w-full">
               <div className="flex items-end justify-between gap-4">
-                <div>
+                <div className="min-w-0">
                   <h2 className="text-xl font-bold text-slate-950">Pending requests</h2>
                   <p className="text-sm text-slate-500">Requests waiting for your response.</p>
                 </div>
-                <span className="status-pill bg-white text-slate-600 ring-1 ring-slate-200">
+                <span className="status-pill bg-white text-slate-600 ring-1 ring-slate-200 flex-shrink-0">
                   {requests.length}
                 </span>
               </div>
@@ -268,12 +295,12 @@ export default function Connections() {
                     user={connectionToDiscoverUser(request)}
                     description="Wants to connect"
                     action={
-                      <>
+                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                         <button
                           type="button"
                           onClick={() => handleAcceptRequest(request)}
                           disabled={busyKey === `accept-${request.id}`}
-                          className="btn btn-success min-h-0 px-3 py-2"
+                          className="btn btn-success min-h-0 px-3 py-1.5 text-xs"
                         >
                           Accept
                         </button>
@@ -281,11 +308,11 @@ export default function Connections() {
                           type="button"
                           onClick={() => handleRejectRequest(request)}
                           disabled={busyKey === `reject-${request.id}`}
-                          className="btn btn-secondary min-h-0 px-3 py-2"
+                          className="btn btn-secondary min-h-0 px-3 py-1.5 text-xs"
                         >
                           Reject
                         </button>
-                      </>
+                      </div>
                     }
                     onClick={() => navigate(`/profile/${request.user.id}`)}
                   />
@@ -293,13 +320,13 @@ export default function Connections() {
               )}
             </section>
 
-            <section className="space-y-3 pb-8 lg:col-span-2">
+            <section className="space-y-3 pb-8 lg:col-span-2 min-w-0 w-full">
               <div className="flex items-end justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-950">My connections</h2>
+                <div className="min-w-0">
+                  <h2 className="text-xl font-bold text-slate-950">My network</h2>
                   <p className="text-sm text-slate-500">People already in your network.</p>
                 </div>
-                <span className="status-pill bg-white text-slate-600 ring-1 ring-slate-200">
+                <span className="status-pill bg-white text-slate-600 ring-1 ring-slate-200 flex-shrink-0">
                   {connections.length}
                 </span>
               </div>
@@ -313,11 +340,21 @@ export default function Connections() {
                   <UserCard
                     key={connection.id}
                     user={connectionToCardUser(connection)}
-                    description="Already Connected"
+                    description="Connected"
                     action={
-                      <span className="status-pill bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
-                        Already Connected
-                      </span>
+                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                        <span className="status-pill bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 text-xs">
+                          Connected
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleDisconnect(connection)}
+                          disabled={busyKey === `disc-${connection.id}`}
+                          className="btn btn-danger min-h-0 text-xs px-2.5 py-1.5 opacity-80 hover:opacity-100"
+                        >
+                          Disconnect
+                        </button>
+                      </div>
                     }
                     onClick={() => navigate(`/profile/${connection.user.id}`)}
                   />

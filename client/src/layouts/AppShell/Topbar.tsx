@@ -1,20 +1,45 @@
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken, logout } from "../../features/auth/utils/auth"
+import { getUnreadNotificationCount } from "../../features/notifications/api/notification"
+import { useTenant } from "../../providers/TenantProvider"
 
 export default function Topbar() {
-  const { collegeSlug } = useParams<{ collegeSlug: string }>()
+  const { collegeSlug: routeSlug } = useParams<{ collegeSlug: string }>()
+  const { tenant } = useTenant()
+  const collegeSlug = routeSlug || tenant?.slug
   const location = useLocation()
   const navigate = useNavigate()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [role, setRole] = useState(getCurrentUserRoleFromToken)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  console.log("Topbar collegeSlug:", collegeSlug);
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [location.pathname])
 
   useEffect(() => {
     const checkAuth = () => {
-      setIsLoggedIn(hasAuthToken())
+      const auth = hasAuthToken()
+      setIsLoggedIn(auth)
       setRole(getCurrentUserRoleFromToken())
+      if (auth && role !== "super_admin") {
+        try {
+          const promise = getUnreadNotificationCount()
+          if (promise && typeof promise.then === "function") {
+            promise
+              .then((res) => {
+                if (res && typeof res.unread_count === "number") {
+                  setUnreadCount(res.unread_count)
+                }
+              })
+              .catch(() => {})
+          }
+        } catch {
+          // ignore notification count failure
+        }
+      }
     }
     
     checkAuth()
@@ -24,19 +49,14 @@ export default function Topbar() {
       window.removeEventListener("storage", checkAuth)
       window.removeEventListener(AUTH_CHANGE_EVENT, checkAuth)
     }
-  }, [location])
+  }, [location, role])
 
   const handleLogout = () => {
     logout()
     setIsLoggedIn(false)
     setRole(null)
+    setIsMobileMenuOpen(false)
     navigate(collegeSlug ? `/c/${collegeSlug}/login` : "/login")
-  }
-
-  const isActive = (path: string) => {
-    return location.pathname === path
-      ? "bg-blue-50 text-blue-700"
-      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
   }
 
   const prefix = collegeSlug ? `/c/${collegeSlug}` : ""
@@ -46,11 +66,33 @@ export default function Topbar() {
     ? [{ to: "/super-admin/college-requests", label: "College Approvals" }]
     : [
         { to: `${prefix}/feed`, label: "Feed" },
+        { to: `${prefix}/discover`, label: "Discover" },
+        { to: `${prefix}/recommendations`, label: "Recommendations" },
         { to: `${prefix}/connections`, label: "Connections" },
-        { to: `${prefix}/profile`, label: "Profile" },
         { to: `${prefix}/messages`, label: "Messages" },
+        { to: `${prefix}/profile`, label: "Profile" },
         ...(role === "admin" ? [{ to: `${prefix}/admin/alumni-requests`, label: "Alumni Requests" }] : []),
       ]
+
+  const isLinkActive = (path: string) => {
+    if (location.pathname === path) return true
+    if (path.endsWith("/profile") && location.pathname.startsWith(`${prefix}/profile`)) return true
+    return false
+  }
+
+  const isActive = (path: string) => {
+    return isLinkActive(path)
+      ? "bg-blue-50 text-blue-700 font-semibold"
+      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 font-medium"
+  }
+
+  const getActiveLabel = () => {
+    const matched = mainLinks.find((link) => isLinkActive(link.to))
+    if (matched) return matched.label
+    if (location.pathname.startsWith(`${prefix}/notifications`)) return "Notifications"
+    if (location.pathname.startsWith(`${prefix}/messages`)) return "Messages"
+    return "Menu"
+  }
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/88 shadow-sm backdrop-blur-xl">
@@ -64,16 +106,16 @@ export default function Topbar() {
                 <path d="M21 8.5v5" />
               </svg>
             </span>
-            <span className="hidden sm:inline">AluminiConn</span>
+            <span className="hidden sm:inline">AlumniConn</span>
           </Link>
 
           {isLoggedIn && (
-            <div className="hidden sm:flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
+            <div className="hidden md:flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
               {mainLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`rounded-md px-3 py-2 text-sm font-semibold transition-colors duration-200 ${isActive(link.to)}`}
+                  className={`rounded-md px-3 py-1.5 text-xs transition-colors duration-200 ${isActive(link.to)}`}
                 >
                   {link.label}
                 </Link>
@@ -84,14 +126,41 @@ export default function Topbar() {
           <div className="flex items-center gap-2">
             {isLoggedIn && role !== "super_admin" && (
               <>
+                {/* Notification Bell */}
+                <Link
+                  to={`${prefix}/notifications`}
+                  className="icon-button relative"
+                  title="Notifications"
+                >
+                  <svg
+                    width="19"
+                    height="19"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                  </svg>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-sm">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </Link>
+
+                {/* Messages Icon */}
                 <Link
                   to={`${prefix}/messages`}
                   className="icon-button"
                   title="Messages"
                 >
                   <svg
-                    width="20"
-                    height="20"
+                    width="19"
+                    height="19"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -107,20 +176,72 @@ export default function Topbar() {
             {isLoggedIn && (
               <button
                 onClick={handleLogout}
-                className="btn btn-danger min-h-0 px-3 py-2 text-sm"
+                className="btn btn-danger min-h-0 px-3 py-1.5 text-xs"
               >
                 Logout
               </button>
             )}
           </div>
         </div>
+
         {isLoggedIn && (
-          <div className="flex flex-wrap gap-1 border-t border-slate-100 py-2 sm:hidden">
-            {mainLinks.map((link) => (
-              <Link key={link.to} to={link.to} className={`rounded-md px-2 py-2 text-center text-xs font-semibold ${isActive(link.to)}`}>
-                {link.label}
-              </Link>
-            ))}
+          <div className="border-t border-slate-200/80 md:hidden">
+            <div className="flex items-center justify-between py-2">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                <span className="h-2 w-2 rounded-full bg-blue-600" aria-hidden="true" />
+                <span>{getActiveLabel()}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+                aria-expanded={isMobileMenuOpen}
+                aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              >
+                <span>{isMobileMenuOpen ? "Close" : "Menu"}</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`transition-transform duration-200 ${isMobileMenuOpen ? "rotate-180" : ""}`}
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            </div>
+
+            {isMobileMenuOpen && (
+              <div
+                data-testid="mobile-nav-dropdown"
+                className="space-y-1 pb-3 pt-1 border-t border-slate-100"
+              >
+                {mainLinks.map((link) => {
+                  const active = isLinkActive(link.to)
+                  return (
+                    <Link
+                      key={link.to}
+                      to={link.to}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors duration-150 ${
+                        active
+                          ? "bg-blue-50 text-blue-700 font-bold"
+                          : "text-slate-700 hover:bg-slate-100 hover:text-slate-950 font-medium"
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      {active && (
+                        <span className="text-xs font-semibold text-blue-600">Active</span>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>

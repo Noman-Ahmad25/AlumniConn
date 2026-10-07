@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { toggleLike } from "../api/post"
 import CommentSection from "./CommentSection"
 import ConnectionButton from "../../connections/components/ConnectionButton"
@@ -80,7 +80,7 @@ function ShareIcon() {
 }
 
 export default function PostCard({ post }: { post: Post }) {
-  const navigate = useNavigate()
+  const { navigate } = useCollegeNavigation()
   const [liked, setLiked] = useState<boolean>(post.liked_by_current_user)
   const [likesCount, setLikesCount] = useState<number>(post.likes_count)
   const [isLoading, setIsLoading] = useState<boolean>(false)

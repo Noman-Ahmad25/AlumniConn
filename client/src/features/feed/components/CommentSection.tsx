@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { getComments, createComment } from "../api/comment"
+import { useCollegeNavigation } from "../../../shared/utils/navigation"
 
 interface Comment {
   id: number
@@ -52,6 +53,7 @@ function SpinnerIcon() {
 }
 
 export default function CommentSection({ postId }: { postId: number }) {
+  const { navigate } = useCollegeNavigation()
   const [comments, setComments] = useState<Comment[]>([])
   const [content, setContent] = useState("")
   const [loading, setLoading] = useState(false)
@@ -151,6 +153,7 @@ export default function CommentSection({ postId }: { postId: number }) {
           type="button"
           onClick={handleAddComment}
           disabled={loading || !content.trim()}
+          aria-label="Post comment"
           className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-blue-600 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? <SpinnerIcon /> : <SendIcon />}
@@ -186,20 +189,32 @@ export default function CommentSection({ postId }: { postId: number }) {
           const avatar = getAvatar(c)
           return (
             <div key={c.id} className="flex gap-2 items-start">
-              {avatar ? (
-                <img
-                  src={avatar}
-                  alt={name}
-                  className="avatar h-7 w-7 border border-slate-200 object-cover"
-                />
-              ) : (
-                <div className="avatar h-7 w-7 border border-slate-200 bg-slate-100 text-[11px] text-slate-500">
-                  {getInitials(name)}
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={() => navigate(`/profile/${c.user_id}`)}
+                className="flex-shrink-0 hover:opacity-80 transition-opacity"
+              >
+                {avatar ? (
+                  <img
+                    src={avatar}
+                    alt={name}
+                    className="avatar h-7 w-7 border border-slate-200 object-cover"
+                  />
+                ) : (
+                  <div className="avatar h-7 w-7 border border-slate-200 bg-slate-100 text-[11px] text-slate-500">
+                    {getInitials(name)}
+                  </div>
+                )}
+              </button>
               <div className="min-w-0 flex-1 rounded-lg rounded-tl-sm border border-slate-200 bg-white px-3 py-2">
                 <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-bold text-slate-800">{name}</span>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/profile/${c.user_id}`)}
+                    className="text-xs font-bold text-slate-800 hover:text-blue-600 transition-colors text-left"
+                  >
+                    {name}
+                  </button>
                   <span className="text-[11px] text-slate-400">{timeAgo(c.created_at)}</span>
                 </div>
                 <p className="mt-0.5 break-words text-[13px] leading-snug text-slate-600">

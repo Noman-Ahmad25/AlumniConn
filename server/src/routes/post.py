@@ -48,17 +48,36 @@ async def api_create_post(
     
 
 @router.get("/feed", response_model=list[PostResponse])
-def get_user_feed(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return get_feed(db, current_user)
+def get_user_feed(
+    skip: int = 0,
+    limit: int = 20,
+    is_opportunity: bool | None = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_feed(db, current_user, skip=skip, limit=limit, is_opportunity=is_opportunity)
+
 
 @router.get("/me", response_model=list[PostResponse])
-def get_my_posts(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return get_user_posts(db, current_user)
+def get_my_posts(
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_user_posts(db, current_user, skip=skip, limit=limit)
+
 
 @router.get("/user/{user_id}", response_model=list[PostResponse])
-def get_posts_by_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_posts_by_user(
+    user_id: int,
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Get posts from a specific user (filtered by college)"""
-    return get_other_user_posts(db, user_id, current_user)
+    return get_other_user_posts(db, user_id, current_user, skip=skip, limit=limit)
 
 @router.delete("/{post_id}", response_model=dict)
 def delete_post_by_id(post_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

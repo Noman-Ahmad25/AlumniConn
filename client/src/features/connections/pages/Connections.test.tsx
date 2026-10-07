@@ -66,7 +66,7 @@ test("renders discover, pending, and connected states from backend", async () =>
   expect(await screen.findByText("rahul")).toBeInTheDocument()
   expect(screen.getByText("Request Sent")).toBeInTheDocument()
   expect(screen.getAllByRole("button", { name: "Accept" }).length).toBeGreaterThan(0)
-  expect(screen.getAllByText("Already Connected").length).toBeGreaterThan(0)
+  expect(screen.getAllByText("Connected").length).toBeGreaterThan(0)
 })
 
 test("send request updates discover state without full reload", async () => {
@@ -84,7 +84,7 @@ test("accept moves user into connections and removes pending request", async () 
   fireEvent.click((await screen.findAllByRole("button", { name: "Accept" }))[0])
 
   await waitFor(() => expect(acceptRequest).toHaveBeenCalledWith(40))
-  expect(screen.getAllByText("Already Connected").length).toBeGreaterThan(1)
+  expect(screen.getAllByText("Connected").length).toBeGreaterThan(1)
 })
 
 test("clicking user card navigates to profile without button clicks navigating", async () => {

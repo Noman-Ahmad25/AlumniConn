@@ -39,19 +39,30 @@ def create_post(db: Session, user_id: int, data: PostCreate, image_file: Optiona
    
 
 
-def get_feed(db: Session, current_user: User):
+def get_feed(
+    db: Session,
+    current_user: User,
+    skip: int = 0,
+    limit: int = 20,
+    is_opportunity: Optional[bool] = None,
+):
     # Join posts with users and profiles to get necessary info for feed
-    rows = db.query(Post, User, Profile).join(
+    query = db.query(Post, User, Profile).join(
         User, Post.user_id == User.id
     ).outerjoin(
         Profile, Profile.user_id == User.id
     ).filter(
         User.college_id == current_user.college_id
-    ).order_by(Post.created_at.desc()).all()
+    )
+
+    if is_opportunity is not None:
+        query = query.filter(Post.is_opportunity == is_opportunity)
+
+    rows = query.order_by(Post.created_at.desc()).offset(skip).limit(limit).all()
 
     if not rows:
         return []
-    
+
     posts = [row[0] for row in rows]
     post_ids = [post.id for post in posts]
 
@@ -65,17 +76,22 @@ def get_feed(db: Session, current_user: User):
         Comment.post_id.in_(post_ids)
     ).group_by(Comment.post_id).all())
 
-
     liked_posts = set(
-        pid for (pid,) in  db.query(Like.post_id).filter(
-        Like.post_id.in_(post_ids),
-        Like.user_id == current_user.id
-    ).all())
+        pid for (pid,) in db.query(Like.post_id).filter(
+            Like.post_id.in_(post_ids),
+            Like.user_id == current_user.id
+        ).all()
+    )
 
     return format_posts_bulk(rows, like_counts, comment_counts, liked_posts, current_user.id, db)
-    
 
-def get_user_posts(db: Session, current_user: User):
+
+def get_user_posts(
+    db: Session,
+    current_user: User,
+    skip: int = 0,
+    limit: int = 20,
+):
     # Similar to get_feed but filtered to just the current user's posts
     rows = db.query(Post, User, Profile).join(
         User, Post.user_id == User.id
@@ -84,11 +100,11 @@ def get_user_posts(db: Session, current_user: User):
     ).filter(
         Post.user_id == current_user.id,
         User.college_id == current_user.college_id
-    ).order_by(Post.created_at.desc()).all()
+    ).order_by(Post.created_at.desc()).offset(skip).limit(limit).all()
 
     if not rows:
         return []
-    
+
     posts = [row[0] for row in rows]
     post_ids = [post.id for post in posts]
 
@@ -100,17 +116,23 @@ def get_user_posts(db: Session, current_user: User):
         Comment.post_id.in_(post_ids)
     ).group_by(Comment.post_id).all())
 
-
     liked_posts = set(
-        pid for (pid,) in  db.query(Like.post_id).filter(
-        Like.post_id.in_(post_ids),
-        Like.user_id == current_user.id
-    ).all())
+        pid for (pid,) in db.query(Like.post_id).filter(
+            Like.post_id.in_(post_ids),
+            Like.user_id == current_user.id
+        ).all()
+    )
 
     return format_posts_bulk(rows, like_counts, comment_counts, liked_posts, current_user.id, db)
 
 
-def get_other_user_posts(db: Session, target_user_id: int, current_user: User):
+def get_other_user_posts(
+    db: Session,
+    target_user_id: int,
+    current_user: User,
+    skip: int = 0,
+    limit: int = 20,
+):
     """Get posts from another user (filtered by college)"""
     rows = db.query(Post, User, Profile).join(
         User, Post.user_id == User.id
@@ -119,11 +141,11 @@ def get_other_user_posts(db: Session, target_user_id: int, current_user: User):
     ).filter(
         Post.user_id == target_user_id,
         User.college_id == current_user.college_id
-    ).order_by(Post.created_at.desc()).all()
+    ).order_by(Post.created_at.desc()).offset(skip).limit(limit).all()
 
     if not rows:
         return []
-    
+
     posts = [row[0] for row in rows]
     post_ids = [post.id for post in posts]
 
@@ -136,10 +158,11 @@ def get_other_user_posts(db: Session, target_user_id: int, current_user: User):
     ).group_by(Comment.post_id).all())
 
     liked_posts = set(
-        pid for (pid,) in  db.query(Like.post_id).filter(
-        Like.post_id.in_(post_ids),
-        Like.user_id == current_user.id
-    ).all())
+        pid for (pid,) in db.query(Like.post_id).filter(
+            Like.post_id.in_(post_ids),
+            Like.user_id == current_user.id
+        ).all()
+    )
 
     return format_posts_bulk(rows, like_counts, comment_counts, liked_posts, current_user.id, db)
 

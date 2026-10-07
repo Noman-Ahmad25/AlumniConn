@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { MemoryRouter } from "react-router-dom"
 import { vi } from "vitest"
 import CommentSection from "./CommentSection"
 import { createComment, getComments } from "../api/comment"
@@ -30,13 +31,17 @@ test("loads and creates comments with backend-provided identity", async () => {
     created_at: new Date().toISOString(),
   })
 
-  render(<CommentSection postId={10} />)
+  render(
+    <MemoryRouter>
+      <CommentSection postId={10} />
+    </MemoryRouter>
+  )
 
   expect(await screen.findByText("Existing comment")).toBeInTheDocument()
   fireEvent.change(screen.getByRole("textbox"), {
     target: { value: "New comment" },
   })
-  fireEvent.click(screen.getByRole("button"))
+  fireEvent.click(screen.getByRole("button", { name: "Post comment" }))
 
   expect(await screen.findByText("New comment")).toBeInTheDocument()
   expect(screen.getByText("bob")).toBeInTheDocument()

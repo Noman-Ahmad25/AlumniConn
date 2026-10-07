@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react"
-import { useNavigate } from "react-router-dom"
+import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { updateProfile } from "../api/profile"
 import ProfileForm from "../components/ProfileForm"
 import {
@@ -10,7 +10,7 @@ import {
 import { getApiErrorMessage } from "../../../utils/error"
 
 export default function CreateProfile() {
-  const navigate = useNavigate()
+  const { navigate } = useCollegeNavigation()
   const [form, setForm] = useState<ProfileFormValues>(profileToForm())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")

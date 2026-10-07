@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
+import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getInbox, getMessages, sendMessage } from "../api/message"
 import type { MessageResponse, InboxMessage, MessageSocketEvent } from "../api/message"
 import { useMessagesSocket } from "../hooks/useMessagesSocket"
@@ -115,7 +116,7 @@ function ImageIcon() {
 
 export default function Messages() {
   const { conversationId } = useParams<{ conversationId: string }>()
-  const navigate = useNavigate()
+  const { navigate } = useCollegeNavigation()
   const currentUserId = getCurrentUserIdFromToken()
 
   // Inbox state

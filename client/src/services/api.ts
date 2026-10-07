@@ -18,8 +18,10 @@ API.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       logout()
-      if (window.location.pathname !== "/login") {
-        window.location.assign("/login")
+      const match = window.location.pathname.match(/^\/c\/([^/]+)/)
+      const loginPath = match ? `/c/${match[1]}/login` : "/login"
+      if (window.location.pathname !== loginPath) {
+        window.location.assign(loginPath)
       }
     }
 

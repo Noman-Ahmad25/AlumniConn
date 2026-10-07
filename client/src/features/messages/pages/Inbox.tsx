@@ -1,7 +1,7 @@
 // src/pages/Inbox.tsx
 
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getInbox } from "../api/message"
 import { getApiErrorMessage } from "../../../utils/error"
 import type { InboxMessage } from "../api/message"
@@ -20,7 +20,7 @@ export default function Inbox() {
   const [chats, setChats] = useState<InboxMessage[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const navigate = useNavigate()
+  const { navigate } = useCollegeNavigation()
 
   useEffect(() => {
     const fetch = async () => {

@@ -1,8 +1,8 @@
 import { API } from "../../../services/api"
-import type { Connection, DiscoverUser } from "../types/connection"
+import type { Connection, DiscoverFilterParams, DiscoverUser } from "../types/connection"
 
-export const getDiscoverUsers = async (): Promise<DiscoverUser[]> => {
-  const response = await API.get("/users/discover")
+export const getDiscoverUsers = async (params?: DiscoverFilterParams): Promise<DiscoverUser[]> => {
+  const response = await API.get("/users/discover", { params })
   return response.data
 }
 
@@ -18,6 +18,16 @@ export const acceptRequest = async (requestId: number): Promise<Connection> => {
 
 export const rejectRequest = async (requestId: number): Promise<Connection> => {
   const response = await API.post(`/connections/reject/${requestId}`)
+  return response.data
+}
+
+export const withdrawRequest = async (requestId: number): Promise<{ detail: string; connection_id: number }> => {
+  const response = await API.post(`/connections/withdraw/${requestId}`)
+  return response.data
+}
+
+export const disconnect = async (connectionId: number): Promise<{ detail: string; connection_id: number }> => {
+  const response = await API.post(`/connections/disconnect/${connectionId}`)
   return response.data
 }
 
