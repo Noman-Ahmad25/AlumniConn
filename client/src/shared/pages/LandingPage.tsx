@@ -596,12 +596,12 @@ export default function LandingPage() {
                 <section id="universities" className="py-16 sm:py-24 px-4 sm:px-6 bg-white border-b border-slate-200/80">
                     <div className="mx-auto max-w-7xl">
                         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-                            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">Active Institutions</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">Demo Environment</span>
                             <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-                                Partner Universities on AlumniConn
+                                Explore Demo Universities
                             </h2>
                             <p className="mt-3 text-base sm:text-lg text-slate-600">
-                                Discover campuses powered by AlumniConn. Students and alumni can navigate directly to their institution's portal.
+                                Discover campuses in the AlumniConn demo environment. All universities and users shown here are fictional and provided for demonstration purposes.
                             </p>
                         </div>
 
@@ -650,7 +650,7 @@ export default function LandingPage() {
                                                     )}
                                                 </div>
                                                 <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
-                                                    Active Network
+                                                    Demo Network
                                                 </span>
                                             </div>
 
@@ -727,7 +727,7 @@ export default function LandingPage() {
                                 onClick={(e) => scrollToSection(e, "universities")}
                                 className="w-full sm:w-auto rounded-lg border border-white/40 bg-white/10 px-8 py-3.5 text-base font-bold text-white hover:bg-white/20 transition-all text-center"
                             >
-                                Browse Partner Campuses
+                                Explore Demo Campuses
                             </a>
                         </div>
                     </div>
@@ -778,7 +778,7 @@ export default function LandingPage() {
                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3">Institutions</h4>
                             <ul className="space-y-2 text-sm text-slate-600">
                                 <li>
-                                    <a href="#universities" onClick={(e) => scrollToSection(e, "universities")} className="hover:text-blue-600 transition-colors">Partner Campuses</a>
+                                    <a href="#universities" onClick={(e) => scrollToSection(e, "universities")} className="hover:text-blue-600 transition-colors">Demo Campuses</a>
                                 </li>
                                 <li>
                                     <Link to="/request-college" className="hover:text-blue-600 transition-colors">Request University</Link>
@@ -875,7 +875,7 @@ export default function LandingPage() {
                         </div>
                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100/90 text-slate-500 text-[11px]">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span>Interactive Demo • Synthetic Showcase Data</span>
+                            <span>Interactive Demo • Fictional Universities • Synthetic Data</span>
                         </div>
                     </div>
                 </div>

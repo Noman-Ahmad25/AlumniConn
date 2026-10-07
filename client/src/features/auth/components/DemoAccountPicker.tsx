@@ -50,16 +50,16 @@ export default function DemoAccountPicker({ className = "", compact = false }: D
     {
       role: "college_admin" as DemoRole,
       title: "College Admin",
-      badge: "NITK Administrator",
+      badge: "Campus Administrator",
       badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
-      description: "Manage NITK campus roster, promote/demote students, review alumni verifications.",
+      description: "Manage campus roster, promote/demote students, review alumni verifications.",
       accent: "hover:border-amber-300 hover:shadow-amber-500/10",
       btnClass: "bg-amber-600 hover:bg-amber-700 text-white",
     },
     {
       role: "alumni" as DemoRole,
       title: "Demo Alumni",
-      badge: "NITK '20 • Microsoft",
+      badge: "Alumna '20 • CloudScale",
       badgeColor: "bg-blue-100 text-blue-800 border-blue-200",
       description: "Senior AI Engineer profile, alumni connections, career posts, mentorship outreach.",
       accent: "hover:border-blue-300 hover:shadow-blue-500/10",
@@ -68,7 +68,7 @@ export default function DemoAccountPicker({ className = "", compact = false }: D
     {
       role: "student" as DemoRole,
       title: "Demo Student",
-      badge: "NITK '26 • Undergrad",
+      badge: "Student '26 • Undergrad",
       badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200",
       description: "Computer Science student, explore alumni network, recommendations, connection requests.",
       accent: "hover:border-emerald-300 hover:shadow-emerald-500/10",

@@ -66,6 +66,8 @@ SHOWCASE_REQUEST_DOMAINS = [
     "vanguardtutorial.fake",
     "vit.ac.in",
     "manipal.edu",
+    "veritas.edu",
+    "millennium.edu",
     "apexglobaltech.fake",
 ]
 
@@ -131,7 +133,7 @@ def upload_synthetic_showcase_images() -> List[str]:
                     '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">'
                     '<rect width="800" height="450" fill="#18181b"/>'
                     '<rect x="40" y="40" width="720" height="370" rx="16" fill="#27272a" stroke="#e11d48" stroke-width="2"/>'
-                    '<text x="400" y="90" fill="#fb7185" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle">Team NITK Racing: Electric Powertrain 2026</text>'
+                    '<text x="400" y="90" fill="#fb7185" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle">Northbridge Racing Team: Electric Powertrain 2026</text>'
                     '<circle cx="250" cy="240" r="70" fill="#09090b" stroke="#f43f5e" stroke-width="4"/>'
                     '<circle cx="550" cy="240" r="70" fill="#09090b" stroke="#f43f5e" stroke-width="4"/>'
                     '<path d="M 200 240 Q 400 130 600 240" stroke="#f43f5e" stroke-width="6" fill="none"/>'
@@ -147,12 +149,12 @@ def upload_synthetic_showcase_images() -> List[str]:
                     '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">'
                     '<rect width="800" height="450" fill="#0c4a6e"/>'
                     '<rect x="40" y="40" width="720" height="370" rx="16" fill="#0369a1" stroke="#38bdf8" stroke-width="2"/>'
-                    '<text x="400" y="110" fill="#ffffff" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">NITK Global Alumni Conclave 2026</text>'
-                    '<text x="400" y="160" fill="#bae6fd" font-family="sans-serif" font-size="18" text-anchor="middle">Surathkal Campus - December 18-20, 2026</text>'
+                    '<text x="400" y="110" fill="#ffffff" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">Northbridge Global Alumni Conclave 2026</text>'
+                    '<text x="400" y="160" fill="#bae6fd" font-family="sans-serif" font-size="18" text-anchor="middle">Northbridge Campus - December 18-20, 2026</text>'
                     '<line x1="150" y1="200" x2="650" y2="200" stroke="#38bdf8" stroke-width="1.5"/>'
                     '<text x="400" y="250" fill="#f0f9ff" font-family="sans-serif" font-size="16" text-anchor="middle">Decarbonization - AI Sovereignty - Next-Gen Infrastructure</text>'
                     '<rect x="300" y="290" width="200" height="50" rx="25" fill="#f59e0b"/>'
-                    '<text x="400" y="322" fill="#78350f" font-family="sans-serif" font-size="15" font-weight="bold" text-anchor="middle">Surathkal, Karnataka</text>'
+                    '<text x="400" y="322" fill="#78350f" font-family="sans-serif" font-size="15" font-weight="bold" text-anchor="middle">Northbridge, Karnataka</text>'
                     '</svg>'
                 ).encode("utf-8")
             ),
@@ -368,7 +370,7 @@ def run_seed(db: Session, force_reset: bool = False):
     if not demo_alumni:
         demo_alumni = User(
             username="demo_alumni",
-            email="demo.alumni@nitk.edu.in",
+            email="demo.alumni@northbridge.edu",
             password_hash=DEMO_PASSWORD_HASH,
             college_id=nitk.id,
             role=UserRole.ALUMNI,
@@ -388,8 +390,8 @@ def run_seed(db: Session, force_reset: bool = False):
             user_id=demo_alumni.id,
             college_id=nitk.id,
             full_name="Ananya Sen (Demo Alumni)",
-            bio="Senior AI Engineer at Microsoft India. Passionate about LLMs, cloud architecture, and mentoring students.",
-            company="Microsoft India",
+            bio="Senior AI Engineer at CloudScale Technologies. Passionate about LLMs, cloud architecture, and mentoring students.",
+            company="CloudScale Technologies",
             job_title="Senior AI Engineer",
             job_industry="Artificial Intelligence & Cloud",
             location="Bengaluru, Karnataka",
@@ -409,7 +411,7 @@ def run_seed(db: Session, force_reset: bool = False):
     if not demo_student:
         demo_student = User(
             username="demo_student",
-            email="demo.student@nitk.edu.in",
+            email="demo.student@northbridge.edu",
             password_hash=DEMO_PASSWORD_HASH,
             college_id=nitk.id,
             role=UserRole.STUDENT,
@@ -426,7 +428,7 @@ def run_seed(db: Session, force_reset: bool = False):
             user_id=demo_student.id,
             college_id=nitk.id,
             full_name="Rohan Mehta (Demo Student)",
-            bio="Final year B.Tech student at NITK. Lead author of ChronoCache. Passionate about Distributed Systems and Go.",
+            bio="Final year B.Tech student at Northbridge. Lead author of ChronoCache. Passionate about Distributed Systems and Go.",
             job_title="Final Year Undergraduate",
             job_industry="Higher Education",
             location="Mangalore, Karnataka",

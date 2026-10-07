@@ -113,7 +113,7 @@ def test_security_authorization(db):
 
 def test_recommendation_crash_fix(db):
     print("\n--- 3. Testing Recommendation pgvector Truthiness & Ranking ---")
-    user = db.query(User).filter(User.email == "rahul.sharma.dev@alumni.nitk.edu.in").first()
+    user = db.query(User).filter(User.username == "rahul_sharma_backend").first()
     assert user is not None
 
     # Test with valid embedding
@@ -141,7 +141,7 @@ def test_recommendation_crash_fix(db):
 
 def test_inbox_sorting_and_none_timestamps(db):
     print("\n--- 4. Testing Message Inbox Sorting & Timestamp Handling ---")
-    user_a = db.query(User).filter(User.id == 3).first()
+    user_a = db.query(User).filter(User.username == "demo_alumni").first()
     inbox = get_inbox(db, user_a)
     assert isinstance(inbox, list)
     # Check that sorting didn't raise TypeError: '<' not supported between instances of 'NoneType' and 'datetime'
@@ -155,7 +155,7 @@ def test_inbox_sorting_and_none_timestamps(db):
 
 def test_post_creation_validation(db):
     print("\n--- 5. Testing Post Creation Validation ---")
-    user = db.query(User).filter(User.id == 3).first()
+    user = db.query(User).filter(User.username == "demo_alumni").first()
 
     # Empty post with whitespace only
     try:
@@ -181,7 +181,7 @@ def test_post_creation_validation(db):
 
 def test_auth_and_email_service(db):
     print("\n--- 6. Testing Auth Verification & Email Dispatch ---")
-    user = db.query(User).filter(User.email == "rahul.sharma.dev@alumni.nitk.edu.in").first()
+    user = db.query(User).filter(User.username == "rahul_sharma_backend").first()
     assert user is not None
 
     # Temporarily toggle email_verified to test dispatch
@@ -210,8 +210,8 @@ def test_auth_and_email_service(db):
 
 def test_event_bus_and_notifications(db):
     print("\n--- 7. Testing Event Bus & Synchronous Notification Persistence ---")
-    user_recipient = db.query(User).filter(User.id == 4).first()
-    user_actor = db.query(User).filter(User.id == 3).first()
+    user_recipient = db.query(User).filter(User.username == "demo_student").first()
+    user_actor = db.query(User).filter(User.username == "demo_alumni").first()
 
     initial_unread = get_unread_count(db, user_recipient.id)
     
@@ -246,13 +246,13 @@ def test_event_bus_and_notifications(db):
 def test_connection_lifecycle(db):
     print("\n--- 8. Testing Complete Connection Lifecycle (Send, Withdraw, Accept, Disconnect) ---")
     # Find two unconnected alumni
-    user_s = db.query(User).filter(User.id == 10).first()
-    user_r = db.query(User).filter(User.id == 11).first()
+    user_s = db.query(User).filter(User.username == "aditi_verma").first()
+    user_r = db.query(User).filter(User.username == "karan_patel").first()
     
-    # Ensure no existing connection between 10 and 11
+    # Ensure no existing connection between user_s and user_r
     existing = db.query(Connection).filter(
-        ((Connection.sender_id == 10) & (Connection.receiver_id == 11)) |
-        ((Connection.sender_id == 11) & (Connection.receiver_id == 10))
+        ((Connection.sender_id == user_s.id) & (Connection.receiver_id == user_r.id)) |
+        ((Connection.sender_id == user_r.id) & (Connection.receiver_id == user_s.id))
     ).first()
     if existing:
         db.delete(existing)
@@ -291,7 +291,7 @@ def test_connection_lifecycle(db):
 
 def test_discovery_search_and_filters(db):
     print("\n--- 9. Testing User Discovery Search & Multi-Field Filters ---")
-    user = db.query(User).filter(User.email == "rahul.sharma.dev@alumni.nitk.edu.in").first()
+    user = db.query(User).filter(User.username == "rahul_sharma_backend").first()
 
     # Pagination
     p1 = get_discover_users(db, user, skip=0, limit=15)
@@ -309,10 +309,10 @@ def test_discovery_search_and_filters(db):
     print(f"✓ Skill filter 'Python' returned {len(py_users)} candidates.")
 
     # Company filter
-    amz_users = get_discover_users(db, user, company="Amazon")
-    assert len(amz_users) > 0
-    assert all("amazon" in (u["company"] or "").lower() for u in amz_users)
-    print(f"✓ Company filter 'Amazon' returned {len(amz_users)} candidates.")
+    scale_users = get_discover_users(db, user, company="CloudScale")
+    assert len(scale_users) > 0
+    assert all("cloudscale" in (u["company"] or "").lower() for u in scale_users)
+    print(f"✓ Company filter 'CloudScale' returned {len(scale_users)} candidates.")
 
     # Location filter
     blr_users = get_discover_users(db, user, location="Bengaluru")
@@ -323,7 +323,7 @@ def test_discovery_search_and_filters(db):
 
 def test_post_feed_and_n_plus_one_batching(db):
     print("\n--- 10. Testing Post Feed Scalability & Batch Connection Resolution ---")
-    user = db.query(User).filter(User.id == 3).first()
+    user = db.query(User).filter(User.username == "demo_alumni").first()
 
     # Feed with pagination
     feed_page = get_feed(db, user, skip=0, limit=10)
@@ -341,8 +341,8 @@ def test_post_feed_and_n_plus_one_batching(db):
 
 async def test_messaging_and_conversation_flow(db):
     print("\n--- 11. Testing Messaging Flow & Conversation Isolation ---")
-    user_a = db.query(User).filter(User.id == 3).first()
-    user_b = db.query(User).filter(User.id == 4).first()
+    user_a = db.query(User).filter(User.username == "demo_alumni").first()
+    user_b = db.query(User).filter(User.username == "demo_student").first()
 
     convo = get_or_create_conversation(db, user_a, user_b.id)
     msg = await send_message(db, user_a, convo.id, content="Audit verification message #100")

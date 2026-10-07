@@ -9,96 +9,9 @@ career advice, referral opportunities, and threaded conversations.
 
 SECONDARY_COLLEGES = [
     {
-        "name": "Birla Institute of Technology and Science, Pilani",
-        "slug": "bits-pilani",
-        "domain": "bits-pilani.ac.in",
-        "location": "Pilani, Rajasthan",
-        "established_year": 1964,
-        "description": "Institute of Eminence offering world-class technology, science, and humanities education.",
-        "is_approved": True,
-        "is_active": True,
-        "branding": {
-            "primary_color": "#1e3a8a",
-            "secondary_color": "#3b82f6",
-            "accent_color": "#f59e0b",
-            "background_color": "#f8fafc",
-            "welcome_message": "Welcome to BITS Pilani Alumni Network",
-            "motto": "Knowledge is Supreme Power",
-        },
-        "admin": {
-            "username": "admin_bits",
-            "email": "alumni.director@bits-pilani.ac.in",
-            "full_name": "Prof. S. R. Ramakrishnan",
-            "job_title": "Dean of Alumni Relations & Resource Mobilization",
-            "job_industry": "Higher Education",
-            "location": "Pilani, Rajasthan",
-            "bio": "Dean of Alumni Relations at BITS Pilani.",
-        },
-        "users": [],
-        "posts": [],
-    },
-    {
-        "name": "Indian Institute of Technology, Bombay",
-        "slug": "iit-bombay",
-        "domain": "iitb.ac.in",
-        "location": "Powai, Mumbai, Maharashtra",
-        "established_year": 1958,
-        "description": "Globally recognized institute for pioneering engineering research, innovation, and leadership.",
-        "is_approved": True,
-        "is_active": True,
-        "branding": {
-            "primary_color": "#1e3a8a",
-            "secondary_color": "#3b82f6",
-            "accent_color": "#f59e0b",
-            "background_color": "#f8fafc",
-            "welcome_message": "Welcome to IIT Bombay Alumni Network",
-            "motto": "Knowledge is the Supreme Goal",
-        },
-        "admin": {
-            "username": "admin_iitb",
-            "email": "dean.acr@iitb.ac.in",
-            "full_name": "Prof. Rajesh Gokhale",
-            "job_title": "Dean of Alumni and Corporate Relations",
-            "job_industry": "Higher Education",
-            "location": "Powai, Mumbai, Maharashtra",
-            "bio": "Dean of Alumni Relations at IIT Bombay.",
-        },
-        "users": [],
-        "posts": [],
-    },
-    {
-        "name": "Delhi Technological University",
-        "slug": "dtu",
-        "domain": "dtu.ac.in",
-        "location": "Shahbad Daulatpur, Bawana Road, Delhi",
-        "established_year": 1941,
-        "description": "Historic technical university focused on engineering education and applied research.",
-        "is_approved": True,
-        "is_active": False,
-        "branding": {
-            "primary_color": "#475569",
-            "secondary_color": "#64748b",
-            "accent_color": "#94a3b8",
-            "background_color": "#f8fafc",
-            "welcome_message": "Welcome to DTU Alumni Network",
-            "motto": "Excellence Through Innovation",
-        },
-        "admin": {
-            "username": "admin_dtu",
-            "email": "alumni.affairs@dtu.ac.in",
-            "full_name": "Dr. Pradeep Kumar",
-            "job_title": "Director of Alumni Affairs",
-            "job_industry": "Higher Education",
-            "location": "Delhi",
-            "bio": "Director of Alumni Affairs at DTU.",
-        },
-        "users": [],
-        "posts": [],
-    },
-    {
         "name": "Apex Institute of Technology",
         "slug": "apex-institute",
-        "domain": "apextech.edu.in",
+        "domain": "apextech.edu",
         "location": "Whitefield, Bengaluru, Karnataka",
         "established_year": 2008,
         "description": "Autonomous engineering institute in Bengaluru's tech corridor specializing in Artificial Intelligence, Cloud Infrastructure, and Fintech Systems.",
@@ -114,7 +27,7 @@ SECONDARY_COLLEGES = [
         },
         "admin": {
             "username": "admin_apex",
-            "email": "dean.alumni@apextech.edu.in",
+            "email": "dean.alumni@apextech.edu",
             "full_name": "Dr. Kavitha Raman",
             "job_title": "Dean of Industry Outreach & Alumni Affairs",
             "job_industry": "Higher Education",
@@ -124,39 +37,39 @@ SECONDARY_COLLEGES = [
         "users": [
             {
                 "username": "siddharth_apex_fintech",
-                "email": "siddharth.m@alumni.apextech.edu.in",
+                "email": "siddharth.m@alumni.apextech.edu",
                 "full_name": "Siddharth Menon",
                 "role": "alumni",
                 "grad_year": 2019,
                 "major": "Computer Science and Engineering",
-                "company": "Razorpay",
+                "company": "OmniPay Network",
                 "job_title": "Senior Payment Systems Architect",
                 "job_industry": "Financial Technology",
                 "job_description": "Designing high-availability payment gateway settlement engines handling millions of transactions daily.",
                 "location": "Bengaluru, Karnataka",
                 "skills": ["Go", "Kafka", "PostgreSQL", "Distributed Systems", "Kubernetes"],
                 "interests": ["Fintech Architecture", "System Resiliency", "High Throughput"],
-                "bio": "Building payment infrastructure at Razorpay. Passionate about fault-tolerant transaction pipelines.",
+                "bio": "Building payment infrastructure at OmniPay Network. Passionate about fault-tolerant transaction pipelines.",
             },
             {
                 "username": "meera_apex_data",
-                "email": "meera.krishnan@alumni.apextech.edu.in",
+                "email": "meera.krishnan@alumni.apextech.edu",
                 "full_name": "Meera Krishnan",
                 "role": "alumni",
                 "grad_year": 2021,
                 "major": "Information Science",
-                "company": "Swiggy",
+                "company": "HyperLogix Delivery",
                 "job_title": "Data Platform Engineer",
                 "job_industry": "E-Commerce & Logistics",
                 "job_description": "Building real-time stream processing infrastructure for ETA predictions using Apache Flink.",
                 "location": "Bengaluru, Karnataka",
                 "skills": ["Apache Flink", "Spark", "Python", "Kafka", "Data Engineering"],
                 "interests": ["Stream Processing", "Distributed Storage", "Lakehouses"],
-                "bio": "Data platform engineer at Swiggy. Apex Institute 2021 batch.",
+                "bio": "Data platform engineer at HyperLogix Delivery. Apex Institute 2021 batch.",
             },
             {
                 "username": "arjun_apex_student",
-                "email": "arjun.nair@student.apextech.edu.in",
+                "email": "arjun.nair@student.apextech.edu",
                 "full_name": "Arjun Nair",
                 "role": "student",
                 "grad_year": 2026,
@@ -168,7 +81,7 @@ SECONDARY_COLLEGES = [
             },
             {
                 "username": "tanvi_apex_student",
-                "email": "tanvi.sharma@student.apextech.edu.in",
+                "email": "tanvi.sharma@student.apextech.edu",
                 "full_name": "Tanvi Sharma",
                 "role": "student",
                 "grad_year": 2025,
@@ -182,7 +95,7 @@ SECONDARY_COLLEGES = [
         "posts": [
             {
                 "author_username": "siddharth_apex_fintech",
-                "content": "🚀 We're expanding the Core Payments platform team at Razorpay! Looking for engineers with strong fundamentals in Go, distributed data stores, and event-driven architectures. If you're an Apex alumnus or final year student with hands-on systems experience, DM me for direct referral! #Hiring #Fintech #ApexAlumni",
+                "content": "🚀 We're expanding the Core Payments platform team at OmniPay Network! Looking for engineers with strong fundamentals in Go, distributed data stores, and event-driven architectures. If you're an Apex alumnus or final year student with hands-on systems experience, DM me for direct referral! #Hiring #Fintech #ApexAlumni",
                 "is_opportunity": True,
                 "days_ago": 6,
                 "comments": [
@@ -200,7 +113,7 @@ SECONDARY_COLLEGES = [
             },
             {
                 "author_username": "meera_apex_data",
-                "content": "Deep dive on Apache Flink checkpointing mechanisms: How we eliminated checkpoint timeouts during high order bursts at Swiggy by tuning buffer debloating and unaligned checkpoints. Happy to share my presentation slides with anyone interested in stream processing!",
+                "content": "Deep dive on Apache Flink checkpointing mechanisms: How we eliminated checkpoint timeouts during high order bursts at HyperLogix by tuning buffer debloating and unaligned checkpoints. Happy to share my presentation slides with anyone interested in stream processing!",
                 "is_opportunity": False,
                 "days_ago": 12,
                 "comments": [],
@@ -210,7 +123,7 @@ SECONDARY_COLLEGES = [
     {
         "name": "Crestview University of Engineering",
         "slug": "crestview-university",
-        "domain": "crestview.edu.in",
+        "domain": "crestview.edu",
         "location": "Kothrud, Pune, Maharashtra",
         "established_year": 1995,
         "description": "Premier technical university in western India recognized for automotive, robotics, IoT, and embedded systems engineering.",
@@ -226,7 +139,7 @@ SECONDARY_COLLEGES = [
         },
         "admin": {
             "username": "admin_crestview",
-            "email": "dean.alumni@crestview.edu.in",
+            "email": "dean.alumni@crestview.edu",
             "full_name": "Prof. Amitabh Joshi",
             "job_title": "Dean of Alumni Relations & Corporate Connect",
             "job_industry": "Higher Education",
@@ -236,23 +149,23 @@ SECONDARY_COLLEGES = [
         "users": [
             {
                 "username": "pooja_crestview_embedded",
-                "email": "pooja.deshmukh@alumni.crestview.edu.in",
+                "email": "pooja.deshmukh@alumni.crestview.edu",
                 "full_name": "Pooja Deshmukh",
                 "role": "alumni",
                 "grad_year": 2018,
                 "major": "Electronics & Telecommunication",
-                "company": "Tata Motors EV Tech",
+                "company": "Apex Mobility Labs",
                 "job_title": "Principal Battery Management Systems Engineer",
                 "job_industry": "Automotive Engineering",
                 "job_description": "Architecting CAN-bus firmware and state-of-charge estimator algorithms for electric vehicle platforms.",
                 "location": "Pune, Maharashtra",
                 "skills": ["Embedded C", "AUTOSAR", "CAN Protocol", "MATLAB", "RTOS"],
                 "interests": ["Electric Vehicles", "Embedded Systems", "Hardware Security"],
-                "bio": "Building next-generation EV powertrains at Tata Motors. Crestview E&TC alumna.",
+                "bio": "Building next-generation EV powertrains at Apex Mobility Labs. Crestview E&TC alumna.",
             },
             {
                 "username": "rohit_crestview_student",
-                "email": "rohit.kulkarni@student.crestview.edu.in",
+                "email": "rohit.kulkarni@student.crestview.edu",
                 "full_name": "Rohit Kulkarni",
                 "role": "student",
                 "grad_year": 2026,
@@ -266,7 +179,7 @@ SECONDARY_COLLEGES = [
         "posts": [
             {
                 "author_username": "pooja_crestview_embedded",
-                "content": "Excited to share that our team at Tata Motors completed hardware-in-the-loop (HIL) validation for the new fast-charging firmware! For juniors interested in automotive software: do not neglect RTOS fundamentals, memory protection units, and MISRA C standards. They are the backbone of safety-critical engineering.",
+                "content": "Excited to share that our team at Apex Mobility Labs completed hardware-in-the-loop (HIL) validation for the new fast-charging firmware! For juniors interested in automotive software: do not neglect RTOS fundamentals, memory protection units, and MISRA C standards. They are the backbone of safety-critical engineering.",
                 "is_opportunity": False,
                 "days_ago": 8,
                 "comments": [
@@ -282,7 +195,7 @@ SECONDARY_COLLEGES = [
     {
         "name": "Solaris Technical Institute",
         "slug": "solaris-tech",
-        "domain": "solaris.edu.in",
+        "domain": "solaris.edu",
         "location": "HITEC City, Hyderabad, Telangana",
         "established_year": 2012,
         "description": "Private polytechnic engineering institute.",
@@ -298,7 +211,7 @@ SECONDARY_COLLEGES = [
         },
         "admin": {
             "username": "admin_solaris",
-            "email": "admin@solaris.edu.in",
+            "email": "admin@solaris.edu",
             "full_name": "Dr. Venkat Reddy",
             "job_title": "Campus Administrator",
             "job_industry": "Higher Education",
@@ -308,12 +221,12 @@ SECONDARY_COLLEGES = [
         "users": [
             {
                 "username": "solaris_alumni_1",
-                "email": "alumni1@solaris.edu.in",
+                "email": "alumni1@solaris.edu",
                 "full_name": "Suresh Babu",
                 "role": "alumni",
                 "grad_year": 2017,
                 "major": "Computer Engineering",
-                "company": "Tech Mahindra",
+                "company": "Enterprise Global Tech",
                 "job_title": "Software Consultant",
                 "job_industry": "Information Technology",
                 "location": "Hyderabad, Telangana",
@@ -355,24 +268,24 @@ COLLEGE_REQUESTS_DATA = [
         "rejection_reason": "Institutional accreditation and university domain ownership could not be validated by platform compliance.",
     },
     {
-        "name": "Vellore Institute of Technology",
-        "domain": "vit.ac.in",
-        "location": "Vellore, Tamil Nadu",
+        "name": "Veritas Institute of Technology",
+        "domain": "veritas.edu",
+        "location": "Coimbatore, Tamil Nadu",
         "established_year": 1984,
         "description": "Premier technical institution with 40,000+ alumni community globally and multidisciplinary research centres.",
         "admin_name": "Dr. K. S. Parthasarathy",
-        "admin_email": "alumni.dean@vit.ac.in",
+        "admin_email": "alumni.dean@veritas.edu",
         "status": "PENDING",
         "email_verified": True,
     },
     {
-        "name": "Manipal Institute of Technology",
-        "domain": "manipal.edu",
-        "location": "Manipal, Karnataka",
+        "name": "Millennium Institute of Technology",
+        "domain": "millennium.edu",
+        "location": "Mysuru, Karnataka",
         "established_year": 1957,
-        "description": "Historic constituent engineering institute of MAHE known for industry partnerships and alumni entrepreneurship.",
+        "description": "Historic constituent engineering institute known for industry partnerships and alumni entrepreneurship.",
         "admin_name": "Prof. Sudheer Shenoy",
-        "admin_email": "alumni.relations@manipal.edu",
+        "admin_email": "alumni.relations@millennium.edu",
         "status": "PENDING",
         "email_verified": True,
     },
@@ -385,91 +298,91 @@ COLLEGE_REQUESTS_DATA = [
 ADDITIONAL_NITK_STUDENTS = [
     {
         "username": "aditi_verma",
-        "email": "aditi.verma@student.nitk.edu.in",
+        "email": "aditi.verma@student.northbridge.edu",
         "full_name": "Aditi Verma",
         "major": "Mechanical Engineering",
         "grad_year": 2025,
         "skills": ["CAD/CAM", "MATLAB", "Finite Element Analysis", "Python", "Ansys"],
         "interests": ["Automotive Engineering", "Aerodynamics", "Electric Vehicles"],
         "alumni_status": "PENDING",
-        "bio": "Final year Mechanical Engineering student at NITK. Lead for Team NITK Racing chassis design. Preparing for automotive R&D roles.",
+        "bio": "Final year Mechanical Engineering student at Northbridge. Lead for Northbridge Racing Team chassis design. Preparing for automotive R&D roles.",
     },
     {
         "username": "karan_patel",
-        "email": "karan.patel@student.nitk.edu.in",
+        "email": "karan.patel@student.northbridge.edu",
         "full_name": "Karan Patel",
         "major": "Information Technology",
         "grad_year": 2026,
         "skills": ["TypeScript", "React", "Node.js", "GraphQL", "TailwindCSS", "PostgreSQL"],
         "interests": ["Web Performance", "Full Stack Development", "UI Architecture", "Hackathons"],
         "alumni_status": "NOT_REQUESTED",
-        "bio": "Pre-final year IT student at NITK. Web enthusiast, open-source contributor, and web dev lead for Incident cultural festival.",
+        "bio": "Pre-final year IT student at Northbridge. Web enthusiast, open-source contributor, and web dev lead for annual cultural festival.",
     },
     {
         "username": "priya_nair",
-        "email": "priya.nair@student.nitk.edu.in",
+        "email": "priya.nair@student.northbridge.edu",
         "full_name": "Priya Nair",
         "major": "Electrical and Electronics Engineering",
         "grad_year": 2025,
         "skills": ["VLSI Design", "Verilog", "Embedded C", "FPGA", "Cadence Virtuoso"],
         "interests": ["Semiconductor Design", "Digital Systems", "IoT", "Higher Studies"],
         "alumni_status": "NOT_REQUESTED",
-        "bio": "Senior EEE undergraduate at NITK. Exploring analog and digital chip design. Aiming for MS in VLSI.",
+        "bio": "Senior EEE undergraduate at Northbridge. Exploring analog and digital chip design. Aiming for MS in VLSI.",
     },
     {
         "username": "varun_singh",
-        "email": "varun.singh@student.nitk.edu.in",
+        "email": "varun.singh@student.northbridge.edu",
         "full_name": "Varun Singh",
         "major": "Chemical Engineering",
         "grad_year": 2027,
         "skills": ["Process Simulation", "Aspen Plus", "Python", "Fluid Mechanics", "Data Analysis"],
         "interests": ["Green Hydrogen", "Carbon Capture", "Clean Energy", "Renewable Tech"],
         "alumni_status": "NOT_REQUESTED",
-        "bio": "Second year Chemical Engineering student at NITK. Passionate about sustainable process engineering and clean tech innovation.",
+        "bio": "Second year Chemical Engineering student at Northbridge. Passionate about sustainable process engineering and clean tech innovation.",
     },
     {
         "username": "tanya_desai",
-        "email": "tanya.desai@student.nitk.edu.in",
+        "email": "tanya.desai@student.northbridge.edu",
         "full_name": "Tanya Desai",
         "major": "Computer Science and Engineering",
         "grad_year": 2026,
         "skills": ["Python", "PyTorch", "HuggingFace", "C++", "FastAPI"],
         "interests": ["Computer Vision", "Multimodal AI", "Machine Learning Research"],
         "alumni_status": "NOT_REQUESTED",
-        "bio": "B.Tech CSE junior at NITK. Undergraduate researcher working on multimodal image segmentation models.",
+        "bio": "B.Tech CSE junior at Northbridge. Undergraduate researcher working on multimodal image segmentation models.",
     },
     {
         "username": "harsh_gupta",
-        "email": "harsh.gupta@student.nitk.edu.in",
+        "email": "harsh.gupta@student.northbridge.edu",
         "full_name": "Harsh Gupta",
         "major": "Civil Engineering",
         "grad_year": 2025,
         "skills": ["AutoCAD", "Revit", "STAAD Pro", "GIS Mapping", "Project Management"],
         "interests": ["Smart City Infrastructure", "Earthquake Engineering", "Sustainable Materials"],
         "alumni_status": "NOT_REQUESTED",
-        "bio": "Final year Civil Engineering undergraduate at NITK. Passionate about resilient structural design and urban transit systems.",
+        "bio": "Final year Civil Engineering undergraduate at Northbridge. Passionate about resilient structural design and urban transit systems.",
     },
     {
         "username": "divya_menon",
-        "email": "divya.menon@student.nitk.edu.in",
+        "email": "divya.menon@student.northbridge.edu",
         "full_name": "Divya Menon",
         "major": "Information Technology",
         "grad_year": 2026,
         "skills": ["Go", "Kubernetes", "Linux", "Terraform", "Prometheus", "Docker"],
         "interests": ["Site Reliability Engineering", "DevOps", "Cloud Security", "Distributed Tracing"],
         "alumni_status": "NOT_REQUESTED",
-        "bio": "Junior IT student fascinated by reliable infrastructure and platform engineering. Active member of NITK Linux Users Group.",
+        "bio": "Junior IT student fascinated by reliable infrastructure and platform engineering. Active member of Northbridge Linux Users Group.",
     },
     {
         "username": "rishabh_shukla",
-        "email": "rishabh.shukla@student.nitk.edu.in",
+        "email": "rishabh.shukla@student.northbridge.edu",
         "full_name": "Rishabh Shukla",
         "major": "Mining Engineering",
         "grad_year": 2025,
         "skills": ["Geotechnical Modeling", "Python", "GIS", "Mine Safety", "Drone Surveying"],
         "interests": ["Automation in Mining", "Mineral Economics", "Environmental Remediation"],
         "alumni_status": "PENDING",
-        "bio": "Final year Mining Engineering student at NITK. Researching autonomous haulage systems and spatial GIS analysis.",
+        "bio": "Final year Mining Engineering student at Northbridge. Researching autonomous haulage systems and spatial GIS analysis.",
     },
 ]
 
@@ -484,7 +397,7 @@ NITK_POSTS_DATA = [
         "is_opportunity": True,
         "days_ago": 3,
         "category": "Referral & Mentorship",
-        "content": """🚀 Excited to share that Microsoft India is actively hiring for Cloud and AI Engineering roles across our Bengaluru, Hyderabad, and Noida offices!
+        "content": """🚀 Excited to share that CloudScale Technologies is actively hiring for Cloud and AI Engineering roles across our Bengaluru, Hyderabad, and Pune offices!
 
 We are looking for both fresh campus graduates (2025/2026 batches) for Software Engineer - 1 roles, as well as experienced alumni (2-6 years) for Cloud Solutions and GenAI platform teams.
 
@@ -495,7 +408,7 @@ Key tech stack requirements:
 
 If you are a student preparing for campus recruitment or an alumnus looking for a career transition, feel free to send me a direct connection request here on AlumniConn. Please include your target role, updated resume link, and a brief summary of your top 2 technical projects.
 
-Happy to provide referrals, review resumes, and run mock technical interviews for my fellow NITKians! Let's elevate each other. 🎓 #Hiring #CampusReferral #MicrosoftIndia #NITKAlumni #CloudEngineering""",
+Happy to provide referrals, review resumes, and run mock technical interviews for my fellow Northbridge students and alumni! Let's elevate each other. 🎓 #Hiring #CampusReferral #CloudScaleTech #NorthbridgeAlumni #CloudEngineering""",
     },
     {
         "author": "demo_student",
@@ -513,18 +426,18 @@ Key performance milestones we achieved in our benchmarks:
 
 A huge shoutout to our alumni mentors Rahul Sharma and Ananya Sen for their invaluable architectural feedback during our initial design reviews last month—especially around avoiding hot partition skew and optimizing Go GC pauses.
 
-The GitHub repository and technical design documentation are linked in my profile. Would love feedback, code reviews, and suggestions from systems engineers in our alumni community! #DistributedSystems #Golang #OpenSource #NITK #FinalYearProject""",
+The GitHub repository and technical design documentation are linked in my profile. Would love feedback, code reviews, and suggestions from systems engineers in our alumni community! #DistributedSystems #Golang #OpenSource #NorthbridgeTech #FinalYearProject""",
     },
     {
         "author": "admin_nitk",
         "is_opportunity": False,
         "days_ago": 7,
         "category": "Institutional Announcement",
-        "content": """📢 Official Announcement: NITK Global Alumni Conclave 2026
+        "content": """📢 Official Announcement: Northbridge Global Alumni Conclave 2026
 
 Dear Students, Faculty, and Alumni,
 
-We are delighted to announce that the Annual NITK Global Alumni Conclave will be hosted on campus from December 18-20, 2026. This year's central theme is 'Decarbonization, AI Sovereignty, and Next-Generation Infrastructure: The Role of Premier Technical Institutes.'
+We are delighted to announce that the Annual Northbridge Global Alumni Conclave will be hosted on campus from December 18-20, 2026. This year's central theme is 'Decarbonization, AI Sovereignty, and Next-Generation Infrastructure: The Role of Premier Technical Institutes.'
 
 Highlights of the 3-day Conclave:
 1. Keynote addresses by distinguished alumni heading global technology enterprises and public sector leaders
@@ -532,11 +445,11 @@ Highlights of the 3-day Conclave:
 3. Dedicated Mentorship Roundtables across 8 specialized domains (Fintech, Semiconductors, AI/ML, Clean Energy, Aerospace, Public Administration, Higher Studies, and Venture Capital)
 4. Golden and Silver Jubilee batch reunions celebrating the batches of 1976 and 2001
 
-We encourage all alumni travelling to Surathkal to confirm their attendance early through our university portal. Let us celebrate our heritage and inspire the next generation of engineers!
+We encourage all alumni travelling to Northbridge to confirm their attendance early through our university portal. Let us celebrate our heritage and inspire the next generation of engineers!
 
 With warm regards,
 Prof. R. K. Bhattacharya
-Dean of Alumni Relations & Outreach, NIT Karnataka""",
+Dean of Alumni Relations & Outreach, Northbridge Institute of Technology""",
     },
     # --- P1: Deep Systems & Engineering Discussions ---
     {
@@ -546,7 +459,7 @@ Dean of Alumni Relations & Outreach, NIT Karnataka""",
         "category": "System Architecture",
         "content": """Reflections on scaling Postgres connection pools beyond 20,000 concurrent clients:
 
-At Swiggy, during major dinner and festival peak windows, backend services experience massive burst traffic that can easily exhaust database connection limits. Here is how we restructured our connection topology to maintain under 5ms query execution times:
+At HyperLogix, during major dinner and festival peak windows, backend services experience massive burst traffic that can easily exhaust database connection limits. Here is how we restructured our connection topology to maintain under 5ms query execution times:
 
 1. Dedicated PgBouncer instances running in transaction-pooling mode alongside our service pods. Session pooling was quickly saturating max_connections and causing thread-contention on the primary Postgres server.
 2. Read-traffic offloading: All analytical, order tracking history, and restaurant catalog reads were strictly isolated to streaming read-replicas with hot-standby feedback enabled to prevent query cancellation from replication conflicts.
@@ -574,7 +487,7 @@ For undergraduates wondering what systems knowledge is most timeless: master ope
         "is_opportunity": True,
         "days_ago": 13,
         "category": "Career & Hiring",
-        "content": """Hiring Alert: Platform & SRE Engineers at Zepto (Bengaluru)! 🛵💨
+        "content": """Hiring Alert: Platform & SRE Engineers at FlashDrop Logistics (Bengaluru)! ⚡
 
 Our Core Platform team is looking for talented Site Reliability and DevOps Engineers who love tackling chaotic distributed systems challenges at breakneck delivery speeds.
 
@@ -583,7 +496,7 @@ What you'll work on:
 • Observability pipelines processing 10+ TBs of logs and telemetry daily using Vector, ClickHouse, and Grafana
 • Service mesh traffic shaping, blue-green deployment strategies, and chaos engineering experiments with Litmus
 
-If you are an alumnus with 1-4 years of experience or a 2025 graduate who has built non-trivial infrastructure projects, ping me with your resume. NITK folks will get fast-tracked interviews! #Zepto #DevOps #SRE #Hiring #CloudNative""",
+If you are an alumnus with 1-4 years of experience or a 2025 graduate who has built non-trivial infrastructure projects, ping me with your resume. Northbridge folks will get fast-tracked interviews! #FlashDropLogistics #DevOps #SRE #Hiring #CloudNative""",
     },
     {
         "author": "ruchi_jain_fe",
@@ -592,7 +505,7 @@ If you are an alumnus with 1-4 years of experience or a 2025 graduate who has bu
         "category": "Web Architecture",
         "content": """Why micro-frontends might be the wrong choice for 95% of web teams:
 
-Over the past year at Flipkart, we evaluated transitioning several consumer web checkout modules into independent Webpack Module Federation micro-frontends. While the theoretical promise of independent deployability sounds enticing to engineering leaders, the hidden engineering tax is immense:
+Over the past year at BharatMart, we evaluated transitioning several consumer web checkout modules into independent Webpack Module Federation micro-frontends. While the theoretical promise of independent deployability sounds enticing to engineering leaders, the hidden engineering tax is immense:
 
 1. Runtime bundle duplication: Even with shared module configurations, users often end up downloading multiple versions of React, styling runtimes, or shared utility libraries.
 2. Inconsistent state synchronization: Passing shared authentication tokens, cart states, and modal overlays across isolated micro-apps introduces brittle custom event buses.
@@ -621,14 +534,14 @@ To the juniors preparing capstones: focus on deployment, latency profiling, and 
         "is_opportunity": False,
         "days_ago": 18,
         "category": "Campus Experience",
-        "content": """Team NITK Racing is ready for the national Formula Student competition next month in Coimbatore! 🏎️💨
+        "content": """Northbridge Racing Team is ready for the national Formula Student competition next month in Coimbatore! 🏎️💨
 
 Our team spent the last 8 months designing, simulating, and fabricating our new electric formula racecar:
 • Custom tubular spaceframe chassis with 22% improved torsional rigidity over last year's model
 • Lightweight carbon-fiber aerodynamic package delivering 45kg of downforce at 60 km/h
 • 72V lithium iron phosphate battery pack with custom temperature telemetry monitoring
 
-Huge thanks to alumni in the automotive industry who gave us design critique sessions over Google Meet on weekends. Seeing the vehicle pass technical inspection today on the campus testing strip made every sleepless night in the workshop completely worth it!""",
+Huge thanks to alumni in the automotive industry who gave us design critique sessions over video calls on weekends. Seeing the vehicle pass technical inspection today on the campus testing strip made every sleepless night in the workshop completely worth it!""",
     },
     {
         "author": "karan_patel",
@@ -680,11 +593,11 @@ Stay safe and build securely from day one! 🛡️""",
         "is_opportunity": True,
         "days_ago": 26,
         "category": "Data Science & Referral",
-        "content": """We are hiring Applied Machine Learning Engineers at Fractal Analytics (Bengaluru & Gurugram)!
+        "content": """We are hiring Applied Machine Learning Engineers at Cortex Analytics (Bengaluru & Gurugram)!
 
 Seeking engineers with 2+ years of experience working on tabular modeling, time-series forecasting, and causal inference. If you have solid Python skills, experience with scikit-learn, XGBoost, MLflow, and strong mathematical foundations in statistics and linear algebra, drop me a message.
 
-Always excited to refer qualified NITK graduates! Feel free to connect and send over your resume. #DataScience #MachineLearning #Fractal #Referral""",
+Always excited to refer qualified Northbridge graduates! Feel free to connect and send over your resume. #DataScience #MachineLearning #CortexAnalytics #Referral""",
     },
     {
         "author": "nishant_goel_bain",
@@ -710,12 +623,12 @@ Happy to chat with any students or alumni considering a transition into tech pro
 
 With multiple commercial semiconductor fabrication and ATMP facilities breaking ground in Gujarat and Assam, the demand for trained VLSI, physical design, and verification engineers is set to skyrocket over the next 5 years.
 
-To our E&C and EEE students at NITK:
+To our E&C and EEE students at Northbridge:
 • Master SystemVerilog and UVM (Universal Verification Methodology)—verification roles outnumber front-end RTL design roles 3 to 1 in the industry.
 • Get comfortable with Linux command lines, Perl/Python scripting, and TCL scripts for EDA synthesis automation.
 • Take courses in computer architecture, static timing analysis (STA), and low-power design methodologies (UPF).
 
-Our alumni working at Qualcomm, Texas Instruments, Intel, and Nvidia are organizing an online VLSI mentorship weekend next month. Stay tuned for details!""",
+Our alumni working across leading semiconductor and microelectronics firms are organizing an online VLSI mentorship weekend next month. Stay tuned for details!""",
     },
     {
         "author": "priya_nair",
@@ -726,14 +639,14 @@ Our alumni working at Qualcomm, Texas Instruments, Intel, and Nvidia are organiz
 
 We investigated spiking neural network (SNN) hardware implementations on Xilinx UltraScale+ FPGAs, comparing energy consumption against standard GPU inference for real-time edge keyword spotting.
 
-Special thanks to our NITK professors and alumni in academia for writing recommendation letters and guiding our literature review. There is nothing more thrilling than seeing simulated theoretical equations come alive on real silicon!""",
+Special thanks to our Northbridge professors and alumni in academia for writing recommendation letters and guiding our literature review. There is nothing more thrilling than seeing simulated theoretical equations come alive on real silicon!""",
     },
     {
         "author": "varun_singh",
         "is_opportunity": False,
         "days_ago": 35,
         "category": "Sustainability & Clean Tech",
-        "content": """Fascinating seminar today at the NITK Chemical Engineering department on 'Electrochemical Carbon Capture and Utilization in Industrial Smelters'.
+        "content": """Fascinating seminar today at the Northbridge Chemical Engineering department on 'Electrochemical Carbon Capture and Utilization in Industrial Smelters'.
 
 It is inspiring to see how traditional chemical engineering mass transfer and thermodynamics principles are intersecting with renewable solar/wind power to produce green methanol and ethylene from captured flue gases.
 
@@ -760,11 +673,11 @@ Wishing all the 2026 batch candidates all the best for the upcoming placement se
         "is_opportunity": False,
         "days_ago": 41,
         "category": "Campus Life",
-        "content": """Nothing beats evening walks along the Surathkal beach after a marathon week of mid-term examinations. 🌅
+        "content": """Nothing beats evening walks along the coastal shoreline after a marathon week of mid-term examinations. 🌅
 
-From watching the iconic lighthouse blink in the evening sky to having hot filter coffee and buns with hostel mates at midnight—four years at NITK truly fly by faster than you can ever imagine.
+From watching the iconic lighthouse blink in the evening sky to having hot filter coffee and buns with hostel mates at midnight—four years at Northbridge truly fly by faster than you can ever imagine.
 
-Cherish every single day of college life, everyone! The friendships and late-night whiteboard debugging sessions are memories you will carry forever. #SurathkalDiaries #NITKMemories #CampusVibes #BeachCampus""",
+Cherish every single day of college life, everyone! The friendships and late-night whiteboard debugging sessions are memories you will carry forever. #NorthbridgeDiaries #NorthbridgeMemories #CampusVibes #CoastalCampus""",
     },
 ]
 
@@ -773,7 +686,7 @@ Cherish every single day of college life, everyone! The friendships and late-nig
 # =====================================================================
 
 NITK_COMMENTS_MAP = {
-    # Comments for Post 0 (demo_alumni's Microsoft hiring post)
+    # Comments for Post 0 (demo_alumni's CloudScale hiring post)
     0: [
         {
             "author": "demo_student",
@@ -788,17 +701,17 @@ NITK_COMMENTS_MAP = {
         {
             "author": "aditi_verma",
             "hours_after": 6,
-            "content": "Are there roles for mechanical/mechatronics graduates in Microsoft's hardware and cloud datacenter infrastructure teams as well?",
+            "content": "Are there roles for mechanical/mechatronics graduates in CloudScale's hardware and cloud datacenter infrastructure teams as well?",
         },
         {
             "author": "demo_alumni",
             "hours_after": 8,
-            "content": "Yes Aditi! Microsoft Azure has dedicated Cloud Hardware and Datacenter Engineering teams in Hyderabad and Taiwan working on thermal cooling, server rack mechanical design, and power delivery. Send over your resume as well!",
+            "content": "Yes Aditi! CloudScale Infrastructure has dedicated Cloud Hardware and Datacenter Engineering teams in Hyderabad and Taiwan working on thermal cooling, server rack mechanical design, and power delivery. Send over your resume as well!",
         },
         {
             "author": "rahul_sharma_backend",
             "hours_after": 10,
-            "content": "Great initiative Ananya. Microsoft's cloud infrastructure teams in Bengaluru are world-class. Can vouch for the engineering culture!",
+            "content": "Great initiative Ananya. CloudScale's cloud infrastructure teams in Bengaluru are world-class. Can vouch for the engineering culture!",
         },
     ],
     # Comments for Post 1 (demo_student's ChronoCache project)
@@ -834,7 +747,7 @@ NITK_COMMENTS_MAP = {
         {
             "author": "rahul_sharma_backend",
             "hours_after": 5,
-            "content": "Count me in! Already booking my flights to Mangalore. Looking forward to reconnecting with batchmates and meeting the current students.",
+            "content": "Count me in! Already booking my flights to Northbridge. Looking forward to reconnecting with batchmates and meeting the current students.",
         },
         {
             "author": "admin_nitk",
@@ -873,7 +786,7 @@ NITK_COMMENTS_MAP = {
             "content": "Hardware and software codesign is truly the holy grail of modern computing. Great synthesis of the underlying systems physics, Vikram.",
         },
     ],
-    # Comments for Post 5 (preeti_sundar_devops hiring at Zepto)
+    # Comments for Post 5 (preeti_sundar_devops hiring at FlashDrop)
     5: [
         {
             "author": "divya_menon",
@@ -915,7 +828,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "demo_student",
                 "offset_minutes": 0,
-                "content": "Hi Ananya ma'am! Thank you so much for accepting my connection request. I saw your post regarding the Cloud and AI engineering openings at Microsoft India.",
+                "content": "Hi Ananya ma'am! Thank you so much for accepting my connection request. I saw your post regarding the Cloud and AI engineering openings at CloudScale Technologies.",
             },
             {
                 "sender": "demo_alumni",
@@ -930,7 +843,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "demo_alumni",
                 "offset_minutes": 38,
-                "content": "Your resume looks very clean. Good structure and quantifiable impact. For the Microsoft technical loop, make sure you are thoroughly prepared for:\n1. Concurrency and goroutine synchronization / thread-safety\n2. Distributed systems tradeoffs (CAP theorem, leader election, log replication)\n3. LeetCode medium/hard tree and graph traversal problems",
+                "content": "Your resume looks very clean. Good structure and quantifiable impact. For the CloudScale technical loop, make sure you are thoroughly prepared for:\n1. Concurrency and goroutine synchronization / thread-safety\n2. Distributed systems tradeoffs (CAP theorem, leader election, log replication)\n3. LeetCode medium/hard tree and graph traversal problems",
             },
             {
                 "sender": "demo_student",
@@ -950,7 +863,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "demo_alumni",
                 "offset_minutes": 68,
-                "content": "Always glad to give back to NITK! Best of luck with your preparation, and feel free to reach out if you want to run a quick 30-minute mock interview before your round.",
+                "content": "Always glad to give back to Northbridge! Best of luck with your preparation, and feel free to reach out if you want to run a quick 30-minute mock interview before your round.",
             },
         ],
     },
@@ -1029,7 +942,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "demo_alumni",
                 "offset_minutes": 42,
-                "content": "Yes! Our Microsoft team has a booth there as well. Let's definitely catch up over lunch and reminisce about our Surathkal days.",
+                "content": "Yes! Our CloudScale team has a booth there as well. Let's definitely catch up over lunch and reminisce about our Northbridge days.",
             },
             {
                 "sender": "vikram_rao_cloud",
@@ -1076,7 +989,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "demo_student",
                 "offset_minutes": 0,
-                "content": "Hi Sneha ma'am! Quick question regarding containerizing Go binaries: Our initial Docker image was around 450MB with the build toolchain. How do you structure production Dockerfiles at Zepto?",
+                "content": "Hi Sneha ma'am! Quick question regarding containerizing Go binaries: Our initial Docker image was around 450MB with the build toolchain. How do you structure production Dockerfiles at FlashDrop?",
             },
             {
                 "sender": "preeti_sundar_devops",
@@ -1109,7 +1022,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "aditi_verma",
                 "offset_minutes": 0,
-                "content": "Hi Ananya ma'am! Thank you for mentioning Azure's Cloud Hardware teams. As a Mechanical student specializing in thermal simulation and CAD, how should I tailor my profile for datacenter engineering?",
+                "content": "Hi Ananya ma'am! Thank you for mentioning CloudScale's Cloud Hardware teams. As a Mechanical student specializing in thermal simulation and CAD, how should I tailor my profile for datacenter engineering?",
             },
             {
                 "sender": "demo_alumni",
@@ -1157,7 +1070,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "arun_mishra_java",
                 "offset_minutes": 50,
-                "content": "That is exceptional for an undergraduate. Most freshers struggle with UVM phases and sequence drivers. Send your resume to my email—I'd be glad to refer you to Qualcomm India.",
+                "content": "That is exceptional for an undergraduate. Most freshers struggle with UVM phases and sequence drivers. Send your resume to my email—I'd be glad to refer you to SiliconScale Semiconductor.",
             },
             {
                 "sender": "priya_nair",
@@ -1180,7 +1093,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "divya_menon",
                 "offset_minutes": 0,
-                "content": "Hi Sneha ma'am! I sent across my resume for the Zepto DevOps intern role. Really excited about the GitOps stack you mentioned.",
+                "content": "Hi Sneha ma'am! I sent across my resume for the FlashDrop DevOps intern role. Really excited about the GitOps stack you mentioned.",
             },
             {
                 "sender": "preeti_sundar_devops",
@@ -1312,7 +1225,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "nishant_goel_bain",
                 "offset_minutes": 65,
-                "content": "Looking forward to it! See you at Surathkal.",
+                "content": "Looking forward to it! See you at Northbridge.",
             },
         ],
     },
@@ -1493,7 +1406,7 @@ NITK_CONVERSATIONS_DATA = [
             {
                 "sender": "demo_alumni",
                 "offset_minutes": 0,
-                "content": "Hey Sneha! How are you managing OpenTelemetry trace sampling rates during multi-tenant spikes at Zepto?",
+                "content": "Hey Sneha! How are you managing OpenTelemetry trace sampling rates during multi-tenant spikes at FlashDrop?",
             },
             {
                 "sender": "preeti_sundar_devops",

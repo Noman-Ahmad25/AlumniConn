@@ -42,7 +42,7 @@ class TestDemoAuthEmail(unittest.TestCase):
         cls.demo_alumni = cls.db.query(User).filter(User.username == "demo_alumni").first()
         cls.demo_student = cls.db.query(User).filter(User.username == "demo_student").first()
         cls.nitk = cls.db.query(College).filter(College.slug == "nitk").first()
-        cls.bits = cls.db.query(College).filter(College.slug == "bits-pilani").first()
+        cls.other_college = cls.db.query(College).filter(College.slug != "nitk").first()
 
     @classmethod
     def tearDownClass(cls):
@@ -55,7 +55,7 @@ class TestDemoAuthEmail(unittest.TestCase):
         """Verify normal tenant login works with either username or email."""
         # 1. Login with email
         email_login = UserLogin(
-            username_or_email="alumni.admin@nitk.edu.in",
+            username_or_email=self.admin_nitk.email,
             password="Admin@Alumni2026!",
             college_slug="nitk",
         )
@@ -122,7 +122,7 @@ class TestDemoAuthEmail(unittest.TestCase):
         # 1. demo_superadmin cannot delete a college
         with self.assertRaises(HTTPException) as ctx:
             delete_college(
-                college_id=self.bits.id,
+                college_id=self.other_college.id,
                 db=self.db,
                 current_user=self.demo_super_admin,
             )
@@ -161,7 +161,7 @@ class TestDemoAuthEmail(unittest.TestCase):
         clear_demo_emails()
 
         # 3. Register a test user
-        test_email = "test.newstudent@nitk.edu.in"
+        test_email = f"test.newstudent@{self.nitk.domain}"
         test_username = "test_newstudent"
 
         # Cleanup in case already exists from previous test
@@ -220,7 +220,7 @@ class TestDemoAuthEmail(unittest.TestCase):
         )
         handle_forgot_password(forgot_req, db=self.db, task_dispatcher=self.task_dispatcher)
 
-        inbox_res = get_demo_emails(to_email="demo.alumni@nitk.edu.in")
+        inbox_res = get_demo_emails(to_email=self.demo_alumni.email)
         self.assertGreaterEqual(inbox_res["total"], 1)
         email_event = inbox_res["emails"][0]
         self.assertEqual(email_event["action_type"], "password_reset")

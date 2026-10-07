@@ -35,7 +35,7 @@ class TestAdminManagement(unittest.TestCase):
             .first()
         )
         cls.nitk = cls.db.query(College).filter(College.slug == "nitk").first()
-        cls.bits = cls.db.query(College).filter(College.slug == "bits-pilani").first()
+        cls.other_college = cls.db.query(College).filter(College.slug != "nitk").first()
 
     @classmethod
     def tearDownClass(cls):
@@ -76,15 +76,15 @@ class TestAdminManagement(unittest.TestCase):
         self.assertTrue(nitk_item.total_users > 50)
 
         # Search filter
-        search_res = list_admin_colleges(search="Pilani", db=self.db, current_user=self.super_admin)
+        search_res = list_admin_colleges(search="Crestview", db=self.db, current_user=self.super_admin)
         self.assertEqual(len(search_res), 1)
-        self.assertEqual(search_res[0].slug, "bits-pilani")
+        self.assertEqual(search_res[0].slug, "crestview-university")
 
         # Status toggle
-        bits_item = next(c for c in colleges if c.slug == "bits-pilani")
-        initial_status = bits_item.is_active
+        crestview_item = next(c for c in colleges if c.slug == "crestview-university")
+        initial_status = crestview_item.is_active
         updated = update_college_status(
-            bits_item.id,
+            crestview_item.id,
             CollegeStatusUpdate(is_active=not initial_status),
             db=self.db,
             current_user=self.super_admin,
@@ -92,7 +92,7 @@ class TestAdminManagement(unittest.TestCase):
         self.assertEqual(updated.is_active, not initial_status)
         # Restore status
         update_college_status(
-            bits_item.id,
+            crestview_item.id,
             CollegeStatusUpdate(is_active=initial_status),
             db=self.db,
             current_user=self.super_admin,
@@ -113,11 +113,11 @@ class TestAdminManagement(unittest.TestCase):
             self.assertNotEqual(u.role, "super_admin")
 
         # College admin modifying user in another college must raise 403
-        bits_user = self.db.query(User).filter(User.college_id == self.bits.id).first()
-        if bits_user:
+        other_user = self.db.query(User).filter(User.college_id == self.other_college.id).first()
+        if other_user:
             with self.assertRaises(HTTPException) as ctx:
                 update_user_status(
-                    bits_user.id,
+                    other_user.id,
                     UserStatusUpdate(is_active=False),
                     db=self.db,
                     current_user=self.college_admin_nitk,

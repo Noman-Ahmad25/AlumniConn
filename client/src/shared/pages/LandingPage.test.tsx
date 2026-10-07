@@ -11,10 +11,10 @@ describe("LandingPage", () => {
         vi.spyOn(collegeApi, "getColleges").mockResolvedValue([
             {
                 id: 1,
-                name: "National Institute of Technology, Karnataka",
+                name: "Northbridge Institute of Technology",
                 slug: "nitk",
-                domain: "nitk.edu.in",
-                location: "Surathkal, Karnataka",
+                domain: "northbridge.edu",
+                location: "Northbridge, Karnataka",
                 established_year: 1960,
                 description: "Premier technology institute.",
                 is_approved: true,
@@ -38,8 +38,8 @@ describe("LandingPage", () => {
 
         // Wait for real university card from DB
         await waitFor(() => {
-            expect(screen.getByText("National Institute of Technology, Karnataka")).toBeInTheDocument();
-            expect(screen.getByText("Surathkal, Karnataka")).toBeInTheDocument();
+            expect(screen.getByText("Northbridge Institute of Technology")).toBeInTheDocument();
+            expect(screen.getByText("Northbridge, Karnataka")).toBeInTheDocument();
         });
 
         // Check university CTA link points to /c/nitk
