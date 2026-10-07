@@ -10,8 +10,11 @@ from src.services.auth_service import (
     verify_user_email,
     resend_user_verification,
     forgot_password,
-    reset_password
+    reset_password,
+    _token_for_user,
 )
+from src.models.user import User, UserRole
+from src.schemas.admin_management import DemoLoginRequest
 from src.schemas.user import (
     SuperAdminLogin,
     TokenResponse,
@@ -24,7 +27,29 @@ from src.schemas.user import (
 from src.database.session import get_db
 from src.utils.dispatcher import AbstractTaskDispatcher, get_task_dispatcher
 
+from src.services.email.service import EMAIL_MODE
+from src.services.email.demo_store import demo_email_store
+
 router = APIRouter()
+
+@router.get("/email-mode")
+def get_email_mode():
+    """Returns the current email mode ('demo' or 'real')."""
+    return {"email_mode": EMAIL_MODE}
+
+
+@router.get("/demo-emails")
+def get_demo_emails(to_email: str | None = None, limit: int = 20):
+    """Retrieve intercepted demo emails (available in demo mode)."""
+    emails = demo_email_store.get_emails(to_email=to_email, limit=limit)
+    return {"emails": [e.to_dict() for e in emails], "total": len(emails)}
+
+
+@router.delete("/demo-emails")
+def clear_demo_emails():
+    """Clear intercepted demo emails."""
+    demo_email_store.clear()
+    return {"message": "Demo email inbox cleared"}
 
 class VerifyEmailRequest(BaseModel):
     token: str
@@ -157,5 +182,48 @@ def token_for_swagger(user: OAuth2PasswordRequestForm = Depends(), db: Session =
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     return {"access_token": token, "token_type": "bearer"}
+
+
+@router.post("/demo-login", response_model=TokenResponse)
+def demo_login(request: DemoLoginRequest, db: Session = Depends(get_db)):
+    role = request.demo_role.lower()
+    user = None
+    if role == "super_admin":
+        user = db.query(User).filter(User.username == "demo_superadmin", User.is_active == True).first()
+        if not user:
+            user = db.query(User).filter(User.role == UserRole.SUPER_ADMIN, User.is_active == True).first()
+    elif role == "college_admin":
+        user = db.query(User).filter(User.username == "admin_nitk", User.is_active == True).first()
+        if not user:
+            user = db.query(User).filter(User.role == UserRole.ADMIN, User.is_active == True).first()
+    elif role == "alumni":
+        user = db.query(User).filter(User.username == "demo_alumni", User.is_active == True).first()
+        if not user:
+            user = db.query(User).filter(User.role == UserRole.ALUMNI, User.is_active == True).first()
+    elif role == "student":
+        user = db.query(User).filter(User.username == "demo_student", User.is_active == True).first()
+        if not user:
+            user = db.query(User).filter(User.role == UserRole.STUDENT, User.is_active == True).first()
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid demo role. Choose: super_admin, college_admin, alumni, student",
+        )
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No active demo account found for role '{role}'",
+        )
+
+    token = _token_for_user(user)
+    college_slug = user.college.slug if user.college else None
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "college_slug": college_slug,
+        "role": user.role.value if hasattr(user.role, "value") else str(user.role),
+    }
+
 
 

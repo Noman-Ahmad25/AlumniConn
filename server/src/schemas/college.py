@@ -73,6 +73,8 @@ class CollegeResponse(BaseModel):
     domain: str
     description: str | None = None
     is_approved: bool
+    is_active: bool = True
+    branding: CollegeBrandingResponse | None = None
 
     model_config = ConfigDict(from_attributes=True)
     
@@ -83,6 +85,8 @@ class CollegePublicResponse(BaseModel):
     location: str | None = None
     established_year: int | None = None
     description: str | None = None
+    is_approved: bool = True
+    is_active: bool = True
     branding: CollegeBrandingResponse | None = None
     stats: CollegeStatsResponse | None = None
     

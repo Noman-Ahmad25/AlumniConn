@@ -136,6 +136,16 @@ export default function Login() {
             Register
           </button>
         </p>
+
+        <div className="pt-2 text-center border-t border-slate-100">
+          <button
+            type="button"
+            className="text-xs font-medium text-slate-500 hover:text-blue-600 transition-colors inline-flex items-center gap-1"
+            onClick={() => navigate("/#demo")}
+          >
+            Explore the live demo &rarr;
+          </button>
+        </div>
       </form>
     </div>
   )

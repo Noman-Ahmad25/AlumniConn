@@ -61,8 +61,8 @@ export function hasRole(roles: UserRole[]) {
 }
 
 export function getRoleHomePath(role: UserRole | null) {
-  if (role === "super_admin") return "/super-admin/college-requests"
-  if (role === "admin") return "/admin/alumni-requests"
+  if (role === "super_admin") return "/super-admin/dashboard"
+  if (role === "admin") return "/admin/users"
   return "/feed"
 }
 

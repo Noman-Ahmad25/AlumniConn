@@ -19,7 +19,11 @@ import Chat from "../../features/messages/pages/Chat"
 import Messages from "../../features/messages/pages/Messages"
 import RequestCollege from "../../features/college/pages/RequestCollege"
 import VerifyCollegeEmail from "../../features/college/pages/VerifyCollegeEmail"
+import SuperAdminDashboard from "../../features/admin/pages/SuperAdminDashboard"
+import SuperAdminUniversities from "../../features/admin/pages/SuperAdminUniversities"
+import SuperAdminUsers from "../../features/admin/pages/SuperAdminUsers"
 import SuperAdminCollegeRequests from "../../features/admin/pages/SuperAdminCollegeRequests"
+import CollegeAdminUsers from "../../features/admin/pages/CollegeAdminUsers"
 import AdminAlumniRequests from "../../features/admin/pages/AdminAlumniRequests"
 import TenantResolver from "../../features/college/pages/TenantResolver"
 import TenantHome from "../../features/college/pages/TenantHome"
@@ -87,6 +91,18 @@ export default function AppRouter() {
         
         {/* Global Protected routes */}
         <Route
+          path="/super-admin/dashboard"
+          element={<RoleRoute roles={["super_admin"]}><SuperAdminDashboard /></RoleRoute>}
+        />
+        <Route
+          path="/super-admin/universities"
+          element={<RoleRoute roles={["super_admin"]}><SuperAdminUniversities /></RoleRoute>}
+        />
+        <Route
+          path="/super-admin/users"
+          element={<RoleRoute roles={["super_admin"]}><SuperAdminUsers /></RoleRoute>}
+        />
+        <Route
           path="/super-admin/college-requests"
           element={<RoleRoute roles={["super_admin"]}><SuperAdminCollegeRequests /></RoleRoute>}
         />
@@ -126,6 +142,10 @@ export default function AppRouter() {
             <Route
               path="connections"
               element={<RoleRoute roles={["admin", "alumni", "student"]}><Connections /></RoleRoute>}
+            />
+            <Route
+              path="admin/users"
+              element={<RoleRoute roles={["admin"]}><CollegeAdminUsers /></RoleRoute>}
             />
             <Route
               path="admin/alumni-requests"

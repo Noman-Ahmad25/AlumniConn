@@ -1,16 +1,13 @@
+import { useTenant } from "../../../../providers/TenantProvider";
+
 export default function TestimonialsSection() {
-    const testimonials = [
-        {
-            quote: "Staying connected via our alumni community helped me find my first engineering referral. It's a game changer.",
-            author: "Jane Doe",
-            role: "Software Engineer, Class of 2022"
-        },
-        {
-            quote: "Mentoring final year students allows me to give back. The portal makes coordination smooth and easy.",
-            author: "John Smith",
-            role: "Product Lead, Class of 2015"
-        }
-    ];
+    const { tenant } = useTenant();
+    if (!tenant) return null;
+
+    const testimonials = tenant.branding?.testimonials;
+    if (!testimonials || testimonials.length === 0) {
+        return null;
+    }
 
     return (
         <section className="py-20 px-6 bg-white border-t border-slate-200/40">
@@ -32,7 +29,7 @@ export default function TestimonialsSection() {
                             </p>
                             <div className="flex flex-col">
                                 <span className="font-bold text-slate-800">{t.author}</span>
-                                <span className="text-sm text-slate-500">{t.role}</span>
+                                {t.role && <span className="text-sm text-slate-500">{t.role}</span>}
                             </div>
                         </div>
                     ))}
@@ -41,3 +38,4 @@ export default function TestimonialsSection() {
         </section>
     );
 }
+

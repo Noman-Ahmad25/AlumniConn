@@ -5,6 +5,7 @@ from src.models.user import User, UserRole
 from src.models.connection import Connection, ConnectionStatus
 from src.models.profile import Profile
 from src.models.post import Post
+from src.models.message import Message
 from src.schemas.college import CollegeCreate, CollegeUpdate
 from sqlalchemy.orm import Session
 from src.utils.college_util import generate_unique_college_slug

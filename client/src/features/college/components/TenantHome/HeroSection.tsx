@@ -70,7 +70,7 @@ export default function HeroSection() {
                         {welcomeMessage}
                     </h1>
                     <p className="mx-auto max-w-2xl text-lg text-slate-300 sm:text-xl leading-relaxed">
-                        Connect with fellow graduates, explore job opportunities, find mentors, and stay updated with your alma mater.
+                        {tenant.branding?.motto || tenant.description || "Connect with fellow graduates, explore job opportunities, find mentors, and stay updated with your alma mater."}
                     </p>
                 </div>
 

@@ -3,16 +3,15 @@ import { useNavigate } from "react-router-dom"
 import { loginSuperAdmin } from "../../auth/api/auth"
 import { getApiErrorMessage } from "../../../utils/error"
 import { setAuthToken } from "../../auth/utils/auth"
-
 interface SuperAdminLoginForm {
-  email: string
+  username_or_email: string
   password: string
 }
 
 export default function SuperAdminLogin() {
   const navigate = useNavigate()
   const [form, setForm] = useState<SuperAdminLoginForm>({
-    email: "",
+    username_or_email: "",
     password: "",
   })
   const [loading, setLoading] = useState(false)
@@ -33,7 +32,7 @@ export default function SuperAdminLogin() {
     try {
       const response = await loginSuperAdmin(form)
       setAuthToken(response.access_token)
-      navigate("/super-admin/college-requests")
+      navigate("/super-admin/dashboard")
     } catch (err: unknown) {
       setError(getApiErrorMessage(err, "Invalid super admin credentials"))
     } finally {
@@ -61,12 +60,12 @@ export default function SuperAdminLogin() {
         )}
 
         <label>
-          <span className="field-label">Email</span>
+          <span className="field-label">Email or Username</span>
           <input
-            type="email"
-            name="email"
-            placeholder="superadmin@example.com"
-            value={form.email}
+            type="text"
+            name="username_or_email"
+            placeholder="superadmin or admin@example.com"
+            value={form.username_or_email}
             onChange={handleChange}
             className="form-field"
             required
@@ -89,6 +88,16 @@ export default function SuperAdminLogin() {
         <button type="submit" disabled={loading} className="btn btn-primary w-full">
           {loading ? "Logging in..." : "Login"}
         </button>
+
+        <div className="pt-2 text-center border-t border-slate-100">
+          <button
+            type="button"
+            className="text-xs font-medium text-slate-500 hover:text-blue-600 transition-colors inline-flex items-center gap-1"
+            onClick={() => navigate("/#demo")}
+          >
+            Explore the live demo &rarr;
+          </button>
+        </div>
       </form>
     </div>
   )

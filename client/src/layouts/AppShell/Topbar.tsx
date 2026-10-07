@@ -60,10 +60,15 @@ export default function Topbar() {
   }
 
   const prefix = collegeSlug ? `/c/${collegeSlug}` : ""
-  const homePath = role === "super_admin" ? "/super-admin/college-requests" : `${prefix}${getRoleHomePath(role)}`
+  const homePath = role === "super_admin" ? "/super-admin/dashboard" : `${prefix}${getRoleHomePath(role)}`
 
   const mainLinks = role === "super_admin"
-    ? [{ to: "/super-admin/college-requests", label: "College Approvals" }]
+    ? [
+        { to: "/super-admin/dashboard", label: "Dashboard" },
+        { to: "/super-admin/universities", label: "Universities" },
+        { to: "/super-admin/users", label: "Users" },
+        { to: "/super-admin/college-requests", label: "College Requests" },
+      ]
     : [
         { to: `${prefix}/feed`, label: "Feed" },
         { to: `${prefix}/discover`, label: "Discover" },
@@ -71,7 +76,12 @@ export default function Topbar() {
         { to: `${prefix}/connections`, label: "Connections" },
         { to: `${prefix}/messages`, label: "Messages" },
         { to: `${prefix}/profile`, label: "Profile" },
-        ...(role === "admin" ? [{ to: `${prefix}/admin/alumni-requests`, label: "Alumni Requests" }] : []),
+        ...(role === "admin"
+          ? [
+              { to: `${prefix}/admin/users`, label: "Manage Users" },
+              { to: `${prefix}/admin/alumni-requests`, label: "Alumni Requests" },
+            ]
+          : []),
       ]
 
   const isLinkActive = (path: string) => {

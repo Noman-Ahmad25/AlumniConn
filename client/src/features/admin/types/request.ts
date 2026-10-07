@@ -32,6 +32,9 @@ export interface CollegeRequest {
 export interface AlumniRequest {
   id: number
   user_id: number
+  username?: string | null
+  email?: string | null
+  full_name?: string | null
   college_id: number
   status: RequestStatus
   reviewed_by?: number | null
@@ -39,3 +42,4 @@ export interface AlumniRequest {
   created_at: string
   reviewed_at?: string | null
 }
+

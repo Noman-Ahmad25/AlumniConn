@@ -14,7 +14,7 @@ class ResendEmailProvider(EmailProvider):
         self.from_email = from_email
         resend.api_key = self.api_key
         
-    async def send_email(self, to_email: str, subject: str, html_body: str) -> bool:
+    async def send_email(self, to_email: str, subject: str, html_body: str, **kwargs) -> bool:
         try:
             params = {
                 "from": self.from_email,

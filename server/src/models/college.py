@@ -14,6 +14,7 @@ class College(Base):
     domain = Column(String, unique=True, index=True, nullable=False)
     slug = Column(String, unique=True, index=True, nullable=True) # nullable for now until backfill, then altered to False in migration
     is_approved = Column(Boolean, default=False, nullable=False, index=True)
+    is_active = Column(Boolean, default=True, nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
  
     # Relationships

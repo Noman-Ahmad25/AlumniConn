@@ -4,12 +4,19 @@ export default function QuickStatsSection() {
     const { tenant } = useTenant();
     if (!tenant) return null;
 
-    // Placements/metrics data mapping
+    const statsData = tenant.stats;
+    const alumniCount = statsData?.alumni_count ?? 0;
+    const studentCount = statsData?.student_count ?? 0;
+    const connectionCount = statsData?.connection_count ?? 0;
+    const majorsCount = statsData?.majors_count ?? 0;
+
+    const formatNumber = (num: number) => num.toLocaleString();
+
     const stats = [
-        { id: "alumni", value: "10,000+", label: "Verified Alumni" },
-        { id: "students", value: "4,500+", label: "Active Students" },
-        { id: "connections", value: "25,000+", label: "Network Connections" },
-        { id: "events", value: "500+", label: "Events & Workshops" }
+        { id: "alumni", value: formatNumber(alumniCount), label: "Verified Alumni" },
+        { id: "students", value: formatNumber(studentCount), label: "Active Students" },
+        { id: "connections", value: formatNumber(connectionCount), label: "Network Connections" },
+        { id: "majors", value: formatNumber(majorsCount), label: "Academic Majors" }
     ];
 
     return (
@@ -31,3 +38,4 @@ export default function QuickStatsSection() {
         </section>
     );
 }
+

@@ -3,14 +3,17 @@ import logging
 from jinja2 import Environment, FileSystemLoader
 from src.services.email.provider import EmailProvider
 from src.services.email.mock_provider import MockEmailProvider
+from src.services.email.demo_provider import DemoEmailProvider
 from src.services.email.resend_provider import ResendEmailProvider
 from src.services.email.smtp_provider import SMTPEmailProvider
 
 
-# We can instantiate the provider based on environment variables
+# EMAIL_MODE can be 'demo' (intercept and store in demo inbox) or 'real' (dispatch via provider)
+EMAIL_MODE = os.getenv("EMAIL_MODE", "demo").lower()
 EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "mock").lower()
-if EMAIL_PROVIDER == "mock":
-    _provider = MockEmailProvider()
+
+if EMAIL_MODE == "demo" or EMAIL_PROVIDER == "mock":
+    _provider = DemoEmailProvider()
 elif EMAIL_PROVIDER == "smtp":
     SMTP_HOST = os.getenv("SMTP_HOST", "")
     
@@ -65,7 +68,9 @@ class EmailService:
         return await _provider.send_email(
             to_email=to_email,
             subject="Verify your AlumniConn account",
-            html_body=html_body
+            html_body=html_body,
+            action_type="user_verification",
+            action_url=verification_link,
         )
         
     @classmethod
@@ -82,7 +87,9 @@ class EmailService:
         return await _provider.send_email(
             to_email=to_email,
             subject="Verify your College Registration Request",
-            html_body=html_body
+            html_body=html_body,
+            action_type="college_verification",
+            action_url=verification_link,
         )
 
     @classmethod
@@ -100,7 +107,9 @@ class EmailService:
         return await _provider.send_email(
             to_email=to_email,
             subject="Reset your password",
-            html_body=html_body
+            html_body=html_body,
+            action_type="password_reset",
+            action_url=reset_link,
         )
 
     @classmethod
@@ -120,7 +129,9 @@ class EmailService:
         return await _provider.send_email(
             to_email=to_email,
             subject=f"Your {college_name} registration request has been approved",
-            html_body=html_body
+            html_body=html_body,
+            action_type="college_approval",
+            action_url=login_url,
         )
          
     @classmethod
@@ -138,5 +149,6 @@ class EmailService:
         return await _provider.send_email(
             to_email=to_email,
             subject=f"{college_name} college request update",
-            html_body=html_body
+            html_body=html_body,
+            action_type="college_rejection",
         )

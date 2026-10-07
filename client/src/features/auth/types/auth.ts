@@ -27,8 +27,27 @@ export interface LoginPayload {
 }
 
 export interface SuperAdminLoginPayload {
-  email: string
+  username_or_email: string
   password: string
+}
+
+export interface DemoEmailEvent {
+  id: string
+  to_email: string
+  subject: string
+  html_body: string
+  action_type: string
+  action_url: string | null
+  created_at: string
+}
+
+export interface DemoEmailsResponse {
+  emails: DemoEmailEvent[]
+  total: number
+}
+
+export interface EmailModeResponse {
+  email_mode: "demo" | "real"
 }
 
 export interface ForgotPasswordPayload {

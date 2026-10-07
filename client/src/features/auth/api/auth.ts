@@ -54,3 +54,20 @@ export const logout = () => {
     localStorage.removeItem('access_token');
     notifyAuthChanged();
 }
+
+export const getEmailMode = async (): Promise<{ email_mode: string }> => {
+    const response = await API.get('/auth/email-mode');
+    return response.data;
+}
+
+export const getDemoEmails = async (toEmail?: string): Promise<{ emails: any[]; total: number }> => {
+    const response = await API.get('/auth/demo-emails', {
+        params: toEmail ? { to_email: toEmail } : {},
+    });
+    return response.data;
+}
+
+export const clearDemoEmails = async (): Promise<{ message: string }> => {
+    const response = await API.delete('/auth/demo-emails');
+    return response.data;
+}

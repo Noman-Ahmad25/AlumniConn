@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { forgotPassword } from "../api/auth";
 import { getApiErrorMessage } from "../../../utils/error";
 import { useTenant } from "../../../providers/TenantProvider";
+import DemoEmailInbox from "../components/DemoEmailInbox";
 
 export default function ForgotPassword() {
     const navigate = useNavigate();
@@ -103,6 +104,7 @@ export default function ForgotPassword() {
                     </>
                 )}
             </form>
+            <DemoEmailInbox className="w-full max-w-lg mt-4" />
         </div>
     );
 }

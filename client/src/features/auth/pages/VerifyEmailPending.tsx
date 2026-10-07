@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useTenant } from "../../../providers/TenantProvider";
+import DemoEmailInbox from "../components/DemoEmailInbox";
 
 export default function VerifyEmailPending() {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function VerifyEmailPending() {
                     We've sent a verification link to your email address. Please click the link to verify your account and continue.
                 </p>
 
-                <div className="pt-4">
+                <div className="pt-2">
                     <button
                         type="button"
                         className="btn btn-primary w-full"
@@ -33,6 +34,7 @@ export default function VerifyEmailPending() {
                     </button>
                 </div>
             </div>
+            <DemoEmailInbox className="w-full max-w-lg mt-4" />
         </div>
     );
 }

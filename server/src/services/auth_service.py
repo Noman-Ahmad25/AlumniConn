@@ -166,7 +166,10 @@ def reset_password(db, reset_data):
 
 def login_super_admin(db, user_data):
     user = db.query(User).filter(
-        User.email == user_data.email,
+        or_(
+            User.email == user_data.username_or_email,
+            User.username == user_data.username_or_email
+        ),
         User.role == UserRole.SUPER_ADMIN,
     ).first()
     if not user or not verify_password(user_data.password, user.password_hash):

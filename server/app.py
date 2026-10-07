@@ -33,6 +33,7 @@ from src.routes.like import router as like_router
 from src.routes.comment import router as comment_router
 from src.routes.user import router as user_router
 from src.routes.recommendation import router as recommendation_router
+from src.routes.admin_management import router as admin_management_router
 from src.utils.event_bus import event_bus
 from src.services.notification_service import handle_notification_event
 from src.utils.logger import setup_logging
@@ -100,6 +101,7 @@ app.include_router(like_router, prefix="/likes", tags=["Likes"])
 app.include_router(comment_router, prefix="/comments", tags=["Comments"])
 app.include_router(recommendation_router, prefix="/recommendations", tags=["Recommendations"])
 app.include_router(notification_router, prefix="/notifications", tags=["Notifications"])
+app.include_router(admin_management_router, prefix="/admin", tags=["Admin Management"])
 
 
 @app.get("/")

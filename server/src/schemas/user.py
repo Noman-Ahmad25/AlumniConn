@@ -47,7 +47,7 @@ class UserLogin(BaseModel):
         return _validate_password_complexity(v)
 
 class SuperAdminLogin(BaseModel):
-    email: EmailStr
+    username_or_email: str
     password: str
 
 class AlumniStatus(str, Enum):
@@ -76,6 +76,8 @@ class UserResponse(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    college_slug: str | None = None
+    role: str | None = None
 
 
 class DiscoverUserResponse(BaseModel):

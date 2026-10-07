@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 class EmailProvider(ABC):
     """
@@ -7,7 +8,7 @@ class EmailProvider(ABC):
     """
     
     @abstractmethod
-    async def send_email(self, to_email: str, subject: str, html_body: str) -> bool:
+    async def send_email(self, to_email: str, subject: str, html_body: str, **kwargs: Any) -> bool:
         """
         Sends an email asynchronously.
         

@@ -14,7 +14,7 @@ class SMTPEmailProvider(EmailProvider):
         self.password = password
         self.from_email = from_email
 
-    async def send_email(self, to_email: str, subject: str, html_body: str) -> bool:
+    async def send_email(self, to_email: str, subject: str, html_body: str, **kwargs) -> bool:
         msg = EmailMessage()
         msg["From"] = self.from_email
         msg["To"] = to_email
