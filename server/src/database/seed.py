@@ -679,26 +679,22 @@ def seed_college_requests(db: Session, super_admin: User | None = None):
     db.commit()
 
 
-def seed_all(db: Session, alumni_count: int = 85):
-    """Seed super admin, demo super admin, college, college admin, alumni users, additional colleges, students, and requests."""
-    print("🌱 Starting AlumniConn development database seeding...")
-    super_admin = seed_super_admin(db)
-    seed_demo_super_admin(db)
-    college = seed_college(db)
-    if college:
-        admin = seed_college_admin(db, college)
-        seed_alumni_users(db, college, admin, target_count=alumni_count)
-        seed_demo_accounts_and_students(db, college)
-    seed_additional_colleges(db)
-    seed_college_requests(db, super_admin)
-    print("✨ Seeding completed successfully!")
+def seed_all(db: Session, alumni_count: int = 85, force_reset: bool = False):
+    """Seed super admin, demo accounts, colleges, alumni, students, posts, comments, likes, messages, and requests."""
+    from scripts.seed_demo import run_seed
+    run_seed(db, force_reset=force_reset)
 
 
 if __name__ == "__main__":
     from src.database.session import SessionLocal
+    import argparse
+    parser = argparse.ArgumentParser(description="AlumniConn Database Seeder")
+    parser.add_argument("--reset", action="store_true", help="Reset showcase demo data before seeding")
+    args = parser.parse_args()
+
     db = SessionLocal()
     try:
-        seed_all(db, alumni_count=85)
+        seed_all(db, alumni_count=85, force_reset=args.reset)
     finally:
         db.close()
 

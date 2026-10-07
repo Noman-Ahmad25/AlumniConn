@@ -10,14 +10,15 @@ import sys
 
 
 _MODEL_MODULES = (
-    "alumni_request",
     "college",
+    "college_branding",
     "college_request",
     "comment",
     "connection",
     "conversation",
     "like",
     "message",
+    "notification",
     "post",
     "profile",
     "user",
