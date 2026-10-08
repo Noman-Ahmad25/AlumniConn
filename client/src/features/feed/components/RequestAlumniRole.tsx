@@ -137,7 +137,7 @@ export default function RequestAlumniRole({
     </div>
   ) : (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-slate-900">Apply for Alumni Status</h2>
+      <h2 className="text-2xl font-bold text-slate-900">Apply for Alumni Role</h2>
 
       {currentStatus === "rejected" && !success && (
         <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-lg text-sm">
@@ -189,7 +189,7 @@ export default function RequestAlumniRole({
               onClick={() => setShowConfirm(true)}
               className="btn btn-primary px-5 text-sm"
             >
-              Apply for Alumni Status
+              Apply for Alumni Role
             </button>
           </div>
         </div>

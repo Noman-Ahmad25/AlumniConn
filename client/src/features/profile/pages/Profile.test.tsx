@@ -56,7 +56,7 @@ test("profile page displays backend identity and connected state", async () => {
   expect(await screen.findByText("Rahul Sharma")).toBeInTheDocument()
   expect(screen.getByText("@rahul")).toBeInTheDocument()
   expect(screen.getByRole("button", { name: "Connected" })).toBeInTheDocument()
-  expect(screen.queryByText("Academic Status")).not.toBeInTheDocument()
+  expect(screen.queryByText("Academic Role")).not.toBeInTheDocument()
 })
 
 test("own profile route renders edit profile instead of connect", async () => {
@@ -85,7 +85,7 @@ test("own profile route renders edit profile instead of connect", async () => {
   expect(screen.queryByRole("button", { name: "Connect" })).not.toBeInTheDocument()
 })
 
-test("student own profile displays Academic Status section and Apply for Alumni Status button", async () => {
+test("student own profile displays Academic Role section and Apply for Alumni Role button", async () => {
   localStorage.setItem("access_token", tokenFor(1, "student"))
   vi.mocked(getMyProfile).mockResolvedValue({
     id: 12,
@@ -113,9 +113,9 @@ test("student own profile displays Academic Status section and Apply for Alumni 
     </MemoryRouter>
   )
 
-  expect(await screen.findByText("Academic Status")).toBeInTheDocument()
+  expect(await screen.findByText("Academic Role")).toBeInTheDocument()
   expect(screen.getByText("Student")).toBeInTheDocument()
-  const applyBtn = screen.getByRole("button", { name: "Apply for Alumni Status" })
+  const applyBtn = screen.getByRole("button", { name: "Apply for Alumni Role" })
   expect(applyBtn).toBeInTheDocument()
 
   // Clicking the button opens the modal dialog
@@ -151,8 +151,8 @@ test("student with pending alumni request shows pending state instead of allowin
     </MemoryRouter>
   )
 
-  expect(await screen.findByText("Academic Status")).toBeInTheDocument()
+  expect(await screen.findByText("Academic Role")).toBeInTheDocument()
   expect(screen.getByText(/Alumni Status Pending Review/i)).toBeInTheDocument()
   expect(screen.getByRole("button", { name: "View Status" })).toBeInTheDocument()
-  expect(screen.queryByRole("button", { name: "Apply for Alumni Status" })).not.toBeInTheDocument()
+  expect(screen.queryByRole("button", { name: "Apply for Alumni Role" })).not.toBeInTheDocument()
 })

@@ -33,7 +33,7 @@ describe("RequestAlumniRole component", () => {
       screen.getByText(/Your request has been submitted to your college administrator/i)
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole("button", { name: /Apply for Alumni Status/i })
+      screen.queryByRole("button", { name: /Apply for Alumni Role/i })
     ).not.toBeInTheDocument()
   })
 
@@ -56,7 +56,7 @@ describe("RequestAlumniRole component", () => {
 
     render(<RequestAlumniRole />)
 
-    const applyBtn = await screen.findByRole("button", { name: /Apply for Alumni Status/i })
+    const applyBtn = await screen.findByRole("button", { name: /Apply for Alumni Role/i })
     expect(applyBtn).toBeInTheDocument()
 
     // Click apply to show confirm

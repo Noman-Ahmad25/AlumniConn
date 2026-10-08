@@ -268,7 +268,7 @@ export default function Profile() {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs font-semibold uppercase text-slate-400">Academic Status</p>
+                      <p className="text-xs font-semibold uppercase text-slate-400">Academic Role</p>
                       <div className="flex flex-wrap items-center gap-2 mt-0.5">
                         <span className="text-sm font-bold text-slate-900">Student</span>
                         {alumniStatus === "pending" && (
@@ -301,7 +301,7 @@ export default function Profile() {
                         onClick={() => setIsAlumniModalOpen(true)}
                         className="btn btn-primary text-xs py-1.5 px-3.5 shadow-sm"
                       >
-                        Apply for Alumni Status
+                        Apply for Alumni Role
                       </button>
                     )}
                   </div>

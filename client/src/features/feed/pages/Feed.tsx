@@ -66,7 +66,7 @@ export default function Feed() {
 
   return (
     <div className="app-page relative min-h-screen">
-      <main className="app-main space-y-5 max-w-2xl mx-auto px-4 sm:px-6 py-6 pb-20">
+      <main className="w-full max-w-3xl lg:max-w-[800px] xl:max-w-[850px] mx-auto px-4 sm:px-6 py-6 pb-20 space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="page-heading mb-0">
             <h1 className="page-title text-2xl font-bold text-slate-950">Campus Feed</h1>
