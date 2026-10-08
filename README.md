@@ -100,7 +100,7 @@ AlumniConn solves this through a **multi-tenant institutional architecture**:
                     |      PostgreSQL 15 +          |   |  Cloudinary API   |
                     |         pgvector              |   +-------------------+
                     |  - 384-d semantic embeddings  |
-                    |  - Tenant-isolated indexes    |
+                    |  - SQL tenant-scoped query    |
                     +-------------------------------+
                                             ^
                                             |
@@ -129,7 +129,7 @@ Tenant isolation is enforced across both data storage and business logic:
 
 2. **Authorization Guards**:
    - FastAPI dependency `require_roles([UserRole.STUDENT, UserRole.ALUMNI, ...])` validates JWT claims against requested endpoints.
-   - Database queries explicitly filter by `current_user.college_id`, ensuring cross-tenant data leakage is impossible even if an entity ID is guessed.
+   - Database queries explicitly scope records by `current_user.college_id`, enforcing tenant boundaries at the application query and service layers even if an entity ID is known.
 
 3. **Student → Alumni Verification State Machine**:
    - Registration selecting the Alumni persona defaults the account to `student` role with `alumni_status = "PENDING"`.
@@ -146,7 +146,7 @@ AlumniConn features a hybrid recommendation engine combining dense semantic vect
 - **Model**: `all-MiniLM-L6-v2` produces compact 384-dimensional dense semantic vectors.
 - **Semantic Text Composition**: Synthesizes a structured profile representation from the user's headline, bio, major, skills, interests, and current industry.
 - **SHA-256 Hashing**: Embeddings are only regenerated when the computed semantic hash of the profile changes, preventing unnecessary neural model inferences.
-- **PostgreSQL Vector Storage**: Embeddings are indexed using `pgvector` with cosine distance operator (`<=>`).
+- **PostgreSQL Vector Storage & Tenant Filtering**: Embeddings are stored in a `Vector(384)` column using `pgvector` and queried with the cosine distance operator (`<=>`). Candidate profile retrieval applies explicit tenant filtering (`User.college_id == current_user.college_id`) at the SQL query level before similarity ranking.
 
 ### 2. Hybrid Scoring Algorithm
 Recommendations calculate a composite match score `M ∈ [0, 1]` for candidate alumni within the same college:
@@ -291,9 +291,9 @@ ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_HOURS=24
 
 # Super Admin Initialization
-SUPER_ADMIN_EMAIL=superadmin@alumniconn.com
+SUPER_ADMIN_EMAIL=superadmin@example.com
 SUPER_ADMIN_USERNAME=superadmin
-SUPER_ADMIN_PASSWORD=SuperAdmin@Secure2026!
+SUPER_ADMIN_PASSWORD=your-secure-super-admin-password
 
 # Frontend Origin (CORS)
 FRONTEND_URL=http://localhost:5173
@@ -400,20 +400,20 @@ npm install
 The database seeder (`scripts/seed_demo.py`) generates a comprehensive showcase environment using **fictional institutions** and realistic synthetic network activity:
 
 ### Showcase Institutions
-- **Northbridge Institute of Technology** (`slug: nitk`) — Primary active tenant.
-- **Apex Institute of Technology** (`slug: apex-institute`)
-- **Crestview University** (`slug: crestview-university`)
-- **Solaris Institute of Technology** (`slug: solaris-tech`)
+- **Northbridge Institute of Technology** — Primary active campus tenant.
+- **Apex Institute of Technology**
+- **Crestview University**
+- **Solaris Institute of Technology**
 
-### Pre-Configured Showcase Accounts
-These credentials are intended strictly for local evaluation and showcase testing:
+### Showcase Evaluation Personas
+For rapid evaluation, the application provides an interactive **1-Click Demo Account Picker** directly on the sign-in page (`/login`), enabling instant authentication into any role without requiring manual password entry:
 
-| Persona Role | Institution | Username | Password | Email |
-| :--- | :--- | :--- | :--- | :--- |
-| **Super Admin** | Platform-Wide | `demo_superadmin` | `Admin@Alumni2026!` | `demo.superadmin@alumniconn.com` |
-| **College Admin** | Northbridge Tech | `admin_nitk` | `Admin@Alumni2026!` | `admin@nitk.edu` |
-| **Alumni (Mentor)** | Northbridge Tech | `demo_alumni` | `DevAlumni@2026!` | `demo.alumni@northbridge.edu` |
-| **Student** | Northbridge Tech | `demo_student` | `DevAlumni@2026!` | `demo.student@northbridge.edu` |
+| Persona Role | Scope / Context | Persona Profile | One-Click Demo Access |
+| :--- | :--- | :--- | :--- |
+| **Super Admin** | Platform-Wide Governance | Platform metrics, university onboarding review, cross-campus administration | Available on Sign In |
+| **College Admin** | Campus Administration | Campus directory, student moderation, alumni status approvals | Available on Sign In |
+| **Alumni (Mentor)** | Verified Alumna / Mentor | Senior AI Engineer profile, alumni connections, career posts, mentorship | Available on Sign In |
+| **Student** | Undergraduate Student | CS student profile, alumni directory discovery, recommendations, connection requests | Available on Sign In |
 
 *To reset and regenerate clean showcase data at any time, run:*
 ```bash
