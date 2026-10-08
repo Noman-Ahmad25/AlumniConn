@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 from datetime import datetime
 from typing import Optional
+from src.schemas.user import _validate_password_complexity
 
 
 class CollegeRequestCreate(BaseModel):
@@ -28,6 +29,12 @@ class CollegeRequestCreate(BaseModel):
     @classmethod
     def normalize_domain(cls, value: str) -> str:
         return value.strip().lower()
+
+    @field_validator("admin_password")
+    @classmethod
+    def check_admin_password(cls, value: str) -> str:
+        return _validate_password_complexity(value)
+
 
 
 class CollegeRequestResponse(BaseModel):

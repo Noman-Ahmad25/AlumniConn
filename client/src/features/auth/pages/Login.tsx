@@ -4,6 +4,7 @@ import { loginUser } from "../api/auth"
 import { getApiErrorMessage } from "../../../utils/error"
 import { getCurrentUserRoleFromToken, getRoleHomePath, setAuthToken } from "../utils/auth"
 import { useTenant } from "../../../providers/TenantProvider"
+import { PasswordInput } from "../components/PasswordInput"
 
 interface LoginForm {
   username_or_email: string
@@ -95,18 +96,14 @@ export default function Login() {
           />
         </label>
 
-        <label>
-          <span className="field-label">Password</span>
-          <input
-            type="password"
-            name="password"
-            placeholder="Your password"
-            value={form.password}
-            onChange={handleChange}
-            className="form-field"
-            required
-          />
-        </label>
+        <PasswordInput
+          label="Password"
+          name="password"
+          placeholder="Your password"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
 
         <div className="flex justify-end">
           <button

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom"
 import { registerUser } from "../api/auth"
 import { getApiErrorMessage } from "../../../utils/error"
 import { useTenant } from "../../../providers/TenantProvider"
+import { PasswordInput } from "../components/PasswordInput"
+import { validatePasswordComplexity, PASSWORD_REQUIREMENTS_HINT } from "../../../utils/password"
 
 interface RegisterForm {
   username: string
@@ -35,6 +37,13 @@ export default function Register() {
 
         if (!tenant) {
             setError("Invalid tenant");
+            setLoading(false);
+            return;
+        }
+
+        const passwordError = validatePasswordComplexity(form.password);
+        if (passwordError) {
+            setError(passwordError);
             setLoading(false);
             return;
         }
@@ -105,18 +114,15 @@ export default function Register() {
           />
         </label>
 
-        <label>
-          <span className="field-label">Password</span>
-          <input
-            type="password"
-            name="password"
-            placeholder="Your password"
-            value={form.password}
-            onChange={handleChange}
-            className="form-field"
-            required
-          />
-        </label>
+        <PasswordInput
+          label="Password"
+          name="password"
+          placeholder="At least 8 characters"
+          value={form.password}
+          onChange={handleChange}
+          helperText={PASSWORD_REQUIREMENTS_HINT}
+          required
+        />
 
         <label>
           <span className="field-label">Role</span>

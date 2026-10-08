@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { loginSuperAdmin } from "../../auth/api/auth"
 import { getApiErrorMessage } from "../../../utils/error"
 import { setAuthToken } from "../../auth/utils/auth"
+import { PasswordInput } from "../../auth/components/PasswordInput"
 interface SuperAdminLoginForm {
   username_or_email: string
   password: string
@@ -72,18 +73,14 @@ export default function SuperAdminLogin() {
           />
         </label>
 
-        <label>
-          <span className="field-label">Password</span>
-          <input
-            type="password"
-            name="password"
-            placeholder="Your password"
-            value={form.password}
-            onChange={handleChange}
-            className="form-field"
-            required
-          />
-        </label>
+        <PasswordInput
+          label="Password"
+          name="password"
+          placeholder="Your password"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
 
         <button type="submit" disabled={loading} className="btn btn-primary w-full">
           {loading ? "Logging in..." : "Login"}

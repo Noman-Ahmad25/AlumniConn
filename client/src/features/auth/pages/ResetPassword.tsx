@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { resetPassword } from "../api/auth";
 import { getApiErrorMessage } from "../../../utils/error";
 import { useTenant } from "../../../providers/TenantProvider";
+import { PasswordInput } from "../components/PasswordInput";
+import { validatePasswordComplexity, PASSWORD_REQUIREMENTS_HINT } from "../../../utils/password";
 
 export default function ResetPassword() {
     const navigate = useNavigate();
@@ -30,6 +32,13 @@ export default function ResetPassword() {
 
         if (!token) {
             setError("Missing reset token. Please request a new password reset link.");
+            setLoading(false);
+            return;
+        }
+
+        const complexityError = validatePasswordComplexity(password);
+        if (complexityError) {
+            setError(complexityError);
             setLoading(false);
             return;
         }
@@ -88,31 +97,24 @@ export default function ResetPassword() {
                     </div>
                 ) : (
                     <>
-                        <label>
-                            <span className="field-label">New Password</span>
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="New password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="form-field"
-                                required
-                            />
-                        </label>
+                        <PasswordInput
+                            label="New Password"
+                            name="password"
+                            placeholder="New password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            helperText={PASSWORD_REQUIREMENTS_HINT}
+                            required
+                        />
                         
-                        <label>
-                            <span className="field-label">Confirm Password</span>
-                            <input
-                                type="password"
-                                name="confirm_password"
-                                placeholder="Confirm new password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="form-field"
-                                required
-                            />
-                        </label>
+                        <PasswordInput
+                            label="Confirm Password"
+                            name="confirm_password"
+                            placeholder="Confirm new password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
 
                         <button
                             type="submit"

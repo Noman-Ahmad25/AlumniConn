@@ -1,6 +1,9 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
 import { collegeRequestsAPI } from "../../admin/api/requests"
 import { getApiErrorMessage } from "../../../utils/error"
+import { PasswordInput } from "../../auth/components/PasswordInput"
+import { validatePasswordComplexity, PASSWORD_REQUIREMENTS_HINT } from "../../../utils/password"
+import DemoEmailInbox from "../../auth/components/DemoEmailInbox"
 
 interface RequestCollegeFormProps {
   onSuccess?: () => void
@@ -11,6 +14,7 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
+  const [submittedAdminEmail, setSubmittedAdminEmail] = useState("")
   const [formData, setFormData] = useState({
     collegeName: "",
     domain: "",
@@ -36,9 +40,10 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
     setError("")
     setSuccess(false)
 
-    // Validate passwords
-    if (formData.adminPassword.length < 8) {
-      setError("Admin password must be at least 8 characters")
+    // Validate passwords with backend complexity rules
+    const passwordError = validatePasswordComplexity(formData.adminPassword)
+    if (passwordError) {
+      setError(passwordError)
       return
     }
 
@@ -49,6 +54,7 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
 
     setLoading(true)
 
+    const submittedEmail = formData.adminEmail.trim()
     try {
       await collegeRequestsAPI.requestCollege({
         collegeName: formData.collegeName.trim(),
@@ -57,10 +63,11 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
         establishedYear: Number(formData.establishedYear),
         description: formData.description.trim() || undefined,
         adminName: formData.adminName.trim(),
-        adminEmail: formData.adminEmail.trim(),
+        adminEmail: submittedEmail,
         adminPassword: formData.adminPassword,
       })
 
+      setSubmittedAdminEmail(submittedEmail)
       setSuccess(true)
       setFormData({
         collegeName: "",
@@ -95,18 +102,27 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
       )}
 
       {success && (
-        <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-          <p className="font-semibold">College request submitted successfully!</p>
-          <p className="text-sm mt-1">Please check your admin email inbox for a verification link. You must verify your email before a Super Admin can approve the request.</p>
-        </div>
+        <>
+          <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+            <p className="font-semibold">College request submitted successfully!</p>
+            <p className="text-sm mt-1">Please check your admin email inbox for a verification link. You must verify your email before a Super Admin can approve the request.</p>
+          </div>
+
+          <DemoEmailInbox
+            filterEmail={submittedAdminEmail}
+            title="Admin Verification Email (Demo Mode)"
+            className="mb-6"
+          />
+        </>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="collegeName" className="block text-sm font-medium text-gray-700 mb-1">
             College Name *
           </label>
           <input
+            id="collegeName"
             type="text"
             name="collegeName"
             value={formData.collegeName}
@@ -118,10 +134,11 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="adminName" className="block text-sm font-medium text-gray-700 mb-1">
             Admin Name *
           </label>
           <input
+            id="adminName"
             type="text"
             name="adminName"
             value={formData.adminName}
@@ -133,10 +150,11 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="domain" className="block text-sm font-medium text-gray-700 mb-1">
             College Domain *
           </label>
           <input
+            id="domain"
             type="text"
             name="domain"
             value={formData.domain}
@@ -149,10 +167,11 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
             Location *
           </label>
           <input
+            id="location"
             type="text"
             name="location"
             value={formData.location}
@@ -164,10 +183,11 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="establishedYear" className="block text-sm font-medium text-gray-700 mb-1">
             Established Year *
           </label>
           <input
+            id="establishedYear"
             type="number"
             name="establishedYear"
             value={formData.establishedYear}
@@ -181,10 +201,11 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="adminEmail" className="block text-sm font-medium text-gray-700 mb-1">
             Admin Email *
           </label>
           <input
+            id="adminEmail"
             type="email"
             name="adminEmail"
             value={formData.adminEmail}
@@ -195,36 +216,24 @@ export default function RequestCollegeForm({ onSuccess, onError }: RequestColleg
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Admin Password *
-          </label>
-          <input
-            type="password"
-            name="adminPassword"
-            value={formData.adminPassword}
-            onChange={handleChange}
-            required
-            className="form-field"
-            placeholder="At least 8 characters"
-          />
-          <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
-        </div>
+        <PasswordInput
+          label="Admin Password *"
+          name="adminPassword"
+          placeholder="At least 8 characters"
+          value={formData.adminPassword}
+          onChange={handleChange}
+          helperText={PASSWORD_REQUIREMENTS_HINT}
+          required
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Confirm Password *
-          </label>
-          <input
-            type="password"
-            name="adminPasswordConfirm"
-            value={formData.adminPasswordConfirm}
-            onChange={handleChange}
-            required
-            className="form-field"
-            placeholder="Re-enter password"
-          />
-        </div>
+        <PasswordInput
+          label="Confirm Password *"
+          name="adminPasswordConfirm"
+          placeholder="Re-enter password"
+          value={formData.adminPasswordConfirm}
+          onChange={handleChange}
+          required
+        />
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>

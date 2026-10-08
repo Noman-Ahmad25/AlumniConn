@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { collegeRequestsAPI } from "../../admin/api/requests";
 import { getApiErrorMessage } from "../../../utils/error";
+import DemoEmailInbox from "../../auth/components/DemoEmailInbox";
 
 export default function VerifyCollegeEmail() {
     const navigate = useNavigate();
@@ -76,6 +77,11 @@ export default function VerifyCollegeEmail() {
                         </button>
                     </div>
                 )}
+
+                <DemoEmailInbox
+                    title="College Verification Email Inbox (Demo Mode)"
+                    className="mt-6 text-left"
+                />
             </div>
         </div>
     );
