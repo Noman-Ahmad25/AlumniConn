@@ -1,281 +1,218 @@
-# AlumniConn 🎓✨
+# AlumniConn 🎓
 
-**A multi-tenant networking platform connecting students and alumni within college-specific boundaries**
+**A multi-tenant networking and mentorship platform connecting students and alumni within institutional boundaries, powered by semantic vector search and real-time communication.**
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-4.9+-blue.svg?style=flat&logo=typescript)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19.0+-61DAFB.svg?style=flat&logo=react)](https://react.dev/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100.0+-green.svg?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0+-336791.svg?style=flat&logo=postgresql)](https://www.postgresql.org/)
-
----
-
-## 🚀 Overview
-
-AlumniConn is a comprehensive networking platform designed to connect students with alumni from their respective colleges. Built with a **multi-tenant architecture**, it allows each college to operate as an isolated network, maintaining clear boundaries between different educational institutions.
-
-### Key Features:
-✅ **Multi-Tenant Architecture** - Each college operates as a separate tenant<br>
-✅ **Role-Based Access** - Students, Alumni, College Admins, and Super Admins with distinct permissions<br>
-✅ **College Onboarding** - Super Admins review and approve college registration requests<br>
-✅ **Alumni Role Upgrade** - Students can apply to become alumni with admin approval<br>
-✅ **Social Feed** - Posts, likes, comments, and opportunity posts (Alumni-only)<br>
-✅ **Connections** - Send, accept, and reject connection requests within your college<br>
-✅ **Real-Time Messaging** - WebSocket-based one-to-one chat with image support<br>
-✅ **Profile Management** - Career details with Cloudinary-hosted profile pictures<br>
-
-### Who This Project Is For:
-- **Developers** looking to build a scalable social networking platform
-- **Educational Institutions** wanting to create alumni networks
-- **Students & Alumni** seeking to connect with peers and former classmates
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19.0+-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.135+-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![pgvector](https://img.shields.io/badge/pgvector-0.2.5+-336791?style=flat&logo=postgresql&logoColor=white)](https://github.com/pgvector/pgvector)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
-## ✨ Features in Detail
+## 🌐 Live Demo
 
-### Core Functionality:
-- **Multi-Tenant System**: Each college has its own isolated network with distinct users and data
-- **Role-Based Permissions**: Fine-grained control over what users can do based on their role
-- **Real-Time Communication**: WebSocket-based messaging for instant conversations
-- **Social Features**: Posts, likes, comments, and connections between users
-
-### Advanced Features:
-- **College Onboarding**: Super Admins can approve new college registrations
-- **Alumni Upgrade**: Students can apply to become alumni with admin approval
-- **Profile Customization**: Users can create detailed profiles with career information
-- **Image Uploads**: Cloudinary integration for profile pictures and post images
-
-### Technical Implementation:
-- **Frontend**: React 19 with TypeScript, Vite, Tailwind CSS
-- **Backend**: FastAPI with PostgreSQL, SQLAlchemy, Alembic
-- **Authentication**: JWT with role-based access control
-- **Real-Time**: WebSocket connections for instant messaging
+- **Hosted Application**: [https://alumniconn-umber.vercel.app/](https://alumniconn-umber.vercel.app/) 
+- **Interactive Demo Notice**: The platform includes a self-contained showcase environment pre-seeded with synthetic institutional data, pre-configured role personas, and an in-browser demo email inbox for testing verification workflows without third-party email configuration.
 
 ---
 
-## 🛠️ Tech Stack
+## 💡 What AlumniConn Does
 
-### Frontend:
-- **Framework**: React 19
-- **TypeScript**: Type-safe JavaScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **State Management**: React Context API
-- **API Client**: Axios
-- **Testing**: Vitest, Testing Library
+### The Problem
+Traditional professional networks (such as LinkedIn) are global and noisy. Students frequently struggle to reach relevant alumni who share their exact collegiate background, degree curriculum, and departmental context. Cold outreach often goes unanswered due to lack of shared institutional trust. Conversely, universities rarely possess unified, self-serve networking platforms with real-time chat, opportunity feeds, and machine-learning-driven mentor matching tailored strictly to their own student and graduate bodies.
 
-### Backend:
-- **Framework**: FastAPI
-- **Database**: PostgreSQL
-- **ORM**: SQLAlchemy
-- **Migrations**: Alembic
-- **Authentication**: JWT
-- **Real-Time**: WebSockets
-- **Image Storage**: Cloudinary
-
-### Infrastructure:
-- **Deployment**: Render (backend) + Vite (frontend)
-- **Environment**: Cloudinary for media storage
-
-### Development Tools:
-- **Linting**: ESLint
-- **Formatting**: Prettier
-- **Testing**: Pytest (backend), Vitest (frontend)
+### The Solution
+AlumniConn solves this through a **multi-tenant institutional architecture**:
+- **Strict Institutional Isolation**: Each college functions as an autonomous tenant with isolated user directories, social feeds, connection graphs, and messaging channels.
+- **Verified Academic Progression**: Students transition to verified alumni status through college-admin verification workflows.
+- **AI-Powered Mentor Matching**: Hybrid vector search (`pgvector` + `sentence-transformers`) paired with heuristic ranking connects students with alumni based on domain expertise, career trajectories, graduation proximity, and skill overlap.
+- **Real-Time Collaboration**: Instant one-on-one WebSocket messaging and rich media sharing support focused mentorship conversations.
 
 ---
 
-## 📦 Installation
+## ✨ Key Features
 
-### Prerequisites
+### 🏛️ Multi-Tenant Institutional Boundaries
+- **Tenant-Scoped Networks**: All posts, connection requests, profiles, and messages are partitioned by institutional identity (`college_id`). Users cannot discover or interact across tenant borders.
+- **Custom Institutional Identity**: Dedicated sub-branding with institutional logos, hex color themes, and custom URLs for each approved college.
+- **College Self-Registration**: Colleges submit onboarding requests reviewed and approved by platform Super Admins.
 
-Before you begin, ensure you have the following installed on your system:
-- **Node.js** 18+
-- **Python** 3.11+
-- **PostgreSQL** 15+
-- **Git** (for version control)
+### 👥 Role-Based Capabilities (RBAC)
+- **Student**:
+  - Discover verified alumni within their institution via vector-similarity recommendations.
+  - Send and manage connection requests.
+  - Participate in the social feed (create posts, like, and comment).
+  - Apply for upgraded Alumni status directly from their profile with administrative verification.
+- **Alumni**:
+  - Full networking and messaging privileges.
+  - Publish specialized **Opportunity Posts** (jobs, internships, research grants, mentorship slots) flagged with distinct visual markers in the feed.
+  - Mentor students and review inbound connection requests from their alma mater.
+- **College Admin**:
+  - Review and approve/reject Student → Alumni status elevation requests with administrative audit notes.
+  - Monitor college-level user activity and manage institutional branding parameters.
+- **Super Admin**:
+  - Platform-level governance: review, approve, or reject new college onboarding applications.
+  - Monitor cross-tenant health and tenant metrics.
 
-### Quick Start
+### 📰 Centered Campus Feed & Opportunities
+- Responsive desktop layout (optimized up to 850px max width) eliminating whitespace while retaining focus.
+- Filter views for **All Posts** and dedicated **Opportunities**.
+- Single streamlined floating action trigger (`+ Create Post`) opening modal composer with Cloudinary image upload.
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Noman-Ahmad25/AlumniConn.git
-   cd AlumniConn
-   ```
+### 🤝 Connections & Graph Management
+- Asymmetric request lifecycle (`PENDING` → `ACCEPTED` / `REJECTED`).
+- Bi-directional friendship tracking enforcing institution boundaries.
 
-2. **Set up the backend**:
-   ```bash
-   cd server
-   pip install -r requirements.txt
-   ```
+### 💬 Real-Time Messaging
+- Full-duplex WebSocket communication over `/messages/ws`.
+- Online/offline presence indicators.
+- Instant delivery, offline message persistence, and Cloudinary image attachments.
 
-3. **Configure environment variables**:
-   Create a `.env` file in the `server` directory with the following variables:
-   ```
-   DATABASE_URL=postgresql://username:password@localhost:5432/alumniconn
-   SECRET_KEY=your-secret-key-here
-   ALGORITHM=HS256
-   ACCESS_TOKEN_EXPIRE_HOURS=24
-   SUPER_ADMIN_EMAIL=superadmin@example.com
-   SUPER_ADMIN_USERNAME=superadmin
-   SUPER_ADMIN_PASSWORD=your-strong-password
-   FRONTEND_URL=http://localhost:5173
-   CLOUDINARY_CLOUD_NAME=your_cloud_name
-   CLOUDINARY_API_KEY=your_api_key
-   CLOUDINARY_API_SECRET=your_api_secret
-   ```
-
-4. **Run database migrations**:
-   ```bash
-   alembic upgrade head
-   ```
-
-5. **Start the backend server**:
-   ```bash
-   uvicorn app:app --reload
-   ```
-
-6. **Set up the frontend**:
-   ```bash
-   cd ../client
-   npm install
-   ```
-
-7. **Configure frontend environment variables**:
-   Create a `.env` file in the `client` directory:
-   ```
-   VITE_API_URL=http://localhost:8000
-   ```
-
-8. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
-
-### Alternative Installation Methods
-
-#### Using Docker (Backend Only)
-1. Create a `docker-compose.yml` file:
-   ```yaml
-   version: '3.8'
-   services:
-     db:
-       image: postgres:15
-       environment:
-         POSTGRES_DB: alumniconn
-         POSTGRES_USER: postgres
-         POSTGRES_PASSWORD: postgres
-       ports:
-         - "5432:5432"
-       volumes:
-         - postgres_data:/var/lib/postgresql/data
-
-     backend:
-       build: ./server
-       command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
-       volumes:
-         - ./server:/app
-       ports:
-         - "8000:8000"
-       environment:
-         DATABASE_URL: postgresql://postgres:postgres@db:5432/alumniconn
-         SECRET_KEY: your-secret-key-here
-       depends_on:
-         - db
-
-   volumes:
-     postgres_data:
-   ```
-
-2. Run the services:
-   ```bash
-   docker-compose up --build
-   ```
-
-#### Development Setup
-- Install VSCode with recommended extensions (ESLint, Prettier, TypeScript)
-- Configure your IDE to use the project's ESLint and Prettier configurations
+### 🧠 Semantic AI Recommendations
+- Explainable hybrid mentor recommendations combining 384-dimensional dense semantic vectors with heuristic domain scoring and human-readable explanation generation.
 
 ---
 
-## 🎯 Usage
+## 🏗️ Architecture
 
-### Basic Usage Examples
-
-#### Creating a Post
-```typescript
-import { createPost } from './api/post';
-
-// Create a text post
-const textPost = await createPost({
-  content: "Hello everyone! I'm excited to be part of this platform.",
-  is_opportunity: false,
-});
-
-// Create a post with an image
-const imageFile = document.getElementById('file-input').files[0];
-const imagePost = await createPost({
-  content: "Check out my project!",
-  is_opportunity: false,
-  image_file: imageFile
-});
+```
+                                  +---------------------------------------+
+                                  |         React 19 Frontend (SPA)       |
+                                  |  TypeScript, Tailwind, Context API    |
+                                  +-------------------+-------------------+
+                                                      |
+                                     HTTP REST / Auth | WebSocket (/messages/ws)
+                                                      v
+                                  +---------------------------------------+
+                                  |            FastAPI Backend            |
+                                  |  - Dependency Injection (Session/Auth)|
+                                  |  - RBAC & Tenant Scoping Middleware   |
+                                  |  - Event Bus & Notification Dispatch  |
+                                  +---------+-------------------+---------+
+                                            |                   |
+                        Vector Embeddings & |                   | Image Storage
+                            Relational CRUD |                   |
+                                            v                   v
+                    +-------------------------------+   +-------------------+
+                    |      PostgreSQL 15 +          |   |  Cloudinary API   |
+                    |         pgvector              |   +-------------------+
+                    |  - 384-d semantic embeddings  |
+                    |  - Tenant-isolated indexes    |
+                    +-------------------------------+
+                                            ^
+                                            |
+                               +------------+------------+
+                               |                         |
+                    +----------+----------+   +----------+----------+
+                    |  In-Memory Demo     |   |   Real Email Mode   |
+                    |  Email Store & API  |   |  (Resend API / SMTP)|
+                    +---------------------+   +---------------------+
 ```
 
-#### Sending a Connection Request
-```typescript
-import { sendRequest } from './api/connection';
+---
 
-const userId = 123; // ID of the user you want to connect with
-const connectionResponse = await sendRequest(userId);
-console.log(connectionResponse);
-```
+## 🏢 Multi-Tenancy & Authorization
 
-#### Real-Time Messaging
-```typescript
-import { createMessagesSocket } from './api/message';
+Tenant isolation is enforced across both data storage and business logic:
 
-const socket = createMessagesSocket();
-socket.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  if (data.type === 'new_msg') {
-    console.log('New message:', data.payload);
-  }
-};
-```
+1. **Database Partitioning**:
+   - Entities (`User`, `Post`, `Connection`, `Conversation`, `CollegeBranding`) maintain foreign key references to `colleges.id`.
+   - Unique constraints scope usernames and email addresses within individual institutions:
+     ```python
+     UniqueConstraint('email', 'college_id', name='uq_users_email_college')
+     UniqueConstraint('username', 'college_id', name='uq_users_username_college')
+     ```
+   - Platform Super Admins exist globally without a tenant assignment (`college_id = None`).
 
-### Advanced Usage
+2. **Authorization Guards**:
+   - FastAPI dependency `require_roles([UserRole.STUDENT, UserRole.ALUMNI, ...])` validates JWT claims against requested endpoints.
+   - Database queries explicitly filter by `current_user.college_id`, ensuring cross-tenant data leakage is impossible even if an entity ID is guessed.
 
-#### Customizing the UI
-AlumniConn uses Tailwind CSS for styling. You can easily customize the design by modifying the `client/src/index.css` file or adding new styles to your component files.
+3. **Student → Alumni Verification State Machine**:
+   - Registration selecting the Alumni persona defaults the account to `student` role with `alumni_status = "PENDING"`.
+   - College Admins inspect graduation documentation through `/admin/alumni-requests` and approve or reject the request.
+   - Upon approval, the user's role is atomically migrated to `alumni`, unlocking opportunity posting privileges.
 
-#### Extending the Backend API
-To add new endpoints or modify existing ones:
+---
 
-1. Create a new route file in `server/src/routes/`
-2. Define your Pydantic schemas in `server/src/schemas/`
-3. Add business logic in `server/src/services/`
-4. Update the FastAPI app in `server/app.py`
+## 🧠 AI Recommendation System
 
-#### Implementing New Features
-1. **Add a new feature type** (e.g., events):
-   - Create a new model in `server/src/models/`
-   - Add a new schema in `server/src/schemas/`
-   - Create a new route in `server/src/routes/`
-   - Add service logic in `server/src/services/`
-   - Implement the frontend components in `client/src/components/`
+AlumniConn features a hybrid recommendation engine combining dense semantic vector search with deterministic domain heuristics:
 
-2. **Example: Adding Events**
-   ```typescript
-   // server/src/schemas/event.py
-   from pydantic import BaseModel
+### 1. Vector Embeddings (`sentence-transformers` + `pgvector`)
+- **Model**: `all-MiniLM-L6-v2` produces compact 384-dimensional dense semantic vectors.
+- **Semantic Text Composition**: Synthesizes a structured profile representation from the user's headline, bio, major, skills, interests, and current industry.
+- **SHA-256 Hashing**: Embeddings are only regenerated when the computed semantic hash of the profile changes, preventing unnecessary neural model inferences.
+- **PostgreSQL Vector Storage**: Embeddings are indexed using `pgvector` with cosine distance operator (`<=>`).
 
-   class EventCreate(BaseModel):
-       title: str
-       description: str
-       start_time: datetime
-       end_time: datetime
-       location: str
-       is_public: bool = True
+### 2. Hybrid Scoring Algorithm
+Recommendations calculate a composite match score `M ∈ [0, 1]` for candidate alumni within the same college:
+$$\text{Score} = w_v \cdot S_{\text{cosine}} + w_s \cdot J(\text{skills}) + w_i \cdot J(\text{interests}) + w_m \cdot \mathbb{I}(\text{major}) + w_{\text{ind}} \cdot \mathbb{I}(\text{industry}) + P(\Delta \text{grad})$$
 
-   ```
+- **Cosine Vector Similarity**: Captures high-level latent semantic alignment between career goals and background.
+- **Jaccard Similarity**: Evaluates precise keyword overlaps across listed skills and personal interests.
+- **Domain Indicators**: Binary boosts for identical collegiate majors and target industries.
+- **Gaussian Decay Penalty**: Proximity weighting based on graduation year gap ($\Delta \text{grad}$).
+
+### 3. Explainable Matches
+Recommendations return human-readable justifications generated from deterministic feature analysis (e.g., *"Shared background in Computer Science"*, *"Common expertise in Distributed Systems & Kubernetes"*).
+
+---
+
+## ⚡ Real-Time Communication
+
+- **WebSocket Protocol**: Connected clients authenticate via query token handshake at `/messages/ws?token=<JWT>`.
+- **Connection Pooling**: Managed via `ConnectionManager` handling thread-safe registration, active socket tracking, and clean disconnection handling.
+- **Presence Tracking**: `PresenceManager` monitors active socket connections per user ID and broadcasts real-time online/offline statuses across mutual connections.
+- **Persistence & Media**: Inbound chat payloads are persisted in PostgreSQL (`Conversation` and `Message` tables) with support for Cloudinary-hosted image attachments.
+
+---
+
+## 🔐 Authentication & Email Subsystem
+
+AlumniConn implements a flexible dual-mode email and authentication pipeline designed for development, testing, and production environments:
+
+### Authentication Pipeline
+- **Password Complexity**: Enforced on registration and resets (minimum 8 characters, requiring at least one uppercase letter, one lowercase letter, one numeric digit, and one special character).
+- **JWT Cryptography**: Signed using HMAC-SHA256 (`HS256`) with configurable expiration windows.
+- **Verification Tokens**: Ephemeral signed tokens for email activation and password resets.
+
+### Dual-Mode Email Subsystem
+Configured via `EMAIL_MODE` (`demo` | `real`) and `EMAIL_PROVIDER` (`demo` | `smtp` | `resend`):
+
+| Mode | Provider | Behavior |
+| :--- | :--- | :--- |
+| **`demo`** | `demo` | **Zero external dependencies.** Outgoing emails (verification links, password reset codes) are intercepted by an in-memory `DemoEmailStore`. The frontend renders a dedicated `<DemoEmailInbox />` allowing evaluators to preview and click verification links directly in the browser. |
+| **`real`** | `resend` | Dispatches production HTML templates via the official Resend REST API using `RESEND_API_KEY`. |
+| **`real`** | `smtp` | Dispatches emails over standard TLS/STARTTLS SMTP (e.g., AWS SES, SendGrid, Gmail) using configured host credentials. |
+
+---
+
+## 💻 Tech Stack
+
+### Frontend
+- **Framework**: React 19 (`react`, `react-dom`)
+- **Routing**: React Router DOM 7
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 3.4, PostCSS, Autoprefixer
+- **Build Tool**: Vite 8 with React Compiler support
+- **HTTP Client**: Axios with automatic JWT interceptors
+- **Testing**: Vitest, React Testing Library, jsdom
+
+### Backend
+- **Framework**: FastAPI (Python 3.11+)
+- **Server**: Uvicorn (ASGI)
+- **Database ORM**: SQLAlchemy 2.0
+- **Database Migrations**: Alembic
+- **Relational DB**: PostgreSQL 15+ with `pgvector`
+- **Vector Search & ML**: `sentence-transformers`, `pgvector`, PyTorch, Scikit-learn
+- **Authentication**: `python-jose` (JWT), `passlib` (Argon2 / bcrypt)
+- **Validation**: Pydantic v2, `pydantic-settings`, `email-validator`
+- **Media Storage**: Cloudinary Python SDK
+- **Email Delivery**: Resend SDK, standard SMTP, Jinja2 template engine
 
 ---
 
@@ -283,212 +220,266 @@ To add new endpoints or modify existing ones:
 
 ```
 AlumniConn/
-├── client/                  # Frontend application
-│   ├── public/              # Static files
+├── client/                           # React 19 Frontend Application
 │   ├── src/
-│   │   ├── api/             # API service layer
-│   │   ├── components/      # Reusable UI components
-│   │   ├── hooks/           # Custom React hooks
-│   │   ├── pages/           # Page components
-│   │   ├── types/           # TypeScript types
-│   │   ├── utils/           # Utility functions
-│   │   ├── App.tsx          # Main application component
-│   │   └── main.tsx         # Entry point
-│   ├── package.json          # Frontend dependencies and scripts
-│   └── vite.config.ts       # Vite configuration
+│   │   ├── app/                      # App root, router, layout definitions
+│   │   ├── features/                 # Domain-driven feature modules
+│   │   │   ├── admin/                # College & Super Admin management
+│   │   │   ├── auth/                 # Login, Registration, Demo Email Inbox
+│   │   │   ├── college/              # College discovery & onboarding
+│   │   │   ├── connections/          # Connection graphs & requests
+│   │   │   ├── feed/                 # Campus posts & opportunity stream
+│   │   │   ├── messages/             # WebSocket chat & conversation lists
+│   │   │   ├── notifications/        # Activity feeds & alerts
+│   │   │   ├── profile/              # Career profile & Alumni status modal
+│   │   │   └── recommendations/      # AI mentor discovery cards
+│   │   ├── layouts/                  # AppShell, AuthLayout, SuperAdminLayout
+│   │   ├── providers/                # Tenant context and auth state providers
+│   │   ├── services/                 # Axios client and API endpoints
+│   │   ├── shared/                   # Shared UI primitives, icons, modals
+│   │   ├── test/                     # Vitest test suites
+│   │   └── utils/                    # Password validation and error handlers
+│   ├── package.json
+│   └── vite.config.ts
 │
-├── server/                  # Backend application
-│   ├── app.py               # FastAPI application entry point
+├── server/                           # FastAPI Backend Application
+│   ├── app.py                        # FastAPI application entrypoint & routers
+│   ├── alembic.ini                   # Alembic migration configuration
+│   ├── migrations/                   # Schema migration versions
+│   │   └── versions/                 # 293e6cac4656_db_initialization.py
+│   ├── scripts/                      # Data seeding & demo setup scripts
+│   │   ├── seed_demo.py              # Realistic multi-tenant showcase seeder
+│   │   └── demo_content.py           # Synthetic collegiate data & posts
 │   ├── src/
-│   │   ├── database/        # Database configuration
-│   │   ├── models/          # SQLAlchemy models
-│   │   ├── routes/          # API route definitions
-│   │   ├── schemas/         # Pydantic schemas
-│   │   ├── services/        # Business logic
-│   │   ├── utils/           # Utility functions
-│   │   └── websocket.py     # WebSocket handler
-│   ├── migrations/          # Database migrations
-│   ├── requirements.txt     # Python dependencies
-│   └── alembic.ini          # Alembic configuration
-│
-├── .gitignore               # Files to ignore in version control
-├── README.md                # Project documentation
-└── render.yaml              # Render deployment configuration
+│   │   ├── database/                 # SQLAlchemy session and Base models
+│   │   ├── models/                   # PostgreSQL table entities
+│   │   ├── routes/                   # REST and WebSocket endpoints
+│   │   ├── schemas/                  # Pydantic request/response schemas
+│   │   ├── services/                 # Domain services (auth, AI, email, posts)
+│   │   │   └── email/                # Email provider abstractions (demo/resend/smtp)
+│   │   ├── templates/emails/         # Jinja2 HTML transactional templates
+│   │   └── utils/                    # Embeddings, presence, RBAC, tokens
+│   ├── tests/                        # Integration and unit test runners
+│   └── requirements.txt              # Pinned Python dependencies
+└── README.md
 ```
 
 ---
 
-## 🔧 Configuration
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js**: v18.0.0 or higher
+- **Python**: v3.11 or higher
+- **PostgreSQL**: v15 or higher with `pgvector` extension
+- **Git**
+
+---
 
 ### Environment Variables
 
-#### Backend Configuration (`server/.env`)
+#### Backend (`server/.env`)
+Create `server/.env` with the following variables:
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:password@localhost:5432/alumniconn` |
-| `SECRET_KEY` | JWT signing key | `your-secret-key-here` |
-| `ALGORITHM` | JWT algorithm | `HS256` |
-| `ACCESS_TOKEN_EXPIRE_HOURS` | Token expiration time | `24` |
-| `SUPER_ADMIN_EMAIL` | Super admin email | `superadmin@example.com` |
-| `SUPER_ADMIN_USERNAME` | Super admin username | `superadmin` |
-| `SUPER_ADMIN_PASSWORD` | Super admin password | `your-strong-password` |
-| `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:5173` |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | `your_cloud_name` |
-| `CLOUDINARY_API_KEY` | Cloudinary API key | `your_api_key` |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret | `your_api_secret` |
+```env
+# Database Connection (with pgvector support)
+DATABASE_URL=postgresql://username:password@localhost:5432/alumniconn
 
-#### Frontend Configuration (`client/.env`)
+# Security & JWT
+SECRET_KEY=your-secure-random-secret-key-at-least-32-chars
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_HOURS=24
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `VITE_API_URL` | Base URL for the FastAPI backend | `http://localhost:8000` |
+# Super Admin Initialization
+SUPER_ADMIN_EMAIL=superadmin@alumniconn.com
+SUPER_ADMIN_USERNAME=superadmin
+SUPER_ADMIN_PASSWORD=SuperAdmin@Secure2026!
 
-### Customization Options
+# Frontend Origin (CORS)
+FRONTEND_URL=http://localhost:5173
 
-1. **Theming**: Modify the Tailwind CSS variables in `client/src/index.css`
-2. **Branding**: Update the logo and color scheme in the `brand-mark` components
-3. **Features**: Enable/disable features by modifying the role-based access in the backend
+# Email Service Configuration
+EMAIL_MODE=demo                      # 'demo' captures emails in-memory; 'real' sends emails
+EMAIL_PROVIDER=demo                  # 'demo' | 'resend' | 'smtp'
 
----
+# Real Email Credentials (required only if EMAIL_MODE=real)
+RESEND_API_KEY=                      # Required if EMAIL_PROVIDER=resend
+SMTP_HOST=                           # Required if EMAIL_PROVIDER=smtp
+SMTP_PORT=587
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_FROM_EMAIL=noreply@yourdomain.com
+SMTP_USE_TLS=True
 
-## 🤝 Contributing
-
-We welcome contributions from the community! Here's how you can get involved:
-
-### Development Setup
-
-1. Fork the repository
-2. Clone your fork locally
-3. Install dependencies:
-   ```bash
-   cd server && pip install -r requirements.txt
-   cd ../client && npm install
-   ```
-4. Set up your environment variables
-5. Run the development servers:
-   ```bash
-   cd server && uvicorn app:app --reload
-   cd ../client && npm run dev
-   ```
-
-### Code Style Guidelines
-
-1. **TypeScript**: Use strict type checking and interfaces
-2. **React**: Follow functional components with hooks
-3. **Python**: Follow PEP 8 guidelines
-4. **Testing**: Write comprehensive tests for all new features
-
-### Pull Request Process
-
-1. Create a new branch for your feature or bugfix
-2. Make your changes and ensure they pass all tests
-3. Update documentation if necessary
-4. Submit a pull request with a clear description of your changes
-
-### Code of Conduct
-
-Please review our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for guidelines on how to interact with our community.
-
----
-
-## 📝 License
-
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
-
----
-
-## 👥 Authors & Contributors
-
-### Core Team:
-- **Maintainer**: [Noman Ahmad](https://github.com/Noman-Ahmad25)
-- **Contributors**: [List of contributors](https://github.com/Noman-Ahmad25/AlumniConn/graphs/contributors)
-
-### Special Thanks:
-- [Cloudinary](https://cloudinary.com/) for media storage
-- [Render](https://render.com/) for hosting
-- The open-source community for their invaluable contributions
-
----
-
-## 🐛 Issues & Support
-
-### Reporting Issues
-If you encounter any problems or have feature requests, please:
-1. Check the [GitHub Issues](https://github.com/Noman-Ahmad25/AlumniConn/issues) for existing reports
-2. Open a new issue with a clear description of the problem
-3. Include relevant code snippets, error messages, and steps to reproduce
-
-### Getting Help
-- Ask questions on the [GitHub Discussions](https://github.com/Noman-Ahmad25/AlumniConn/discussions)
-
-### FAQ
-
-**Q: Can I customize the branding?**
-A: Yes! Modify the `brand-mark` components in the React application and update the Tailwind CSS variables.
-
----
-
-## 🗺️ Roadmap
-
-### Planned Features:
-- [ ] **Mobile App**: iOS and Android applications
-- [ ] **Advanced Analytics**: User engagement metrics
-- [ ] **Event Calendar**: College events and alumni gatherings
-- [ ] **Job Board**: Alumni job postings and opportunities
-- [ ] **AI Recommendations**: Smart connection suggestions
-
-
-### Future Improvements:
-- **Performance**: Optimize database queries and API responses
-- **Security**: Implement additional security measures
-- **Accessibility**: Improve accessibility compliance
-- **Internationalization**: Add support for multiple languages
-
----
-
-## 🚀 Getting Started with Development
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Noman-Ahmad25/AlumniConn.git
-   cd AlumniConn
-   ```
-
-2. **Set up the development environment**:
-   ```bash
-   # Backend
-   cd server
-   pip install -r requirements.txt
-
-   # Frontend
-   cd ../client
-   npm install
-   ```
-
-3. **Run the application**:
-   ```bash
-   # In one terminal (backend)
-   cd server
-   uvicorn app:app --reload
-
-   # In another terminal (frontend)
-   cd ../client
-   npm run dev
-   ```
-
-4. **Start coding!** Make changes, add features, and submit pull requests.
-
----
-
-## 🎉 Join the Community
-
-We'd love to have you join our community! Here's how you can get involved:
-
-- **Star the repository** to show your support
-- **Contribute to the project**: Check out our [open issues](https://github.com/Noman-Ahmad25/AlumniConn/issues)
-
-Together, we can make AlumniConn even better! 🚀
+# Cloudinary Storage (optional for local development, media falls back to avatars)
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
-This README.md provides a comprehensive, engaging, and professional overview of the AlumniConn project. It follows modern GitHub README best practices, includes practical code examples, and encourages contributions from the developer community. The structure is clear, visually appealing, and organized to make it easy for new contributors to understand and get started with the project.
+#### Frontend (`client/.env`)
+Create `client/.env` with:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+---
+
+### Database Setup
+
+1. **Create the Database and Enable `pgvector`**:
+   ```sql
+   CREATE DATABASE alumniconn;
+   \c alumniconn
+   CREATE EXTENSION IF NOT EXISTS vector;
+   ```
+
+2. **Apply Alembic Migrations**:
+   ```bash
+   cd server
+   alembic upgrade head
+   ```
+
+---
+
+### Backend Setup
+
+```bash
+cd server
+
+# Create and activate Python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate      # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Run initial database migrations
+alembic upgrade head
+
+# Seed the showcase demo environment (institutions, users, posts, chats)
+python -m scripts.seed_demo
+```
+
+---
+
+### Frontend Setup
+
+```bash
+cd client
+
+# Install NPM packages
+npm install
+```
+
+---
+
+### Running the Application
+
+1. **Start the FastAPI Backend**:
+   ```bash
+   cd server
+   source .venv/bin/activate
+   uvicorn app:app --reload --host 0.0.0.0 --port 8000
+   ```
+   *API Swagger documentation will be available at `http://localhost:8000/docs`.*
+
+2. **Start the Vite Frontend**:
+   ```bash
+   cd client
+   npm run dev
+   ```
+   *Frontend application will be accessible at `http://localhost:5173`.*
+
+---
+
+## 🎭 Demo Data & Personas
+
+The database seeder (`scripts/seed_demo.py`) generates a comprehensive showcase environment using **fictional institutions** and realistic synthetic network activity:
+
+### Showcase Institutions
+- **Northbridge Institute of Technology** (`slug: nitk`) — Primary active tenant.
+- **Apex Institute of Technology** (`slug: apex-institute`)
+- **Crestview University** (`slug: crestview-university`)
+- **Solaris Institute of Technology** (`slug: solaris-tech`)
+
+### Pre-Configured Showcase Accounts
+These credentials are intended strictly for local evaluation and showcase testing:
+
+| Persona Role | Institution | Username | Password | Email |
+| :--- | :--- | :--- | :--- | :--- |
+| **Super Admin** | Platform-Wide | `demo_superadmin` | `Admin@Alumni2026!` | `demo.superadmin@alumniconn.com` |
+| **College Admin** | Northbridge Tech | `admin_nitk` | `Admin@Alumni2026!` | `admin@nitk.edu` |
+| **Alumni (Mentor)** | Northbridge Tech | `demo_alumni` | `DevAlumni@2026!` | `demo.alumni@northbridge.edu` |
+| **Student** | Northbridge Tech | `demo_student` | `DevAlumni@2026!` | `demo.student@northbridge.edu` |
+
+*To reset and regenerate clean showcase data at any time, run:*
+```bash
+python -m scripts.seed_demo --reset
+```
+
+---
+
+## 🧪 Testing
+
+### Frontend Test Suites
+The frontend utilizes Vitest with React Testing Library:
+```bash
+cd client
+
+# Run all unit and integration tests
+npm test
+
+# Run tests in watch mode during development
+npm run test:watch
+
+# Verify production build compilation
+npm run build
+```
+
+### Backend Test Suites
+The backend includes automated integration and audit test runners:
+```bash
+cd server
+source .venv/bin/activate
+
+# Execute authentication, demo email, and registration test runner
+python tests/test_demo_auth_email_runner.py
+
+# Execute full system audit test runner
+python tests/test_full_system_audit.py
+
+# Run standard pytest suite
+pytest
+```
+
+---
+
+## 🚀 Deployment
+
+The project is structured for straightforward deployment on cloud platforms:
+
+- **Backend (Render / Railway / Container VM)**:
+  - Can be run as a containerized Docker service using `server/DockerFile` or directly as a Python web service with start command:
+    `uvicorn app:app --host 0.0.0.0 --port $PORT`
+  - Requires a managed PostgreSQL instance with `pgvector` enabled (e.g. Neon, Supabase, AWS RDS, or Render Postgres).
+- **Frontend (Vercel / Netlify / Cloudflare Pages)**:
+  - Static SPA deployable with build command: `npm run build`
+  - Output directory: `dist`
+  - Rewrites are pre-configured in `client/vercel.json` for client-side routing.
+
+---
+
+## 📢 Showcase Disclaimer
+
+> **Notice**: AlumniConn is an open-source educational and technical demonstration platform. All institutions (such as *Northbridge Institute of Technology*, *Crestview University*, and *Solaris Tech*), corporate affiliations, profile data, discussion posts, and member personas presented in the seeded demo environment are purely synthetic and fictional. Any resemblance to real institutions, organizations, or individuals is coincidental.
+
+---
+
+## 👤 Author & License
+
+- **Author / Maintainer**: [Noman Ahmad](https://github.com/Noman-Ahmad25)
+- **Repository**: [https://github.com/Noman-Ahmad25/AlumniConn](https://github.com/Noman-Ahmad25/AlumniConn)
+- **License**: Released under the [MIT License](LICENSE).
