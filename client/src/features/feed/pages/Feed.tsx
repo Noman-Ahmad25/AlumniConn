@@ -2,11 +2,10 @@ import { useEffect, useState } from "react"
 import { getFeed } from "../api/post"
 import PostCard from "../components/PostCard"
 import CreatePost from "../components/CreatePost"
-import RequestAlumniRole from "../components/RequestAlumniRole"
 import type { Post } from "../types/post"
 import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getApiErrorMessage } from "../../../utils/error"
-import { getCurrentUserRoleFromToken, hasAuthToken } from "../../auth/utils/auth"
+import { hasAuthToken } from "../../auth/utils/auth"
 
 export default function Feed() {
   const { navigate } = useCollegeNavigation()
@@ -17,9 +16,8 @@ export default function Feed() {
   const [filterOpportunity, setFilterOpportunity] = useState<boolean | undefined>(undefined)
   const [skip, setSkip] = useState(0)
   const [hasMore, setHasMore] = useState(true)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
   const PAGE_SIZE = 15
-
-  const role = getCurrentUserRoleFromToken()
 
   const handleNewPost = (post: Post) => {
     setPosts((prev) => [post, ...prev])
@@ -67,12 +65,12 @@ export default function Feed() {
   }, [filterOpportunity])
 
   return (
-    <div className="app-page">
-      <main className="app-main space-y-5 max-w-2xl mx-auto px-4 sm:px-6 py-6">
+    <div className="app-page relative min-h-screen">
+      <main className="app-main space-y-5 max-w-2xl mx-auto px-4 sm:px-6 py-6 pb-20">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="page-heading">
+          <div className="page-heading mb-0">
             <h1 className="page-title text-2xl font-bold text-slate-950">Campus Feed</h1>
-            <p className="page-subtitle text-sm text-slate-500">See what is happening across your alumni network.</p>
+            <p className="page-subtitle text-sm text-slate-500 mt-1">See what is happening across your alumni network.</p>
           </div>
 
           <div className="flex gap-1.5 rounded-lg border border-slate-200 bg-slate-50 p-1 self-start sm:self-auto">
@@ -110,9 +108,12 @@ export default function Feed() {
           </div>
         )}
 
-        <CreatePost onPostCreated={handleNewPost} />
-
-        {role === "student" && <RequestAlumniRole />}
+        {/* Modal Post Creation Dialog */}
+        <CreatePost
+          isOpen={isCreateOpen}
+          onClose={() => setIsCreateOpen(false)}
+          onPostCreated={handleNewPost}
+        />
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16">
@@ -131,7 +132,7 @@ export default function Feed() {
               {filterOpportunity ? "No opportunity posts yet" : "No posts yet"}
             </p>
             <p className="mt-1 text-sm text-slate-500">
-              {filterOpportunity ? "Check back later or post an opportunity above." : "Be the first to share something with your campus."}
+              {filterOpportunity ? "Check back later or post an opportunity." : "Be the first to share something with your campus."}
             </p>
           </div>
         ) : (
@@ -154,6 +155,21 @@ export default function Feed() {
           </div>
         )}
       </main>
+
+      {/* Floating Action Button (FAB) - Single entry point for creating posts */}
+      <button
+        type="button"
+        onClick={() => setIsCreateOpen(true)}
+        className="fixed bottom-6 right-6 z-30 flex items-center gap-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white pl-3.5 pr-4 py-3 shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 group"
+        title="Create Post"
+        aria-label="Create Post"
+      >
+        <svg className="h-5 w-5 transition-transform group-hover:rotate-90 duration-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 8v8M8 12h8" strokeLinecap="round" />
+        </svg>
+        <span className="text-xs font-bold hidden sm:inline tracking-wide">Create Post</span>
+      </button>
     </div>
   )
 }

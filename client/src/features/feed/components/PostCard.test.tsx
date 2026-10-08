@@ -4,6 +4,7 @@ import { vi } from "vitest"
 import PostCard from "./PostCard"
 import { toggleLike } from "../api/post"
 import type { Post } from "../types/post"
+import * as authUtils from "../../auth/utils/auth"
 
 vi.mock("../api/post", () => ({
   toggleLike: vi.fn(),
@@ -57,6 +58,13 @@ test("like button updates optimistically", async () => {
 
 test("does not show connect button for current user's own post", () => {
   renderPostCard({ ...basePost, connection_status: "self" })
+
+  expect(screen.queryByRole("button", { name: "Connect" })).not.toBeInTheDocument()
+})
+
+test("does not show connect button when post.user_id matches current user id even if status is none", () => {
+  vi.spyOn(authUtils, "getCurrentUserIdFromToken").mockReturnValue(10)
+  renderPostCard({ ...basePost, user_id: 10, connection_status: "none" })
 
   expect(screen.queryByRole("button", { name: "Connect" })).not.toBeInTheDocument()
 })

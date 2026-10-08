@@ -134,7 +134,7 @@ def format_posts_bulk(rows, like_counts, comment_counts, liked_posts, current_us
     result = []
     for post, user, profile in rows:
         if post.user_id == current_user_id:
-            connection_status = "none"
+            connection_status = "self"
         else:
             connection_status = connection_map.get(post.user_id, "none")
 

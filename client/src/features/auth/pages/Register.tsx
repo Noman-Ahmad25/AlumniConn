@@ -53,8 +53,13 @@ export default function Register() {
               ...form,
               college_slug: tenant.slug,
             });
-            // Send user to verify email page
-            navigate(`/c/${tenant.slug}/verify-email-pending`);
+            // Send user to verify email page with state
+            navigate(`/c/${tenant.slug}/verify-email-pending`, {
+              state: {
+                requestedRole: form.role,
+                email: form.email,
+              },
+            });
         } catch (error: unknown) {
             setError(getApiErrorMessage(error, "Registration failed"));
         } finally {
@@ -137,6 +142,13 @@ export default function Register() {
             <option value="alumni">Alumni</option>
           </select>
         </label>
+
+        {form.role === "alumni" && (
+          <div className="rounded-lg border border-blue-200 bg-blue-50/80 p-3 text-xs text-blue-900 leading-relaxed">
+            <span className="font-semibold block mb-0.5">Alumni Verification Notice</span>
+            You will be registered with Student access first while your alumni request is submitted to your college administrator. Once verified, your account will automatically be upgraded to Alumni.
+          </div>
+        )}
 
         <button
           type="submit"

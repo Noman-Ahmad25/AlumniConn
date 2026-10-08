@@ -18,6 +18,8 @@ from src.routes.auth import (
     handle_forgot_password,
 )
 from src.routes.admin_management import delete_college, delete_user
+from src.routes.alumni import get_my_alumni_request
+from src.services.alumni_service import list_alumni_requests_for_admin
 from src.services.email.demo_store import demo_email_store
 import asyncio
 import inspect
@@ -225,6 +227,62 @@ class TestDemoAuthEmail(unittest.TestCase):
         email_event = inbox_res["emails"][0]
         self.assertEqual(email_event["action_type"], "password_reset")
         self.assertIn("/reset-password", email_event["action_url"])
+
+    def test_08_alumni_registration_initial_student_role_and_pending_request(self):
+        """Verify registering with role=ALUMNI creates a STUDENT with pending alumni request."""
+        test_email = f"test.futurealumni@{self.nitk.domain}"
+        test_username = "test_futurealumni"
+
+        # Cleanup if exists
+        existing = self.db.query(User).filter(User.email == test_email).first()
+        if existing:
+            if existing.profile:
+                self.db.delete(existing.profile)
+            self.db.delete(existing)
+            self.db.commit()
+
+        user_create = UserCreate(
+            username=test_username,
+            email=test_email,
+            password="Password@123!",
+            college_slug="nitk",
+            role=UserRole.ALUMNI,
+        )
+
+        reg_res = register(user_create, db=self.db, task_dispatcher=self.task_dispatcher)
+        self.assertIsNotNone(reg_res)
+        # 1. Registered role must be STUDENT
+        self.assertEqual(reg_res.role, UserRole.STUDENT)
+        # 2. Alumni status must be PENDING
+        self.assertEqual(reg_res.alumni_status, AlumniStatus.PENDING)
+        self.assertIsNotNone(reg_res.alumni_requested_at)
+
+        # 3. Check DB directly
+        created_user = self.db.query(User).filter(User.email == test_email).first()
+        self.assertEqual(created_user.role, UserRole.STUDENT)
+        self.assertEqual(created_user.alumni_status, AlumniStatus.PENDING)
+        self.assertIsNotNone(created_user.alumni_requested_at)
+
+        # 4. Verify /alumni-requests/me returns pending status for this user
+        my_req = get_my_alumni_request(current_user=created_user)
+        self.assertEqual(my_req["status"], "pending")
+        self.assertEqual(my_req["user_id"], created_user.id)
+
+        # 5. Verify the college admin sees this pending request
+        admin_reqs = list_alumni_requests_for_admin(
+            db=self.db,
+            admin_id=self.admin_nitk.id,
+            college_id=self.nitk.id,
+            status="pending",
+        )
+        found = any(u.id == created_user.id for u in admin_reqs)
+        self.assertTrue(found, "Pending request must be visible to college admin")
+
+        # Cleanup
+        if created_user.profile:
+            self.db.delete(created_user.profile)
+        self.db.delete(created_user)
+        self.db.commit()
 
 
 if __name__ == "__main__":

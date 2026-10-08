@@ -1,4 +1,4 @@
-export type RequestStatus = "pending" | "approved" | "rejected"
+export type RequestStatus = "pending" | "approved" | "rejected" | "not_requested"
 
 export interface CollegeRequestCreate {
   collegeName: string
@@ -35,7 +35,7 @@ export interface AlumniRequest {
   username?: string | null
   email?: string | null
   full_name?: string | null
-  college_id: number
+  college_id?: number | null
   status: RequestStatus
   reviewed_by?: number | null
   rejection_reason?: string | null

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { sendRequest } from "../api/connection"
 import { getApiErrorMessage } from "../../../utils/error"
+import { getCurrentUserIdFromToken } from "../../auth/utils/auth"
 
 type ConnectionButtonStatus = "self" | "none" | "pending" | "connected"
 
@@ -11,11 +12,12 @@ export default function ConnectionButton({
   userId: number
   initialStatus: ConnectionButtonStatus
 }) {
+  const currentUserId = getCurrentUserIdFromToken()
   const [status, setStatus] = useState(initialStatus)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  if (status === "self") return null
+  if (status === "self" || (currentUserId !== null && userId === currentUserId)) return null
 
   const handleConnect = async () => {
     if (status !== "none" || loading) return

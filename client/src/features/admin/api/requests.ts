@@ -66,6 +66,11 @@ export const alumniRequestsAPI = {
     return response.data
   },
 
+  getMyAlumniRequest: async (): Promise<AlumniRequest> => {
+    const response = await API.get("/alumni-requests/me")
+    return response.data
+  },
+
   getAlumniRequests: async (
     status?: RequestStatus,
     skip: number = 0,

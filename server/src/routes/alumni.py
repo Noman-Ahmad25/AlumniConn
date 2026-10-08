@@ -120,6 +120,18 @@ def submit_alumni_request(
 
 
 @router.get(
+    "/alumni-requests/me",
+    response_model=AlumniRequestResponse,
+    tags=["Alumni", "Alumni Requests"],
+    summary="Get Current User Alumni Request Status"
+)
+def get_my_alumni_request(
+    current_user: User = Depends(get_current_user)
+):
+    return format_alumni_request(current_user)
+
+
+@router.get(
     "/alumni-requests/{request_id}",
     response_model=AlumniRequestResponse,
     tags=["Admin", "Alumni Requests"],

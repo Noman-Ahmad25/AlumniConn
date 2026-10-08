@@ -7,6 +7,9 @@ import { startConversation } from "../../messages/api/message"
 import PostCard from "../../feed/components/PostCard"
 import ConnectionButton from "../../connections/components/ConnectionButton"
 import ProfileForm from "../components/ProfileForm"
+import RequestAlumniRole from "../../feed/components/RequestAlumniRole"
+import { alumniRequestsAPI } from "../../admin/api/requests"
+import type { RequestStatus } from "../../admin/types/request"
 import {
   formToProfilePayload,
   profileToForm,
@@ -15,7 +18,11 @@ import {
 import type { Profile as ProfileType } from "../types/profile"
 import type { Post } from "../../feed/types/post"
 import { getApiErrorMessage } from "../../../utils/error"
-import { getAuthToken, getCurrentUserIdFromToken } from "../../auth/utils/auth"
+import {
+  getAuthToken,
+  getCurrentUserIdFromToken,
+  getCurrentUserRoleFromToken,
+} from "../../auth/utils/auth"
 
 function getInitials(username: string) {
   return username
@@ -43,6 +50,7 @@ export default function Profile() {
   const { userId } = useParams<{ userId: string }>()
   const { navigate } = useCollegeNavigation()
   const currentUserId = getCurrentUserIdFromToken()
+  const currentUserRole = getCurrentUserRoleFromToken()
   const [profile, setProfile] = useState<ProfileType | null>(null)
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
@@ -52,6 +60,8 @@ export default function Profile() {
   const [error, setError] = useState("")
   const [saveError, setSaveError] = useState("")
   const [messagingLoading, setMessagingLoading] = useState(false)
+  const [alumniStatus, setAlumniStatus] = useState<RequestStatus | "not_requested" | null>(null)
+  const [isAlumniModalOpen, setIsAlumniModalOpen] = useState(false)
   const isOwnProfile = !userId || (!!profile && profile.user_id === currentUserId)
 
   useEffect(() => {
@@ -81,6 +91,19 @@ export default function Profile() {
         setProfile(profileData)
         setForm(profileToForm(profileData))
         setPosts(postsData || [])
+
+        if (currentUserRole === "student" && (!userId || profileData.user_id === currentUserId)) {
+          try {
+            const req = await alumniRequestsAPI.getMyAlumniRequest()
+            if (req?.status) {
+              setAlumniStatus(req.status as RequestStatus)
+            } else {
+              setAlumniStatus("not_requested")
+            }
+          } catch {
+            setAlumniStatus("not_requested")
+          }
+        }
       } catch (err: unknown) {
         console.error("Error loading profile:", err)
         setError(getApiErrorMessage(err, "Failed to load profile"))
@@ -90,7 +113,7 @@ export default function Profile() {
     }
 
     fetchProfile()
-  }, [userId, navigate, currentUserId])
+  }, [userId, navigate, currentUserId, currentUserRole])
 
   const handleSave = async (event: FormEvent) => {
     event.preventDefault()
@@ -234,6 +257,58 @@ export default function Profile() {
               </div>
             </div>
 
+            {/* Academic Status Section for Student Users */}
+            {isOwnProfile && currentUserRole === "student" && (
+              <div className="border-t border-slate-100 pt-4 mb-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-3.5 sm:px-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100/80 text-blue-700">
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase text-slate-400">Academic Status</p>
+                      <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                        <span className="text-sm font-bold text-slate-900">Student</span>
+                        {alumniStatus === "pending" && (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                            Alumni Status Pending Review
+                          </span>
+                        )}
+                        {alumniStatus === "rejected" && (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-semibold text-rose-800">
+                            Upgrade Request Declined
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    {alumniStatus === "pending" ? (
+                      <button
+                        type="button"
+                        onClick={() => setIsAlumniModalOpen(true)}
+                        className="btn btn-secondary text-xs py-1.5 px-3"
+                      >
+                        View Status
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setIsAlumniModalOpen(true)}
+                        className="btn btn-primary text-xs py-1.5 px-3.5 shadow-sm"
+                      >
+                        Apply for Alumni Status
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-6 border-t border-slate-100 pt-4 text-sm text-slate-600">
               <div>
                 <p className="font-bold text-slate-950">{posts.length}</p>
@@ -293,6 +368,13 @@ export default function Profile() {
           )}
         </div>
       </main>
+
+      {/* Alumni Status Application Modal */}
+      <RequestAlumniRole
+        isOpen={isAlumniModalOpen}
+        onClose={() => setIsAlumniModalOpen(false)}
+        onSuccess={() => setAlumniStatus("pending")}
+      />
     </div>
   )
 }

@@ -2,8 +2,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 from datetime import datetime, timedelta
 
-from src.models.user import User
-from src.models.user import UserRole
+from src.models.user import User, UserRole, AlumniStatus
 from src.models.profile import Profile
 from src.models.college import College
 from src.utils.security import (
@@ -51,17 +50,25 @@ def register_user(db, user_data, task_dispatcher: AbstractTaskDispatcher):
     token_hash = hash_token(raw_token)
     expires_at = datetime.utcnow() + timedelta(hours=24)
 
+    requested_role = UserRole(user_data.role.value)
+    is_alumni_requested = requested_role == UserRole.ALUMNI
+    actual_role = UserRole.STUDENT if is_alumni_requested else requested_role
+    alumni_status = AlumniStatus.PENDING if is_alumni_requested else AlumniStatus.NOT_REQUESTED
+    alumni_requested_at = datetime.utcnow() if is_alumni_requested else None
+
     # Create new user
     new_user = User(
         username=user_data.username,
         email=user_data.email,
         password_hash=hash_password(user_data.password),
         college_id=college.id,
-        role=UserRole(user_data.role.value),
+        role=actual_role,
         is_active=True,
         email_verified=False,
         verification_token_hash=token_hash,
-        verification_token_expires_at=expires_at
+        verification_token_expires_at=expires_at,
+        alumni_status=alumni_status,
+        alumni_requested_at=alumni_requested_at,
     )
 
     try:

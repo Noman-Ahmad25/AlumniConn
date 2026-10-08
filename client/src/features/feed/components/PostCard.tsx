@@ -3,6 +3,7 @@ import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { toggleLike } from "../api/post"
 import CommentSection from "./CommentSection"
 import ConnectionButton from "../../connections/components/ConnectionButton"
+import { getCurrentUserIdFromToken } from "../../auth/utils/auth"
 import type { Post } from "../types/post"
 
 
@@ -85,7 +86,9 @@ export default function PostCard({ post }: { post: Post }) {
   const [likesCount, setLikesCount] = useState<number>(post.likes_count)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [showComments, setShowComments] = useState<boolean>(false)
-  const connectionStatus = (post.connection_status || "none") as "self" | "none" | "pending" | "connected"
+  const currentUserId = getCurrentUserIdFromToken()
+  const isOwnPost = currentUserId !== null && post.user_id === currentUserId
+  const connectionStatus = (isOwnPost ? "self" : post.connection_status || "none") as "self" | "none" | "pending" | "connected"
 
   const handleLikeToggle = async () => {
     if (isLoading) return
@@ -169,7 +172,7 @@ export default function PostCard({ post }: { post: Post }) {
         </button>
       </div>
 
-      {connectionStatus !== "self" && (
+      {!isOwnPost && connectionStatus !== "self" && (
         <div className="border-t border-slate-100 px-4 py-3">
           <ConnectionButton
             userId={post.user_id}
