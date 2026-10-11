@@ -214,10 +214,7 @@ export default function LandingPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                             {/* Hero Text */}
                             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-                                <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 border border-blue-200/70 px-3.5 py-1 text-xs font-semibold text-blue-700">
-                                    <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
-                                    Enterprise Multi-Tenant University Network
-                                </div>
+                                
                                 <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl leading-[1.15]">
                                     The modern network for your{" "}
                                     <span className="text-blue-600">campus community</span>
@@ -842,22 +839,6 @@ export default function LandingPage() {
                                 className="text-slate-600 hover:text-blue-600 transition-colors font-medium"
                             >
                                 GitHub
-                            </a>
-                            <span>•</span>
-                            <a
-                                href="https://www.linkedin.com/in/noman-ahmad25/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-slate-600 hover:text-blue-600 transition-colors font-medium"
-                            >
-                                LinkedIn
-                            </a>
-                            <span>•</span>
-                            <a
-                                href="mailto:nomanahmad9356@gmail.com"
-                                className="text-slate-600 hover:text-blue-600 transition-colors font-medium"
-                            >
-                                Email
                             </a>
                             <span>•</span>
                             <a

@@ -66,22 +66,6 @@ export default function Footer() {
             </a>
             <span>•</span>
             <a
-              href="https://www.linkedin.com/in/noman-ahmad25/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-1 font-medium"
-            >
-              LinkedIn
-            </a>
-            <span>•</span>
-            <a
-              href="mailto:nomanahmad9356@gmail.com"
-              className="text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-1 font-medium"
-            >
-              Email
-            </a>
-            <span>•</span>
-            <a
               href="https://github.com/Noman-Ahmad25/AlumniConn"
               target="_blank"
               rel="noopener noreferrer"
