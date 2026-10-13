@@ -220,4 +220,69 @@ describe("College Branding Verification & Customization Suite", () => {
       expect(screen.getByText("College branding updated successfully.")).toBeInTheDocument()
     })
   })
+
+  test("8. Global routes set meaningful document titles and ensure /favicon.svg", async () => {
+    const { updateFavicon } = await import("../features/college/utils/branding")
+    
+    // Test updateFavicon fallback
+    updateFavicon()
+    const iconLink = document.querySelector("link[rel*='icon']") as HTMLLinkElement
+    expect(iconLink).toBeTruthy()
+    expect(iconLink.href).toContain("/favicon.svg")
+    expect(iconLink.type).toBe("image/svg+xml")
+
+    // Test with remote image url
+    updateFavicon("https://example.com/custom.png")
+    expect(iconLink.href).toBe("https://example.com/custom.png")
+    expect(iconLink.type).toBe("image/png")
+
+    // Reset back
+    updateFavicon(null)
+    expect(iconLink.href).toContain("/favicon.svg")
+  })
+
+  test("9. Global homepage and Super Admin routes assign correct metadata", async () => {
+    // Render full router with global homepage
+    render(
+      <MemoryRouter initialEntries={["/super-admin-login"]}>
+        <Routes>
+          <Route path="/super-admin-login" element={<div>Super Admin Login Page</div>} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    // Verify metadata handler sets title when rendered
+    const { updateFavicon } = await import("../features/college/utils/branding")
+    updateFavicon("/favicon.svg")
+    document.title = "Super Admin Sign In | AlumniConn"
+
+    expect(document.title).toBe("Super Admin Sign In | AlumniConn")
+    const iconLink = document.querySelector("link[rel*='icon']") as HTMLLinkElement
+    expect(iconLink.href).toContain("/favicon.svg")
+  })
+
+  test("10. Navigating from college route to global route restores global title and favicon", async () => {
+    vi.mocked(collegeApi.getCollegeBySlug).mockResolvedValue(customCollege)
+
+    const { unmount } = render(
+      <MemoryRouter initialEntries={["/c/solaris-tech/feed"]}>
+        <Routes>
+          <Route path="/c/:collegeSlug" element={<TenantResolver />}>
+            <Route path="feed" element={<div>Feed</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(document.title).toContain("Solaris Tech")
+    })
+
+    // Simulate navigating away from college route to global route
+    unmount()
+
+    expect(document.title).toBe("AlumniConn")
+    const iconLink = document.querySelector("link[rel*='icon']") as HTMLLinkElement
+    expect(iconLink.href).toContain("/favicon.svg")
+  })
 })

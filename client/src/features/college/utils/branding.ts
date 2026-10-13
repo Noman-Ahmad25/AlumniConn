@@ -24,18 +24,23 @@ export function getContrastColor(hexColor: string | null | undefined): string {
 
 /**
  * Dynamically updates the browser favicon.
+ * Falls back to /favicon.svg if logoUrl is omitted, null, or undefined.
  */
-export function updateFavicon(logoUrl: string | null | undefined) {
-    if (!logoUrl) return;
+export function updateFavicon(logoUrl?: string | null) {
+    const targetUrl = logoUrl || "/favicon.svg";
     
     let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
     if (!link) {
         link = document.createElement("link");
-        link.type = "image/x-icon";
-        link.rel = "shortcut icon";
+        link.rel = "icon";
         document.getElementsByTagName("head")[0].appendChild(link);
     }
-    link.href = logoUrl;
+    if (targetUrl.endsWith(".svg") || targetUrl.includes(".svg")) {
+        link.type = "image/svg+xml";
+    } else {
+        link.type = "image/png";
+    }
+    link.href = targetUrl;
 }
 
 /**

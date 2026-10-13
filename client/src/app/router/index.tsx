@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from "react-router-dom"
 import { useEffect, useState, type ReactNode } from "react"
+import { updateFavicon } from "../../features/college/utils/branding"
 import Register from "../../features/auth/pages/Register"
 import Login from "../../features/auth/pages/Login"
 import ForgotPassword from "../../features/auth/pages/ForgotPassword"
@@ -78,10 +79,37 @@ function RoleRoute({ children, roles }: { children: ReactNode; roles: UserRole[]
   return <>{children}</>
 }
 
+const GLOBAL_TITLES: Record<string, string> = {
+  "/": "AlumniConn",
+  "/super-admin-login": "Super Admin Sign In | AlumniConn",
+  "/request-college": "Register University | AlumniConn",
+  "/verify-college-email": "Verify University Email | AlumniConn",
+  "/super-admin/dashboard": "Platform Dashboard | AlumniConn",
+  "/super-admin/universities": "Manage Universities | AlumniConn",
+  "/super-admin/users": "Manage Platform Users | AlumniConn",
+  "/super-admin/college-requests": "University Onboarding Requests | AlumniConn",
+}
+
+function RouteMetadataHandler() {
+  const location = useLocation()
+
+  useEffect(() => {
+    // Only apply global metadata if not inside a college tenant route (/c/:collegeSlug)
+    if (!location.pathname.startsWith("/c/")) {
+      const matchedTitle = GLOBAL_TITLES[location.pathname] || "AlumniConn"
+      document.title = matchedTitle
+      updateFavicon("/favicon.svg")
+    }
+  }, [location.pathname])
+
+  return null
+}
+
 export default function AppRouter() {
   
   return (
     <BrowserRouter>
+      <RouteMetadataHandler />
 
       <Routes>
         {/* Global Public routes */}

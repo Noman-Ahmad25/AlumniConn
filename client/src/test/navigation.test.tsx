@@ -419,6 +419,121 @@ describe("College-Scoped Navigation & Integration Regression Suite", () => {
       expect(screen.getByRole("navigation")).toBeInTheDocument()
     })
   })
+
+  // ── Test J: Desktop Topbar displays 5 primary text links and accessible Messages icon ──
+  test("Test J: desktop primary nav displays exactly 5 text links, Messages is accessed via icon button", async () => {
+    localStorage.setItem("access_token", tokenFor(1, "alumni"))
+
+    render(
+      <MemoryRouter initialEntries={["/c/nitk/feed"]}>
+        <TenantProvider tenant={mockTenant}>
+          <Topbar />
+        </TenantProvider>
+      </MemoryRouter>
+    )
+
+    // Primary text-labeled links
+    expect(screen.getByText("Feed")).toBeInTheDocument()
+    expect(screen.getByText("Discover")).toBeInTheDocument()
+    expect(screen.getByText("Recommendations")).toBeInTheDocument()
+    expect(screen.getByText("Connections")).toBeInTheDocument()
+    expect(screen.getByText("Profile")).toBeInTheDocument()
+
+    // Messages is NOT rendered as a text button in the desktop pill (it is accessible via icon)
+    // The Messages icon button exists with accessible title and aria-label
+    const messagesIcon = screen.getByRole("link", { name: "Messages" })
+    expect(messagesIcon).toBeInTheDocument()
+    expect(messagesIcon).toHaveAttribute("href", "/c/nitk/messages")
+    expect(messagesIcon).toHaveAttribute("title", "Messages")
+
+    // Notifications bell exists with title and aria-label
+    const notifIcon = screen.getByRole("link", { name: "Notifications" })
+    expect(notifIcon).toBeInTheDocument()
+    expect(notifIcon).toHaveAttribute("href", "/c/nitk/notifications")
+
+    // College identity truncation and title
+    const collegeBrandLink = screen.getByTitle("NITK Surathkal")
+    expect(collegeBrandLink).toBeInTheDocument()
+    expect(collegeBrandLink.querySelector(".truncate")).toHaveTextContent("NITK Surathkal")
+  })
+
+  // ── Test K: Admin dropdown groups admin links and shows active trigger ──
+  test("Test K: Admin dropdown groups admin links and highlights trigger when child route is active", async () => {
+    localStorage.setItem("access_token", tokenFor(2, "admin"))
+
+    render(
+      <MemoryRouter initialEntries={["/c/nitk/admin/users"]}>
+        <TenantProvider tenant={mockTenant}>
+          <Topbar />
+        </TenantProvider>
+      </MemoryRouter>
+    )
+
+    // Admin trigger button exists
+    const adminTrigger = screen.getByRole("button", { name: /Admin menu/i })
+    expect(adminTrigger).toBeInTheDocument()
+    // Admin trigger is highlighted because /c/nitk/admin/users is active
+    expect(adminTrigger.className).toContain("bg-[var(--primary)]/10")
+
+    // Admin child links are in the DOM (under the dropdown)
+    expect(screen.getByText("Manage Users")).toBeInTheDocument()
+    expect(screen.getByText("Alumni Requests")).toBeInTheDocument()
+    expect(screen.getByText("Branding")).toBeInTheDocument()
+
+    // Manage Users link has aria-current="page"
+    const manageUsersLink = screen.getByRole("menuitem", { name: "Manage Users" })
+    expect(manageUsersLink).toHaveAttribute("aria-current", "page")
+
+    // Toggle dropdown open
+    fireEvent.click(adminTrigger)
+    expect(adminTrigger).toHaveAttribute("aria-expanded", "true")
+
+    // Click outside closes dropdown
+    fireEvent.mouseDown(document.body)
+    await waitFor(() => {
+      expect(adminTrigger).toHaveAttribute("aria-expanded", "false")
+    })
+  })
+
+  // ── Test L: Mobile dropdown header does NOT display duplicate active-page text or Active label ──
+  test("Test L: mobile dropdown header is clean without duplicate active text or Active badge", async () => {
+    localStorage.setItem("access_token", tokenFor(2, "admin"))
+
+    render(
+      <MemoryRouter initialEntries={["/c/nitk/admin/users"]}>
+        <TenantProvider tenant={mockTenant}>
+          <Topbar />
+        </TenantProvider>
+      </MemoryRouter>
+    )
+
+    // The header above the menu does NOT show redundant "Navigation" text
+    expect(screen.queryByText("Navigation")).not.toBeInTheDocument()
+    // It should NOT display "Manage Users · Active" or active text in the mobile header bar
+    expect(screen.queryByText(/Manage Users · Active/i)).not.toBeInTheDocument()
+
+    // Open mobile menu
+    const menuToggle = screen.getByRole("button", { name: /Open navigation menu/i })
+    fireEvent.click(menuToggle)
+
+    const mobileDropdown = screen.getByTestId("mobile-nav-dropdown")
+    expect(mobileDropdown).toBeInTheDocument()
+
+    // In mobile, the Admin section has an Admin trigger button
+    const mobileAdminTrigger = screen.getByRole("button", { name: /Admin section/i })
+    expect(mobileAdminTrigger).toBeInTheDocument()
+    // Highlights because /admin/users is active
+    expect(mobileAdminTrigger.className).toContain("bg-[var(--primary)]/10")
+
+    // The active child link has active background styling and aria-current, but NO separate "Active" text
+    const activeChildLink = mobileDropdown.querySelector('a[href="/c/nitk/admin/users"]')
+    expect(activeChildLink).toBeInTheDocument()
+    expect(activeChildLink).toHaveAttribute("aria-current", "page")
+    expect(activeChildLink?.className).toContain("bg-[var(--primary)]/10")
+    expect(activeChildLink?.className).toContain("font-bold")
+    expect(activeChildLink).not.toHaveTextContent("Active")
+    expect(activeChildLink).toHaveTextContent("Manage Users")
+  })
 })
 
 
