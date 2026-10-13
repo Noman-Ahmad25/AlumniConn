@@ -8,16 +8,16 @@ class Message(Base):
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, index=True)
-    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=False)
+    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=False, index=True)
 
-    conversation_id = Column(Integer, ForeignKey("conversations.id"), nullable=False)
+    conversation_id = Column(Integer, ForeignKey("conversations.id"), nullable=False, index=True)
 
     sender_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     content = Column(Text, nullable=False)
     image_url = Column(String, nullable=True)
 
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
 
     college = relationship("College", back_populates="messages")
     sender = relationship("User", foreign_keys=[sender_id], back_populates="messages")

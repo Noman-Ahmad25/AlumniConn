@@ -4,6 +4,7 @@ import type { AdminUser } from "../types/management"
 import { getApiErrorMessage } from "../../../utils/error"
 import { useTenant } from "../../../providers/TenantProvider"
 import { getCurrentUserIdFromToken } from "../../auth/utils/auth"
+import { TableSkeleton } from "../../../shared/components/skeletons"
 
 export default function CollegeAdminUsers() {
   const { tenant } = useTenant()
@@ -18,21 +19,33 @@ export default function CollegeAdminUsers() {
   const [roleFilter, setRoleFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   
+  // Pagination
+  const [page, setPage] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
+  const [totalStudents, setTotalStudents] = useState<number | null>(null)
+  const [totalAlumni, setTotalAlumni] = useState<number | null>(null)
+  const PAGE_SIZE = 25
+  
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
   const [deleteModalUser, setDeleteModalUser] = useState<AdminUser | null>(null)
   const [confirmPromoteUser, setConfirmPromoteUser] = useState<AdminUser | null>(null)
   const [confirmDemoteUser, setConfirmDemoteUser] = useState<AdminUser | null>(null)
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (targetPage = page) => {
     setLoading(true)
     setError("")
     try {
-      const data = await adminManagementAPI.getCollegeUsers({
+      const res = await adminManagementAPI.getCollegeUsers({
         search: searchTerm.trim() || undefined,
         role: roleFilter !== "all" ? roleFilter : undefined,
         is_active: statusFilter === "all" ? undefined : statusFilter === "active",
+        skip: targetPage * PAGE_SIZE,
+        limit: PAGE_SIZE,
       })
-      setUsers(data)
+      setUsers(res.users)
+      setTotalCount(res.total)
+      if (res.studentCount !== undefined) setTotalStudents(res.studentCount)
+      if (res.alumniCount !== undefined) setTotalAlumni(res.alumniCount)
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to load college users"))
     } finally {
@@ -41,12 +54,19 @@ export default function CollegeAdminUsers() {
   }
 
   useEffect(() => {
-    fetchUsers()
+    setPage(0)
+    fetchUsers(0)
   }, [roleFilter, statusFilter])
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    fetchUsers()
+    setPage(0)
+    fetchUsers(0)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+    fetchUsers(newPage)
   }
 
   const handleToggleStatus = async (user: AdminUser) => {
@@ -115,8 +135,8 @@ export default function CollegeAdminUsers() {
     }
   }
 
-  const studentCount = users.filter((u) => u.role === "student").length
-  const alumniCount = users.filter((u) => u.role === "alumni").length
+  const studentCount = totalStudents !== null ? totalStudents : users.filter((u) => u.role === "student").length
+  const alumniCount = totalAlumni !== null ? totalAlumni : users.filter((u) => u.role === "alumni").length
 
   return (
     <div className="app-main-wide py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
@@ -213,10 +233,7 @@ export default function CollegeAdminUsers() {
 
         {/* User Table */}
         {loading ? (
-          <div className="py-20 text-center bg-white rounded-xl border border-slate-200 shadow-sm">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-            <p className="mt-2 text-sm text-slate-500 font-medium">Loading user roster...</p>
-          </div>
+          <TableSkeleton columns={5} rows={6} />
         ) : users.length === 0 ? (
           <div className="py-16 text-center bg-white rounded-xl border border-slate-200 shadow-sm p-6">
             <p className="text-base font-semibold text-slate-900">No users found</p>
@@ -362,6 +379,38 @@ export default function CollegeAdminUsers() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalCount > PAGE_SIZE && (
+              <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-200 px-4 py-3 sm:px-6 bg-slate-50 gap-3">
+                <div className="text-xs sm:text-sm text-slate-700">
+                  Showing <span className="font-semibold text-slate-900">{page * PAGE_SIZE + 1}</span> to{" "}
+                  <span className="font-semibold text-slate-900">{Math.min((page + 1) * PAGE_SIZE, totalCount)}</span> of{" "}
+                  <span className="font-semibold text-slate-900">{totalCount}</span> users
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 0 || loading}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-xs font-medium text-slate-600 px-1">
+                    Page {page + 1} of {Math.ceil(totalCount / PAGE_SIZE)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={(page + 1) * PAGE_SIZE >= totalCount || loading}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

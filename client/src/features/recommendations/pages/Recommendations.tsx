@@ -4,6 +4,7 @@ import type { RecommendationItem } from "../types/recommendation"
 import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import ConnectionButton from "../../connections/components/ConnectionButton"
 import { getApiErrorMessage } from "../../../utils/error"
+import { RecommendationCardSkeleton } from "../../../shared/components/skeletons"
 
 function getInitials(name?: string | null) {
   if (!name) return "U"
@@ -123,9 +124,10 @@ export default function Recommendations() {
         )}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="spinner" />
-            <p className="mt-4 text-sm font-medium text-slate-500">Calculating semantic recommendations...</p>
+          <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full" data-testid="recommendations-skeletons">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <RecommendationCardSkeleton key={i} />
+            ))}
           </div>
         ) : recommendations.length === 0 ? (
           <div className="empty-state surface-card p-12 text-center text-slate-500">

@@ -2,8 +2,8 @@ import { API } from "../../../services/api"
 import type {
   PlatformOverview,
   AdminCollege,
-  AdminUser,
   DemoRole,
+  PaginatedUsersResult,
 } from "../types/management"
 
 export const adminManagementAPI = {
@@ -44,9 +44,13 @@ export const adminManagementAPI = {
     is_active?: boolean
     skip?: number
     limit?: number
-  }): Promise<AdminUser[]> => {
-    const response = await API.get("/admin/users", { params })
-    return response.data
+  }): Promise<PaginatedUsersResult> => {
+    const response = await API.get("/admin/users", { params: { limit: 25, ...params } })
+    const total = Number(response.headers?.["x-total-count"] ?? response.data.length)
+    return {
+      users: response.data,
+      total,
+    }
   },
 
   getCollegeUsers: async (params?: {
@@ -55,11 +59,19 @@ export const adminManagementAPI = {
     is_active?: boolean
     skip?: number
     limit?: number
-  }): Promise<AdminUser[]> => {
+  }): Promise<PaginatedUsersResult> => {
     const response = await API.get("/admin/college-users", {
-      params: { limit: 200, ...params },
+      params: { limit: 25, ...params },
     })
-    return response.data
+    const total = Number(response.headers?.["x-total-count"] ?? response.data.length)
+    const studentCount = response.headers?.["x-student-count"] ? Number(response.headers["x-student-count"]) : undefined
+    const alumniCount = response.headers?.["x-alumni-count"] ? Number(response.headers["x-alumni-count"]) : undefined
+    return {
+      users: response.data,
+      total,
+      studentCount,
+      alumniCount,
+    }
   },
 
   updateUserStatus: async (

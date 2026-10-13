@@ -13,6 +13,7 @@ import UserCard from "../../profile/components/UserCard"
 import type { Connection, DiscoverUser } from "../types/connection"
 import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getApiErrorMessage } from "../../../utils/error"
+import { Skeleton, UserCardSkeleton } from "../../../shared/components/skeletons"
 
 function connectionToDiscoverUser(connection: Connection): DiscoverUser {
   return {
@@ -350,9 +351,44 @@ export default function Connections() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="spinner" />
-            <p className="mt-4 text-sm font-medium text-slate-500">Loading connections...</p>
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full items-start" data-testid="connections-skeletons">
+            {/* Column 1 Skeleton */}
+            <div className="surface-card rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-5 w-8 rounded-full" />
+              </div>
+              <div className="space-y-2.5">
+                <UserCardSkeleton compact />
+                <UserCardSkeleton compact />
+                <UserCardSkeleton compact />
+              </div>
+            </div>
+
+            {/* Column 2 Skeleton */}
+            <div className="hidden md:flex flex-col surface-card rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <Skeleton className="h-5 w-36" />
+                <Skeleton className="h-5 w-8 rounded-full" />
+              </div>
+              <div className="space-y-2.5">
+                <UserCardSkeleton compact />
+                <UserCardSkeleton compact />
+              </div>
+            </div>
+
+            {/* Column 3 Skeleton */}
+            <div className="hidden xl:flex flex-col surface-card rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <Skeleton className="h-5 w-28" />
+                <Skeleton className="h-5 w-8 rounded-full" />
+              </div>
+              <div className="space-y-2.5">
+                <UserCardSkeleton compact />
+                <UserCardSkeleton compact />
+                <UserCardSkeleton compact />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full items-start">

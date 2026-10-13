@@ -62,3 +62,10 @@ export interface AdminUser {
 }
 
 export type DemoRole = "super_admin" | "college_admin" | "alumni" | "student"
+
+export interface PaginatedUsersResult {
+  users: AdminUser[]
+  total: number
+  studentCount?: number
+  alumniCount?: number
+}

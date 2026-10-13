@@ -8,6 +8,7 @@ import {
 import type { NotificationItem, NotificationType } from "../types/notification"
 import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getApiErrorMessage } from "../../../utils/error"
+import { NotificationSkeleton } from "../../../shared/components/skeletons"
 
 function timeAgo(dateStr: string) {
   const normalized = dateStr.endsWith("Z") ? dateStr : dateStr + "Z"
@@ -219,9 +220,10 @@ export default function Notifications() {
         )}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="spinner" />
-            <p className="mt-4 text-sm font-medium text-slate-500">Loading notifications...</p>
+          <div className="space-y-3" data-testid="notifications-skeletons">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <NotificationSkeleton key={i} />
+            ))}
           </div>
         ) : notifications.length === 0 ? (
           <div className="empty-state surface-card p-12 text-center text-slate-500">

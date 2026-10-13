@@ -8,6 +8,7 @@ from src.models.post import Post
 from src.models.message import Message
 from src.schemas.college import CollegeCreate, CollegeUpdate
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from src.utils.college_util import generate_unique_college_slug
 
 def create_college(db: Session, college: CollegeCreate) -> College:
@@ -45,16 +46,14 @@ def get_college_by_slug(db: Session, slug: str) -> College | None:
 
 
 def get_college_stats(db: Session, college_id: int) -> dict:
-    alumni_count = db.query(User).filter(
+    role_counts = db.query(User.role, func.count(User.id)).filter(
         User.college_id == college_id,
-        User.role == UserRole.ALUMNI,
-        User.is_active == True
-    ).count()
-    student_count = db.query(User).filter(
-        User.college_id == college_id,
-        User.role == UserRole.STUDENT,
-        User.is_active == True
-    ).count()
+        User.is_active == True,
+        User.role.in_([UserRole.ALUMNI, UserRole.STUDENT])
+    ).group_by(User.role).all()
+    role_map = {r: c for r, c in role_counts}
+    alumni_count = role_map.get(UserRole.ALUMNI, 0)
+    student_count = role_map.get(UserRole.STUDENT, 0)
     connection_count = db.query(Connection).filter(
         Connection.college_id == college_id,
         Connection.status == ConnectionStatus.ACCEPTED

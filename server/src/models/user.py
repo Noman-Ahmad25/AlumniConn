@@ -49,7 +49,7 @@ class User(Base):
     verification_token_hash = Column(String, nullable=True, unique=True, index=True)
     verification_token_expires_at = Column(DateTime, nullable=True)
  
-    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=True)
+    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=True, index=True)
  
     # Role
     role = Column(
@@ -61,10 +61,11 @@ class User(Base):
         ),
         default=UserRole.STUDENT,
         nullable=False,
+        index=True,
     )
  
     # Status
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=True, index=True)
 
     # Alumni Request State
     alumni_status = Column(Enum(AlumniStatus), default=AlumniStatus.NOT_REQUESTED, nullable=False, index=True)
@@ -74,7 +75,7 @@ class User(Base):
     review_notes = Column(String, nullable=True)
  
     # Timestamp
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
  
     # Relationships
     college = relationship("College", back_populates="users")

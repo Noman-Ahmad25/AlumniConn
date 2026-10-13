@@ -6,6 +6,7 @@ import type { MessageResponse, InboxMessage, MessageSocketEvent } from "../api/m
 import { useMessagesSocket } from "../hooks/useMessagesSocket"
 import { getCurrentUserIdFromToken } from "../../auth/utils/auth"
 import { getApiErrorMessage } from "../../../utils/error"
+import { InboxListSkeleton, ChatMessagesSkeleton } from "../../../shared/components/skeletons"
 
 function getInitials(username?: string | null) {
   if (!username) return "U"
@@ -270,9 +271,7 @@ export default function Messages() {
         {/* Chat List */}
         <div className="flex-1 overflow-y-auto">
           {inboxLoading ? (
-            <div className="flex items-center justify-center h-32">
-              <div className="text-sm font-medium text-slate-500">Loading…</div>
-            </div>
+            <InboxListSkeleton count={5} />
           ) : filteredChats.length === 0 ? (
             <div className="flex items-center justify-center h-32">
               <p className="text-sm text-slate-500">
@@ -358,10 +357,7 @@ export default function Messages() {
           {/* Messages */}
           <section className="flex-1 overflow-y-auto p-6 space-y-3 bg-gradient-to-b from-slate-50 to-white">
             {chatLoading ? (
-              <div className="flex h-full flex-col items-center justify-center">
-                <div className="spinner" />
-                <p className="mt-4 text-sm font-medium text-slate-500">Loading messages…</p>
-              </div>
+              <ChatMessagesSkeleton count={4} />
             ) : visibleMessages.length === 0 ? (
               <div className="empty-state mt-6">
                 <p className="font-semibold text-slate-700">No messages yet</p>

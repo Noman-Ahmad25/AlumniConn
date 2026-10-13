@@ -20,7 +20,7 @@ class Connection(Base):
     )
  
     id = Column(Integer, primary_key=True, index=True)
-    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=False)
+    college_id = Column(Integer, ForeignKey("colleges.id"), nullable=False, index=True)
     sender_id = Column(
         Integer,
         ForeignKey("users.id", ondelete="CASCADE"),
@@ -33,7 +33,7 @@ class Connection(Base):
         nullable=False,
         index=True,
     )
-    status = Column(Enum(ConnectionStatus), default=ConnectionStatus.PENDING, nullable=False)
+    status = Column(Enum(ConnectionStatus), default=ConnectionStatus.PENDING, nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
  
     # Relationships

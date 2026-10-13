@@ -1,35 +1,41 @@
 import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from "react-router-dom"
-import { useEffect, useState, type ReactNode } from "react"
+import { Suspense, lazy, useEffect, useState, type ReactNode } from "react"
 import { updateFavicon } from "../../features/college/utils/branding"
-import Register from "../../features/auth/pages/Register"
-import Login from "../../features/auth/pages/Login"
-import ForgotPassword from "../../features/auth/pages/ForgotPassword"
-import ResetPassword from "../../features/auth/pages/ResetPassword"
-import VerifyEmail from "../../features/auth/pages/VerifyEmail"
-import VerifyEmailPending from "../../features/auth/pages/VerifyEmailPending"
-import SuperAdminLogin from "../../features/admin/pages/SuperAdminLogin"
+import { PageFallbackSkeleton } from "../../shared/components/skeletons"
 
-import CreateProfile from "../../features/profile/pages/CreateProfile"
-import Feed from "../../features/feed/pages/Feed"
-import Connections from "../../features/connections/pages/Connections"
-import Discover from "../../features/connections/pages/Discover"
-import Recommendations from "../../features/recommendations/pages/Recommendations"
-import Notifications from "../../features/notifications/pages/Notifications"
-import Profile from "../../features/profile/pages/Profile"
-import Chat from "../../features/messages/pages/Chat"
-import Messages from "../../features/messages/pages/Messages"
-import RequestCollege from "../../features/college/pages/RequestCollege"
-import VerifyCollegeEmail from "../../features/college/pages/VerifyCollegeEmail"
-import SuperAdminDashboard from "../../features/admin/pages/SuperAdminDashboard"
-import SuperAdminUniversities from "../../features/admin/pages/SuperAdminUniversities"
-import SuperAdminUsers from "../../features/admin/pages/SuperAdminUsers"
-import SuperAdminCollegeRequests from "../../features/admin/pages/SuperAdminCollegeRequests"
-import CollegeAdminUsers from "../../features/admin/pages/CollegeAdminUsers"
-import AdminAlumniRequests from "../../features/admin/pages/AdminAlumniRequests"
-import CollegeAdminBranding from "../../features/admin/pages/CollegeAdminBranding"
+// Immediate landing & tenant core pages
+import LandingPage from "../../shared/pages/LandingPage"
 import TenantResolver from "../../features/college/pages/TenantResolver"
 import TenantHome from "../../features/college/pages/TenantHome"
-import LandingPage from "../../shared/pages/LandingPage"
+import Login from "../../features/auth/pages/Login"
+import Register from "../../features/auth/pages/Register"
+
+// Code-split dynamic routes for optimal bundle distribution
+const ForgotPassword = lazy(() => import("../../features/auth/pages/ForgotPassword"))
+const ResetPassword = lazy(() => import("../../features/auth/pages/ResetPassword"))
+const VerifyEmail = lazy(() => import("../../features/auth/pages/VerifyEmail"))
+const VerifyEmailPending = lazy(() => import("../../features/auth/pages/VerifyEmailPending"))
+const SuperAdminLogin = lazy(() => import("../../features/admin/pages/SuperAdminLogin"))
+
+const CreateProfile = lazy(() => import("../../features/profile/pages/CreateProfile"))
+const Feed = lazy(() => import("../../features/feed/pages/Feed"))
+const Connections = lazy(() => import("../../features/connections/pages/Connections"))
+const Discover = lazy(() => import("../../features/connections/pages/Discover"))
+const Recommendations = lazy(() => import("../../features/recommendations/pages/Recommendations"))
+const Notifications = lazy(() => import("../../features/notifications/pages/Notifications"))
+const Profile = lazy(() => import("../../features/profile/pages/Profile"))
+const Chat = lazy(() => import("../../features/messages/pages/Chat"))
+const Messages = lazy(() => import("../../features/messages/pages/Messages"))
+const RequestCollege = lazy(() => import("../../features/college/pages/RequestCollege"))
+const VerifyCollegeEmail = lazy(() => import("../../features/college/pages/VerifyCollegeEmail"))
+const SuperAdminDashboard = lazy(() => import("../../features/admin/pages/SuperAdminDashboard"))
+const SuperAdminUniversities = lazy(() => import("../../features/admin/pages/SuperAdminUniversities"))
+const SuperAdminUsers = lazy(() => import("../../features/admin/pages/SuperAdminUsers"))
+const SuperAdminCollegeRequests = lazy(() => import("../../features/admin/pages/SuperAdminCollegeRequests"))
+const CollegeAdminUsers = lazy(() => import("../../features/admin/pages/CollegeAdminUsers"))
+const AdminAlumniRequests = lazy(() => import("../../features/admin/pages/AdminAlumniRequests"))
+const CollegeAdminBranding = lazy(() => import("../../features/admin/pages/CollegeAdminBranding"))
+
 import { AUTH_CHANGE_EVENT, getCurrentUserRoleFromToken, getRoleHomePath, hasAuthToken } from "../../features/auth/utils/auth"
 import type { UserRole } from "../../features/auth/types/auth"
 
@@ -111,7 +117,8 @@ export default function AppRouter() {
     <BrowserRouter>
       <RouteMetadataHandler />
 
-      <Routes>
+      <Suspense fallback={<PageFallbackSkeleton />}>
+        <Routes>
         {/* Global Public routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/super-admin-login" element={<SuperAdminLogin />} />
@@ -211,7 +218,8 @@ export default function AppRouter() {
 
         {/* Global Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

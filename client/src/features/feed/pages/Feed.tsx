@@ -6,6 +6,7 @@ import type { Post } from "../types/post"
 import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getApiErrorMessage } from "../../../utils/error"
 import { hasAuthToken } from "../../auth/utils/auth"
+import { PostCardSkeleton } from "../../../shared/components/skeletons"
 
 export default function Feed() {
   const { navigate } = useCollegeNavigation()
@@ -116,9 +117,10 @@ export default function Feed() {
         />
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="spinner" />
-            <p className="mt-4 text-sm font-medium text-slate-500">Loading your feed...</p>
+          <div className="space-y-4" data-testid="feed-skeletons">
+            <PostCardSkeleton />
+            <PostCardSkeleton />
+            <PostCardSkeleton />
           </div>
         ) : posts.length === 0 ? (
           <div className="empty-state surface-card p-12 text-center text-slate-500">

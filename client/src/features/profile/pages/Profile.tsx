@@ -23,6 +23,7 @@ import {
   getCurrentUserIdFromToken,
   getCurrentUserRoleFromToken,
 } from "../../auth/utils/auth"
+import { ProfileSkeleton } from "../../../shared/components/skeletons"
 
 function getInitials(username: string) {
   return username
@@ -151,14 +152,7 @@ export default function Profile() {
     navigate("/messages")
   }
   if (loading) {
-    return (
-      <div className="app-page flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="spinner" />
-          <p className="text-sm font-medium text-slate-500">Loading profile...</p>
-        </div>
-      </div>
-    )
+    return <ProfileSkeleton />
   }
 
   if (!profile) {

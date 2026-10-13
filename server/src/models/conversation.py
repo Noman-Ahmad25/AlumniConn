@@ -7,8 +7,8 @@ class Conversation(Base):
 
 
     id = Column(Integer, primary_key=True, index=True)
-    user1_id = Column(Integer, ForeignKey("users.id"))
-    user2_id = Column(Integer, ForeignKey("users.id"))
-    college_id = Column(Integer, nullable=False)
+    user1_id = Column(Integer, ForeignKey("users.id"), index=True)
+    user2_id = Column(Integer, ForeignKey("users.id"), index=True)
+    college_id = Column(Integer, nullable=False, index=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import os
+import time
+import logging
 
 from src.database.base import Base
 from src.database.session import engine, SessionLocal
@@ -85,7 +87,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
+    expose_headers=["X-Total-Count", "X-Student-Count", "X-Alumni-Count", "X-Process-Time"],
 )
+
+timing_logger = logging.getLogger("alumniconn.timing")
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+    response.headers["X-Process-Time"] = f"{process_time:.4f}s"
+    if process_time > 0.5:
+        timing_logger.warning(
+            f"Slow Request: {request.method} {request.url.path} took {process_time:.3f}s"
+        )
+    return response
 
 
 app.include_router(college_router, prefix="/colleges", tags=["Colleges"])

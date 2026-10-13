@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { alumniRequestsAPI } from "../api/requests"
 import { getApiErrorMessage } from "../../../utils/error"
+import { TableSkeleton } from "../../../shared/components/skeletons"
 import type { AlumniRequest, RequestStatus } from "../types/request"
 
 export default function AdminAlumniRequests() {
@@ -139,10 +140,7 @@ export default function AdminAlumniRequests() {
         </div>
 
         {loading ? (
-          <div className="surface-card p-12 text-center text-slate-500 rounded-xl">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-            <p className="mt-3 text-sm text-slate-500">Loading requests...</p>
-          </div>
+          <TableSkeleton columns={5} rows={5} />
         ) : requests.length === 0 ? (
           <div className="surface-card p-12 text-center text-slate-500 rounded-xl border border-slate-200/80">
             <svg

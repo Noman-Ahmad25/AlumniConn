@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
+from sqlalchemy.orm import Session, contains_eager, joinedload
 from sqlalchemy import or_, and_, func, desc
 from datetime import datetime
 from typing import Annotated
@@ -56,9 +56,12 @@ def get_platform_overview(
     pending_requests = db.query(CollegeRequest).filter(
         CollegeRequest.status == CollegeRequestStatus.PENDING
     ).count()
-    total_users = db.query(User).count()
-    alumni_count = db.query(User).filter(User.role == UserRole.ALUMNI).count()
-    student_count = db.query(User).filter(User.role == UserRole.STUDENT).count()
+
+    role_counts = db.query(User.role, func.count(User.id)).group_by(User.role).all()
+    role_map = {r: c for r, c in role_counts}
+    alumni_count = role_map.get(UserRole.ALUMNI, 0)
+    student_count = role_map.get(UserRole.STUDENT, 0)
+    total_users = sum(role_map.values())
 
     # Dynamic recent activity stream
     recent_activity = []
@@ -99,9 +102,10 @@ def get_platform_overview(
             "timestamp": ts,
         })
 
-    # 3. Recent Registered Users (cross-college)
+    # 3. Recent Registered Users (cross-college, eager load college)
     recent_users = (
         db.query(User)
+        .options(joinedload(User.college))
         .order_by(desc(User.created_at if User.created_at is not None else User.id))
         .limit(10)
         .all()
@@ -315,6 +319,7 @@ def delete_college(
 # ==========================================
 @router.get("/users", response_model=list[AdminUserItem])
 def list_platform_users(
+    response: Response = None,
     search: str | None = None,
     college_id: int | None = None,
     role: str | None = None,
@@ -328,6 +333,10 @@ def list_platform_users(
         db.query(User)
         .outerjoin(Profile, User.id == Profile.user_id)
         .outerjoin(College, User.college_id == College.id)
+        .options(
+            contains_eager(User.profile),
+            contains_eager(User.college),
+        )
     )
 
     if search:
@@ -350,6 +359,10 @@ def list_platform_users(
 
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
+
+    total_count = query.order_by(None).count()
+    if response is not None:
+        response.headers["X-Total-Count"] = str(total_count)
 
     users = query.order_by(User.id).offset(skip).limit(limit).all()
 
@@ -386,11 +399,12 @@ def list_platform_users(
 # ==========================================
 @router.get("/college-users", response_model=list[AdminUserItem])
 def list_college_users(
+    response: Response = None,
     search: str | None = None,
     role: str | None = None,
     is_active: bool | None = None,
     skip: int = 0,
-    limit: int = 200,
+    limit: int = 50,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin_or_super_admin),
 ):
@@ -398,6 +412,10 @@ def list_college_users(
         db.query(User)
         .outerjoin(Profile, User.id == Profile.user_id)
         .outerjoin(College, User.college_id == College.id)
+        .options(
+            contains_eager(User.profile),
+            contains_eager(User.college),
+        )
     )
 
     # Tenant enforcement: College Admin cannot view users outside their college
@@ -408,6 +426,19 @@ def list_college_users(
     elif current_user.role == UserRole.SUPER_ADMIN:
         # If super admin, could filter if they provide college_id (or all)
         pass
+
+    # Quick institutional counters for headers (if tenant-scoped)
+    student_total = 0
+    alumni_total = 0
+    if current_user.role == UserRole.ADMIN and current_user.college_id:
+        role_counts = (
+            db.query(User.role, func.count(User.id))
+            .filter(User.college_id == current_user.college_id, User.role != UserRole.SUPER_ADMIN)
+            .group_by(User.role)
+            .all()
+        )
+        student_total = next((c for r, c in role_counts if r == UserRole.STUDENT), 0)
+        alumni_total = next((c for r, c in role_counts if r == UserRole.ALUMNI), 0)
 
     if search:
         search_term = f"%{search.strip()}%"
@@ -426,6 +457,13 @@ def list_college_users(
 
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
+
+    total_count = query.order_by(None).count()
+    if response is not None:
+        response.headers["X-Total-Count"] = str(total_count)
+        if current_user.role == UserRole.ADMIN and current_user.college_id:
+            response.headers["X-Student-Count"] = str(student_total)
+            response.headers["X-Alumni-Count"] = str(alumni_total)
 
     users = query.order_by(User.id).offset(skip).limit(limit).all()
 

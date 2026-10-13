@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { collegeRequestsAPI } from "../api/requests"
 import { getApiErrorMessage } from "../../../utils/error"
+import { TableSkeleton } from "../../../shared/components/skeletons"
 import type { CollegeRequest, RequestStatus } from "../types/request"
 import Topbar from "../../../layouts/AppShell/Topbar"
 import Footer from "../../../layouts/AppShell/Footer"
@@ -133,7 +134,7 @@ export default function SuperAdminCollegeRequests() {
       </div>
 
       {loading ? (
-        <div className="text-center py-8">Loading...</div>
+        <TableSkeleton columns={4} rows={4} />
       ) : requests.length === 0 ? (
         <div className="text-center py-8 text-gray-500">No college requests found</div>
       ) : (

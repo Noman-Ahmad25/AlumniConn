@@ -5,6 +5,7 @@ import { adminManagementAPI } from "../api/management"
 import type { AdminUser, AdminCollege } from "../types/management"
 import { getApiErrorMessage } from "../../../utils/error"
 import { getCurrentUserIdFromToken } from "../../auth/utils/auth"
+import { TableSkeleton } from "../../../shared/components/skeletons"
 
 export default function SuperAdminUsers() {
   const currentUserId = getCurrentUserIdFromToken()
@@ -32,17 +33,25 @@ export default function SuperAdminUsers() {
       .catch(() => {})
   }, [])
 
-  const fetchUsers = async () => {
+  // Pagination
+  const [page, setPage] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
+  const PAGE_SIZE = 25
+
+  const fetchUsers = async (targetPage = page) => {
     setLoading(true)
     setError("")
     try {
-      const data = await adminManagementAPI.getPlatformUsers({
+      const res = await adminManagementAPI.getPlatformUsers({
         search: searchTerm.trim() || undefined,
         college_id: selectedCollegeId !== "all" ? Number(selectedCollegeId) : undefined,
         role: selectedRole !== "all" ? selectedRole : undefined,
         is_active: selectedStatus === "all" ? undefined : selectedStatus === "active",
+        skip: targetPage * PAGE_SIZE,
+        limit: PAGE_SIZE,
       })
-      setUsers(data)
+      setUsers(res.users)
+      setTotalCount(res.total)
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to load platform users"))
     } finally {
@@ -51,12 +60,19 @@ export default function SuperAdminUsers() {
   }
 
   useEffect(() => {
-    fetchUsers()
+    setPage(0)
+    fetchUsers(0)
   }, [selectedCollegeId, selectedRole, selectedStatus])
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    fetchUsers()
+    setPage(0)
+    fetchUsers(0)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+    fetchUsers(newPage)
   }
 
   const handleToggleStatus = async (user: AdminUser) => {
@@ -225,10 +241,7 @@ export default function SuperAdminUsers() {
 
         {/* Users Table */}
         {loading ? (
-          <div className="py-20 text-center bg-white rounded-xl border border-slate-200 shadow-sm">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-            <p className="mt-2 text-sm text-slate-500 font-medium">Loading platform users...</p>
-          </div>
+          <TableSkeleton columns={6} rows={6} />
         ) : users.length === 0 ? (
           <div className="py-16 text-center bg-white rounded-xl border border-slate-200 shadow-sm p-6">
             <p className="text-base font-semibold text-slate-900">No users match your criteria</p>
@@ -342,6 +355,38 @@ export default function SuperAdminUsers() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalCount > PAGE_SIZE && (
+              <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-200 px-4 py-3 sm:px-6 bg-slate-50 gap-3">
+                <div className="text-xs sm:text-sm text-slate-700">
+                  Showing <span className="font-semibold text-slate-900">{page * PAGE_SIZE + 1}</span> to{" "}
+                  <span className="font-semibold text-slate-900">{Math.min((page + 1) * PAGE_SIZE, totalCount)}</span> of{" "}
+                  <span className="font-semibold text-slate-900">{totalCount}</span> users
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 0 || loading}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-xs font-medium text-slate-600 px-1">
+                    Page {page + 1} of {Math.ceil(totalCount / PAGE_SIZE)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={(page + 1) * PAGE_SIZE >= totalCount || loading}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

@@ -5,6 +5,7 @@ import Footer from "../../../layouts/AppShell/Footer"
 import { adminManagementAPI } from "../api/management"
 import type { PlatformOverview } from "../types/management"
 import { getApiErrorMessage } from "../../../utils/error"
+import { StatCardsSkeleton } from "../../../shared/components/skeletons"
 
 export default function SuperAdminDashboard() {
   const [overview, setOverview] = useState<PlatformOverview | null>(null)
@@ -109,9 +110,8 @@ export default function SuperAdminDashboard() {
         )}
 
         {loading ? (
-          <div className="py-20 text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-            <p className="mt-2 text-sm text-slate-500 font-medium">Aggregating platform metrics...</p>
+          <div className="space-y-6">
+            <StatCardsSkeleton count={6} />
           </div>
         ) : overview ? (
           <div className="space-y-8">

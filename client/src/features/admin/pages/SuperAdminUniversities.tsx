@@ -4,6 +4,7 @@ import Footer from "../../../layouts/AppShell/Footer"
 import { adminManagementAPI } from "../api/management"
 import type { AdminCollege } from "../types/management"
 import { getApiErrorMessage } from "../../../utils/error"
+import { TableSkeleton } from "../../../shared/components/skeletons"
 
 export default function SuperAdminUniversities() {
   const [colleges, setColleges] = useState<AdminCollege[]>([])
@@ -145,10 +146,7 @@ export default function SuperAdminUniversities() {
 
         {/* Content Table */}
         {loading ? (
-          <div className="py-20 text-center bg-white rounded-xl border border-slate-200 shadow-sm">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-            <p className="mt-2 text-sm text-slate-500 font-medium">Loading universities...</p>
-          </div>
+          <TableSkeleton columns={6} rows={5} />
         ) : colleges.length === 0 ? (
           <div className="py-16 text-center bg-white rounded-xl border border-slate-200 shadow-sm p-6">
             <p className="text-base font-semibold text-slate-900">No universities found</p>

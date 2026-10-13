@@ -3,6 +3,7 @@ import { getDiscoverUsers, sendRequest } from "../api/connection"
 import type { DiscoverUser } from "../types/connection"
 import { useCollegeNavigation } from "../../../shared/utils/navigation"
 import { getApiErrorMessage } from "../../../utils/error"
+import { UserCardSkeleton } from "../../../shared/components/skeletons"
 
 function getInitials(name?: string | null) {
   if (!name) return "U"
@@ -198,9 +199,10 @@ export default function Discover() {
         )}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="spinner" />
-            <p className="mt-4 text-sm font-medium text-slate-500">Discovering alumni...</p>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" data-testid="discover-skeletons">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <UserCardSkeleton key={i} />
+            ))}
           </div>
         ) : users.length === 0 ? (
           <div className="empty-state surface-card p-12 text-center text-slate-500">

@@ -141,7 +141,7 @@ def get_recommendations(db: Session, current_user: User, cursor: float, limit: i
         
         explanation = generate_explanation(current_profile, cand_profile, semantic_score, rule_score)
         
-        scored_candidates.append((match_score, candidate_user, explanation))
+        scored_candidates.append((match_score, candidate_user, cand_profile, explanation))
         
     # Sort descending by match_score
     scored_candidates.sort(key=lambda x: x[0], reverse=True)
@@ -155,24 +155,24 @@ def get_recommendations(db: Session, current_user: User, cursor: float, limit: i
     
     # Map to schemas
     response_items = []
-    for score, user, expl in page_items:
+    for score, user, p, expl in page_items:
         response_items.append(
             RecommendationResponse(
-                id=user.profile.id,
+                id=p.id,
                 user_id=user.id,
                 connection_status="none",
-                full_name=user.profile.full_name,
-                profile_picture=user.profile.profile_picture,
-                bio=user.profile.bio,
-                company=user.profile.company,
-                job_title=user.profile.job_title,
-                job_industry=user.profile.job_industry,
-                job_description=user.profile.job_description,
-                location=user.profile.location,
-                skills=user.profile.skills,
-                interests=user.profile.interests,
-                grad_year=user.profile.grad_year,
-                major=user.profile.major,
+                full_name=p.full_name,
+                profile_picture=p.profile_picture,
+                bio=p.bio,
+                company=p.company,
+                job_title=p.job_title,
+                job_industry=p.job_industry,
+                job_description=p.job_description,
+                location=p.location,
+                skills=p.skills,
+                interests=p.interests,
+                grad_year=p.grad_year,
+                major=p.major,
                 username=user.username,
                 match_score=round(score, 3),
                 explanation=expl
