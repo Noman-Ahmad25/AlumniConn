@@ -8,54 +8,54 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-slate-200/80 bg-white/95 text-slate-500 text-sm mt-auto backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-6 space-y-2.5 sm:space-y-4">
         {/* Main Footer Row */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
-            <span className="font-semibold text-slate-800">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2 sm:gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-2 text-center sm:text-left">
+            <span className="font-semibold text-slate-800 text-sm">
               {tenant ? tenant.name : "AlumniConn"}
             </span>
-            <span className="hidden sm:inline">•</span>
-            <span className="text-xs text-slate-500">
+            <span className="hidden sm:inline text-slate-300">•</span>
+            <span className="text-xs text-slate-500 max-w-sm sm:max-w-none text-center sm:text-left">
               © {new Date().getFullYear()} {tenant ? tenant.name : "AlumniConn"}. All rights reserved.
             </span>
           </div>
 
           {/* Nav & Info Links */}
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-slate-600">
+          <div className="flex flex-wrap items-center justify-center gap-x-3.5 sm:gap-x-6 gap-y-1 sm:gap-y-2 text-xs font-medium text-slate-600">
             {collegeSlug ? (
-              <Link to={`${prefix}#about`} className="hover:text-slate-900 transition-colors">
+              <Link to={`${prefix}#about`} className="hover:text-slate-900 transition-colors py-0.5">
                 About
               </Link>
             ) : null}
-            <a href="#privacy" onClick={(e) => e.preventDefault()} className="hover:text-slate-900 transition-colors">
+            <a href="#privacy" onClick={(e) => e.preventDefault()} className="hover:text-slate-900 transition-colors py-0.5">
               Privacy Policy
             </a>
-            <a href="#terms" onClick={(e) => e.preventDefault()} className="hover:text-slate-900 transition-colors">
+            <a href="#terms" onClick={(e) => e.preventDefault()} className="hover:text-slate-900 transition-colors py-0.5">
               Terms of Service
             </a>
-            <a href="#contact" onClick={(e) => e.preventDefault()} className="hover:text-slate-900 transition-colors">
+            <a href="#contact" onClick={(e) => e.preventDefault()} className="hover:text-slate-900 transition-colors py-0.5">
               Contact Support
             </a>
             {!collegeSlug && (
-              <Link to="/super-admin-login" className="hover:text-slate-900 transition-colors">
+              <Link to="/super-admin-login" className="hover:text-slate-900 transition-colors py-0.5">
                 Platform Admin
               </Link>
             )}
           </div>
 
           {collegeSlug && (
-            <div className="text-xs text-slate-400 text-center sm:text-right">
+            <div className="text-[11px] sm:text-xs text-slate-400 text-center md:text-right">
               Powered by <span className="font-semibold text-slate-600">AlumniConn</span>
             </div>
           )}
         </div>
 
         {/* Portfolio Showcase & Attribution Row */}
-        <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1">
+        <div className="pt-2 sm:pt-4 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-2 sm:gap-3 text-xs text-slate-500">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2.5 sm:gap-x-3 gap-y-1">
             <span className="font-medium text-slate-700">Built by Noman Ahmad</span>
-            <span>•</span>
+            <span className="text-slate-300">•</span>
             <a
               href="https://github.com/Noman-Ahmad25"
               target="_blank"
@@ -64,7 +64,7 @@ export default function Footer() {
             >
               GitHub
             </a>
-            <span>•</span>
+            <span className="text-slate-300">•</span>
             <a
               href="https://github.com/Noman-Ahmad25/AlumniConn"
               target="_blank"
@@ -79,9 +79,9 @@ export default function Footer() {
             </a>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100/80 text-slate-500 text-[11px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            <span>Interactive Demo • Synthetic Showcase Data</span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-full bg-slate-100/80 text-slate-500 text-[10px] sm:text-[11px] max-w-full truncate text-center">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+            <span className="truncate">Interactive Demo • Synthetic Showcase Data</span>
           </div>
         </div>
       </div>
