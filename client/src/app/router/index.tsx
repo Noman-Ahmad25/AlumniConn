@@ -25,6 +25,7 @@ import SuperAdminUsers from "../../features/admin/pages/SuperAdminUsers"
 import SuperAdminCollegeRequests from "../../features/admin/pages/SuperAdminCollegeRequests"
 import CollegeAdminUsers from "../../features/admin/pages/CollegeAdminUsers"
 import AdminAlumniRequests from "../../features/admin/pages/AdminAlumniRequests"
+import CollegeAdminBranding from "../../features/admin/pages/CollegeAdminBranding"
 import TenantResolver from "../../features/college/pages/TenantResolver"
 import TenantHome from "../../features/college/pages/TenantHome"
 import LandingPage from "../../shared/pages/LandingPage"
@@ -150,6 +151,10 @@ export default function AppRouter() {
             <Route
               path="admin/alumni-requests"
               element={<RoleRoute roles={["admin"]}><AdminAlumniRequests /></RoleRoute>}
+            />
+            <Route
+              path="admin/branding"
+              element={<RoleRoute roles={["admin"]}><CollegeAdminBranding /></RoleRoute>}
             />
             <Route
               path="profile"

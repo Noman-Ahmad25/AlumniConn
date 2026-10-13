@@ -78,7 +78,7 @@ export default function Feed() {
               onClick={() => setFilterOpportunity(undefined)}
               className={`rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
                 filterOpportunity === undefined
-                  ? "bg-white text-blue-700 shadow-sm"
+                  ? "bg-white text-[var(--primary)] shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -160,7 +160,7 @@ export default function Feed() {
       <button
         type="button"
         onClick={() => setIsCreateOpen(true)}
-        className="fixed bottom-6 right-6 z-30 flex items-center gap-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white pl-3.5 pr-4 py-3 shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 group"
+        className="fixed bottom-6 right-6 z-30 flex items-center gap-2 rounded-full bg-[var(--primary)] hover:brightness-95 text-[var(--text-on-primary)] pl-3.5 pr-4 py-3 shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 group"
         title="Create Post"
         aria-label="Create Post"
       >
