@@ -1,6 +1,6 @@
 from typing import Annotated
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status as http_status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, ConfigDict
 
@@ -79,7 +79,7 @@ def list_alumni_requests(
     current_user: User = Depends(get_current_user)
 ):
     if current_user.role not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admins can access alumni requests")
+        raise HTTPException(status_code=http_status.HTTP_403_FORBIDDEN, detail="Only admins can access alumni requests")
     
     filter_value = status_filter or status
     try:
@@ -89,7 +89,8 @@ def list_alumni_requests(
             college_id=current_user.college_id,
             status=filter_value,
             skip=skip,
-            limit=limit
+            limit=limit,
+            admin_user=current_user,
         )
         return [format_alumni_request(u) for u in users]
     except ValueError as e:
@@ -143,7 +144,7 @@ def get_alumni_request_by_id(
     current_user: User = Depends(get_current_user)
 ):
     if current_user.role not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admins can access alumni requests")
+        raise HTTPException(status_code=http_status.HTTP_403_FORBIDDEN, detail="Only admins can access alumni requests")
     
     user = get_alumni_request(db, request_id)
     if not user or user.college_id != current_user.college_id:

@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from src.models.user import User, UserRole, AlumniStatus
 from src.utils.event_bus import event_bus
@@ -75,7 +75,8 @@ def list_alumni_requests_for_admin(
     college_id: int,
     status: str | None = None,
     skip: int = 0,
-    limit: int = 100
+    limit: int = 100,
+    admin_user: User | None = None,
 ) -> list[User]:
     """
     List alumni requests for an ADMIN of a specific college.
@@ -90,6 +91,7 @@ def list_alumni_requests_for_admin(
         status: Filter by status (optional)
         skip: Pagination offset
         limit: Pagination limit
+        admin_user: Optional already-loaded admin User object
     
     Returns:
         List of User objects
@@ -97,17 +99,21 @@ def list_alumni_requests_for_admin(
     Raises:
         ValueError: If admin is not of the specified college
     """
-    admin = db.query(User).filter(User.id == admin_id).first()
+    admin = admin_user if (admin_user and admin_user.id == admin_id) else db.query(User).filter(User.id == admin_id).first()
     if not admin:
         raise ValueError("Admin not found.")
     
     # Security: ADMIN can only manage requests for their own college
-    if admin.college_id != college_id:
+    if admin.role != UserRole.SUPER_ADMIN and admin.college_id != college_id:
         raise ValueError("You can only view requests for your own college.")
     
-    query = db.query(User).filter(
-        User.college_id == college_id,
-        User.alumni_status != AlumniStatus.NOT_REQUESTED
+    query = (
+        db.query(User)
+        .options(joinedload(User.profile))
+        .filter(
+            User.college_id == college_id,
+            User.alumni_status != AlumniStatus.NOT_REQUESTED
+        )
     )
     
     if status:
